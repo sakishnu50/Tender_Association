@@ -1,8 +1,12 @@
 import React from 'react';
 import { UserPlus, Edit2, CheckCircle2 } from 'lucide-react';
 import { mockUsers } from '../data/mockData';
+import { useUsers } from '../hooks/useApiQueries';
 
 export default function UsersRolesView() {
+  const { data: fetchedUsers } = useUsers();
+  const usersList = fetchedUsers || mockUsers;
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -25,7 +29,7 @@ export default function UsersRolesView() {
               </tr>
             </thead>
             <tbody>
-              {mockUsers.map((u, idx) => (
+              {usersList.map((u, idx) => (
                 <tr key={idx}>
                   <td style={{ fontWeight: '600' }}>{u.name}</td>
                   <td>{u.office}</td>

@@ -1,7 +1,11 @@
 import React from 'react';
 import { mockOffices } from '../data/mockData';
+import { useOffices } from '../hooks/useApiQueries';
 
 export default function OfficesView() {
+  const { data: fetchedOffices } = useOffices();
+  const officesList = fetchedOffices || mockOffices;
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -22,7 +26,7 @@ export default function OfficesView() {
               </tr>
             </thead>
             <tbody>
-              {mockOffices.map((off, idx) => (
+              {officesList.map((off, idx) => (
                 <tr key={idx}>
                   <td style={{ fontWeight: '700' }}>{off.name}</td>
                   <td style={{ fontWeight: '600' }}>{off.total}</td>

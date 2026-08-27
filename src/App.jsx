@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 
@@ -18,8 +19,10 @@ import SettingsView from './views/SettingsView';
 import LoginPageView from './views/LoginPageView';
 
 import { mockOpportunities } from './data/mockData';
+import { usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
 
 export default function App() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchVal, setSearchVal] = useState('');
   const [selectedOpp, setSelectedOpp] = useState(null);
@@ -27,6 +30,9 @@ export default function App() {
 
   const [isPursueOpen, setIsPursueOpen] = useState(false);
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
+
+  const pursueMutation = usePursueOpportunity();
+  const declineMutation = useDeclineOpportunity();
 
   const toggleTheme = () => {
     const nextMode = !darkMode;
@@ -41,6 +47,7 @@ export default function App() {
   const handleSelectOpportunity = (opp) => {
     setSelectedOpp(opp || mockOpportunities[0]);
     setActiveTab('opp_details');
+    navigate('/opportunities/details');
   };
 
   const titlesMap = {
@@ -74,54 +81,72 @@ export default function App() {
           toggleTheme={toggleTheme}
         />
 
-        {/* View Router */}
-        {activeTab === 'dashboard' && (
-          <DashboardView
-            onSelectOpportunity={handleSelectOpportunity}
-            onViewAll={() => setActiveTab('opportunities')}
+        {/* Declarative View Router */}
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <DashboardView
+                onSelectOpportunity={handleSelectOpportunity}
+                onViewAll={() => {
+                  setActiveTab('opportunities');
+                  navigate('/opportunities');
+                }}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'opportunities' && (
-          <OpportunitiesListView
-            onSelectOpportunity={handleSelectOpportunity}
+          <Route
+            path="/opportunities"
+            element={<OpportunitiesListView onSelectOpportunity={handleSelectOpportunity} />}
           />
-        )}
-
-        {activeTab === 'opp_details' && (
-          <OpportunityDetailsView
-            opportunity={selectedOpp || mockOpportunities[0]}
-            onBack={() => setActiveTab('opportunities')}
-            onOpenPursue={() => setIsPursueOpen(true)}
-            onOpenDecline={() => setIsDeclineOpen(true)}
+          <Route
+            path="/opportunities/details"
+            element={
+              <OpportunityDetailsView
+                opportunity={selectedOpp || mockOpportunities[0]}
+                onBack={() => {
+                  setActiveTab('opportunities');
+                  navigate('/opportunities');
+                }}
+                onOpenPursue={() => setIsPursueOpen(true)}
+                onOpenDecline={() => setIsDeclineOpen(true)}
+              />
+            }
           />
-        )}
-
-        {activeTab === 'alerts' && (
-          <AlertsView
-            onSelectProject={() => handleSelectOpportunity(mockOpportunities[0])}
+          <Route
+            path="/alerts"
+            element={<AlertsView onSelectProject={() => handleSelectOpportunity(mockOpportunities[0])} />}
           />
-        )}
-
-        {activeTab === 'calendar' && <BidCalendarView />}
-        {activeTab === 'consortium' && <ConsortiumView />}
-        {activeTab === 'reports' && <ReportsView />}
-        {activeTab === 'sources' && <SourcesView />}
-        {activeTab === 'offices' && <OfficesView />}
-        {activeTab === 'users' && <UsersRolesView />}
-        {activeTab === 'audit' && <AuditTrailView />}
-        {activeTab === 'settings' && <SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />}
-
-        {activeTab === 'login' && (
-          <LoginPageView onLoginSuccess={() => setActiveTab('dashboard')} />
-        )}
+          <Route path="/calendar" element={<BidCalendarView />} />
+          <Route path="/consortium" element={<ConsortiumView />} />
+          <Route path="/reports" element={<ReportsView />} />
+          <Route path="/sources" element={<SourcesView />} />
+          <Route path="/offices" element={<OfficesView />} />
+          <Route path="/users" element={<UsersRolesView />} />
+          <Route path="/audit" element={<AuditTrailView />} />
+          <Route path="/settings" element={<SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />} />
+          <Route
+            path="/login"
+            element={
+              <LoginPageView
+                onLoginSuccess={() => {
+                  setActiveTab('dashboard');
+                  navigate('/');
+                }}
+              />
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
 
       {/* Decision Modals */}
       <PursueModal
         isOpen={isPursueOpen}
         onClose={() => setIsPursueOpen(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
+          const currentId = selectedOpp ? selectedOpp.id : 'OPP-001';
+          await pursueMutation.mutateAsync({ id: currentId, details: { priority: 'High' } });
           alert('Opportunity marked as PURSUED!');
           setIsPursueOpen(false);
         }}
@@ -130,7 +155,9 @@ export default function App() {
       <DeclineModal
         isOpen={isDeclineOpen}
         onClose={() => setIsDeclineOpen(false)}
-        onConfirm={() => {
+        onConfirm={async () => {
+          const currentId = selectedOpp ? selectedOpp.id : 'OPP-001';
+          await declineMutation.mutateAsync({ id: currentId, details: { reason: 'Budget Constraints' } });
           alert('Opportunity DECLINED.');
           setIsDeclineOpen(false);
         }}

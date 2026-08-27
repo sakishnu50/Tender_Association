@@ -1,0 +1,19 @@
+{
+  "name": "infrastrue-backend",
+  "version": "1.0.0",
+  "description": "Backend API infrastructure for Infrastructure Opportunity Tracker",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jspdf": "^2.5.2",
+    "xlsx": "^0.18.5"
+  }
+}

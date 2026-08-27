@@ -1,8 +1,12 @@
 import React from 'react';
-import { Users, Award, ExternalLink, ThumbsUp } from 'lucide-react';
+import { Users, ExternalLink, ThumbsUp } from 'lucide-react';
 import { mockConsortium } from '../data/mockData';
+import { useConsortium } from '../hooks/useApiQueries';
 
 export default function ConsortiumView() {
+  const { data: fetchedConsortium } = useConsortium();
+  const consortiumList = fetchedConsortium || mockConsortium;
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -15,7 +19,7 @@ export default function ConsortiumView() {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {mockConsortium.map((partner) => (
+        {consortiumList.map((partner) => (
           <div
             key={partner.id}
             className="card"

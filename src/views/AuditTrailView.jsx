@@ -1,7 +1,11 @@
 import React from 'react';
 import { mockAuditTrail } from '../data/mockData';
+import { useAuditTrail } from '../hooks/useApiQueries';
 
 export default function AuditTrailView() {
+  const { data: auditTrailData } = useAuditTrail();
+  const logs = auditTrailData || mockAuditTrail;
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -28,7 +32,7 @@ export default function AuditTrailView() {
               </tr>
             </thead>
             <tbody>
-              {mockAuditTrail.map((log, idx) => (
+              {logs.map((log, idx) => (
                 <tr key={idx}>
                   <td style={{ fontWeight: '600' }}>{log.user}</td>
                   <td>

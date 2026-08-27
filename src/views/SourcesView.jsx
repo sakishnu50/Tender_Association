@@ -1,8 +1,12 @@
 import React from 'react';
 import { Globe, CheckCircle2 } from 'lucide-react';
 import { mockSources } from '../data/mockData';
+import { useSources } from '../hooks/useApiQueries';
 
 export default function SourcesView() {
+  const { data: fetchedSources } = useSources();
+  const sourcesList = fetchedSources || mockSources;
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -10,7 +14,7 @@ export default function SourcesView() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-        {mockSources.map((source, idx) => (
+        {sourcesList.map((source, idx) => (
           <div key={idx} className="card" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
               width: '48px',

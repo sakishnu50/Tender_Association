@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Briefcase,
@@ -14,21 +15,37 @@ import {
   LogIn
 } from 'lucide-react';
 
+const navItems = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
+  { id: 'opportunities', label: 'Opportunities', icon: Briefcase, count: 150, path: '/opportunities' },
+  { id: 'alerts', label: 'Alerts', icon: Bell, count: 3, urgent: true, path: '/alerts' },
+  { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' },
+  { id: 'consortium', label: 'Consortium', icon: Users2, path: '/consortium' },
+  { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports' },
+  { id: 'sources', label: 'Sources', icon: Globe2, path: '/sources' },
+  { id: 'offices', label: 'Offices', icon: Building2, path: '/offices' },
+  { id: 'users', label: 'Users & Roles', icon: UserCheck, path: '/users' },
+  { id: 'audit', label: 'Audit Trail', icon: History, path: '/audit' },
+  { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
+  { id: 'login', label: 'Login Showcase', icon: LogIn, path: '/login' }
+];
+
 export default function Sidebar({ activeTab, setActiveTab }) {
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'opportunities', label: 'Opportunities', icon: Briefcase, count: 150 },
-    { id: 'alerts', label: 'Alerts', icon: Bell, count: 3, urgent: true },
-    { id: 'calendar', label: 'Bid Calendar', icon: Calendar },
-    { id: 'consortium', label: 'Consortium', icon: Users2 },
-    { id: 'reports', label: 'Reports', icon: BarChart3 },
-    { id: 'sources', label: 'Sources', icon: Globe2 },
-    { id: 'offices', label: 'Offices', icon: Building2 },
-    { id: 'users', label: 'Users & Roles', icon: UserCheck },
-    { id: 'audit', label: 'Audit Trail', icon: History },
-    { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'login', label: 'Login Showcase', icon: LogIn }
-  ];
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const matchedItem = navItems.find(item => item.path === currentPath || (item.path !== '/' && currentPath.startsWith(item.path)));
+    if (matchedItem && matchedItem.id !== activeTab) {
+      setActiveTab(matchedItem.id);
+    }
+  }, [location.pathname, activeTab, setActiveTab]);
+
+  const handleNavClick = (item) => {
+    setActiveTab(item.id);
+    navigate(item.path);
+  };
 
   return (
     <aside className="sidebar">
@@ -61,7 +78,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             <button
               key={item.id}
               className={`nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => handleNavClick(item)}
             >
               <div className="nav-item-content">
                 <Icon size={18} />

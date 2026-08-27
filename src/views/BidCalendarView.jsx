@@ -1,8 +1,11 @@
 import React from 'react';
-import { Calendar as CalendarIcon, Clock, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon } from 'lucide-react';
 import { mockCalendarEvents } from '../data/mockData';
+import { useCalendar } from '../hooks/useApiQueries';
 
 export default function BidCalendarView() {
+  const { data: fetchedEvents } = useCalendar();
+  const calendarEvents = fetchedEvents || mockCalendarEvents;
   const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1);
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -78,7 +81,7 @@ export default function BidCalendarView() {
           <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '1rem' }}>Events Schedule</h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {mockCalendarEvents.map((evt, idx) => (
+            {calendarEvents.map((evt, idx) => (
               <div
                 key={idx}
                 style={{

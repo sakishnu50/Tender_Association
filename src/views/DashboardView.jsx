@@ -1,8 +1,11 @@
 import React from 'react';
 import { Eye, ArrowUpRight, TrendingUp, AlertTriangle, Clock, CheckCircle } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
+import { useOpportunities } from '../hooks/useApiQueries';
 
 export default function DashboardView({ onSelectOpportunity, onViewAll }) {
+  const { data: fetchedOpps } = useOpportunities();
+  const opportunities = fetchedOpps || mockOpportunities;
   return (
     <div className="page-container">
       {/* KPI Cards Row */}
@@ -193,7 +196,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
               </tr>
             </thead>
             <tbody>
-              {mockOpportunities.slice(0, 4).map((opp) => (
+              {opportunities.slice(0, 4).map((opp) => (
                 <tr key={opp.id}>
                   <td style={{ fontWeight: '600' }}>{opp.name}</td>
                   <td>{opp.source}</td>

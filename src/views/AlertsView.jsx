@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { AlertCircle, Clock, CheckCircle } from 'lucide-react';
 import { mockAlerts } from '../data/mockData';
+import { useAlerts } from '../hooks/useApiQueries';
 
 export default function AlertsView({ onSelectProject }) {
+  const { data: fetchedAlerts } = useAlerts();
+  const alertsList = fetchedAlerts || mockAlerts;
+
   const [filter, setFilter] = useState('All');
 
-  const filteredAlerts = mockAlerts.filter(a => {
+  const filteredAlerts = alertsList.filter(a => {
     if (filter === 'High Priority') return a.type === 'High Priority';
     if (filter === 'Deadline') return a.type === 'Deadline';
     if (filter === 'New') return a.type === 'New';

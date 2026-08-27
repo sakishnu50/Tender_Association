@@ -1,6 +1,18 @@
 import React from 'react';
+import { apiService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPageView({ onLoginSuccess }) {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const email = e.target.elements[0]?.value || 'xyz10@gmail.com';
+    const password = e.target.elements[1]?.value || 'password';
+    const res = await apiService.login(email, password);
+    login(res.token, res.user);
+    onLoginSuccess();
+  };
   return (
     <div style={{
       width: '100%',
@@ -67,7 +79,7 @@ export default function LoginPageView({ onLoginSuccess }) {
             <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Enter your credentials below</span>
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); onLoginSuccess(); }} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
               <label style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>Email</label>
               <input

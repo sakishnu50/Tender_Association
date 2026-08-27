@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Download, BarChart2 } from 'lucide-react';
+import { Download } from 'lucide-react';
+import { exportService } from '../services/exportService';
 
 export default function ReportsView() {
   const [timeRange, setTimeRange] = useState('Monthly');
@@ -89,10 +90,10 @@ export default function ReportsView() {
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-            <button className="btn btn-outline" style={{ flex: 1, fontSize: '0.75rem' }}>
+            <button className="btn btn-outline" style={{ flex: 1, fontSize: '0.75rem' }} onClick={() => exportService.exportToPDF()}>
               <Download size={14} /> Download PDF
             </button>
-            <button className="btn btn-outline" style={{ flex: 1, fontSize: '0.75rem' }}>
+            <button className="btn btn-outline" style={{ flex: 1, fontSize: '0.75rem' }} onClick={() => exportService.exportToExcel()}>
               <Download size={14} /> Download Excel
             </button>
           </div>

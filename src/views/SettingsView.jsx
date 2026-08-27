@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Save, CheckCircle2 } from 'lucide-react';
+import { useSaveSettings } from '../hooks/useApiQueries';
 
 export default function SettingsView({ darkMode, toggleTheme }) {
+  const saveSettingsMutation = useSaveSettings();
   const [highPriority, setHighPriority] = useState(true);
   const [deadlineAlerts, setDeadlineAlerts] = useState(true);
   const [dailyReports, setDailyReports] = useState(true);
@@ -9,7 +11,14 @@ export default function SettingsView({ darkMode, toggleTheme }) {
   const [threshold, setThreshold] = useState('8.0');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await saveSettingsMutation.mutateAsync({
+      highPriority,
+      deadlineAlerts,
+      dailyReports,
+      weeklyReports,
+      threshold
+    });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
   };

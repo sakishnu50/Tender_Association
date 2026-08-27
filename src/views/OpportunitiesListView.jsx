@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import { Eye, Plus, Filter, RotateCcw } from 'lucide-react';
+import { Eye, Plus, RotateCcw } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
+import { useOpportunities } from '../hooks/useApiQueries';
 
 export default function OpportunitiesListView({ onSelectOpportunity }) {
+  const { data: fetchedOpps } = useOpportunities();
+  const opportunitiesList = fetchedOpps || mockOpportunities;
+
   const [sourceFilter, setSourceFilter] = useState('');
   const [sectorFilter, setSectorFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  const filteredOpps = mockOpportunities.filter(item => {
+  const filteredOpps = opportunitiesList.filter(item => {
     if (sourceFilter && item.source !== sourceFilter) return false;
     if (sectorFilter && item.sector !== sectorFilter) return false;
     if (locationFilter && item.location !== locationFilter) return false;
@@ -136,7 +140,7 @@ export default function OpportunitiesListView({ onSelectOpportunity }) {
           padding: '0.875rem 1.25rem',
           borderTop: '1px solid var(--border-color)',
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center',
           fontSize: '0.875rem',
           color: 'var(--text-muted)'
