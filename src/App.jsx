@@ -17,6 +17,7 @@ import UsersRolesView from './views/UsersRolesView';
 import AuditTrailView from './views/AuditTrailView';
 import SettingsView from './views/SettingsView';
 import LoginPageView from './views/LoginPageView';
+import Dashboard from './views/Dashboard';
 
 import { mockOpportunities } from './data/mockData';
 import { usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
@@ -124,6 +125,7 @@ export default function App() {
           <Route path="/offices" element={<OfficesView />} />
           <Route path="/users" element={<UsersRolesView />} />
           <Route path="/audit" element={<AuditTrailView />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/settings" element={<SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />} />
           <Route
             path="/login"
