@@ -6,7 +6,7 @@ export const mockOpportunities = [
     sector: 'Infrastructure',
     location: 'Tamil Nadu',
     value: '₹2.50 Crore',
-    deadline: '15 Sep 2028',
+    deadline: '15 Sep 2026',
     status: 'New',
     aiScore: 9.2,
     matchLevel: 'Strong Match',
@@ -28,7 +28,7 @@ export const mockOpportunities = [
     sector: 'Transport',
     location: 'Karnataka',
     value: '₹8.70 Crore',
-    deadline: '20 Sep 2028',
+    deadline: '20 Sep 2026',
     status: 'New',
     aiScore: 8.7,
     matchLevel: 'High Match',
@@ -44,7 +44,7 @@ export const mockOpportunities = [
     sector: 'Water',
     location: 'Maharashtra',
     value: '₹4.30 Crore',
-    deadline: '25 Sep 2028',
+    deadline: '25 Sep 2026',
     status: 'New',
     aiScore: 7.8,
     matchLevel: 'Moderate Match',
@@ -60,7 +60,7 @@ export const mockOpportunities = [
     sector: 'Transport',
     location: 'Delhi',
     value: '₹12.50 Crore',
-    deadline: '30 Sep 2028',
+    deadline: '30 Sep 2026',
     status: 'New',
     aiScore: 8.1,
     matchLevel: 'High Match',
@@ -76,7 +76,7 @@ export const mockOpportunities = [
     sector: 'Infrastructure',
     location: 'Gujarat',
     value: '₹6.10 Crore',
-    deadline: '05 Oct 2028',
+    deadline: '05 Oct 2026',
     status: 'New',
     aiScore: 7.2,
     matchLevel: 'Moderate Match',
@@ -121,9 +121,9 @@ export const mockAlerts = [
 ];
 
 export const mockCalendarEvents = [
-  { date: '16 Sep 2028', title: 'Submission Deadline', type: 'deadline', desc: 'Urban Infrastructure Project' },
-  { date: '18 Sep 2028', title: 'Pre-bid Meeting', type: 'meeting', desc: 'Highway Development Project' },
-  { date: '20 Sep 2028', title: 'Clarification Cut-off', type: 'cutoff', desc: 'Water Supply Project' }
+  { date: '16 Sep 2026', title: 'Submission Deadline', type: 'deadline', desc: 'Urban Infrastructure Project' },
+  { date: '18 Sep 2026', title: 'Pre-bid Meeting', type: 'meeting', desc: 'Highway Development Project' },
+  { date: '20 Sep 2026', title: 'Clarification Cut-off', type: 'cutoff', desc: 'Water Supply Project' }
 ];
 
 export const mockConsortium = [

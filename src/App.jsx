@@ -117,7 +117,7 @@ export default function App() {
             path="/alerts"
             element={<AlertsView onSelectProject={() => handleSelectOpportunity(mockOpportunities[0])} />}
           />
-          <Route path="/calendar" element={<BidCalendarView />} />
+          <Route path="/calendar" element={<BidCalendarView searchVal={searchVal} onSelectOpportunity={handleSelectOpportunity} />} />
           <Route path="/consortium" element={<ConsortiumView />} />
           <Route path="/reports" element={<ReportsView />} />
           <Route path="/sources" element={<SourcesView />} />

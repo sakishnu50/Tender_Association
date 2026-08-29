@@ -67,7 +67,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
         <div className="card">
           <div className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>Opportunities Trend</span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Apr - Oct 2028</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Apr - Oct 2026</span>
           </div>
           <div style={{ width: '100%', height: '160px', marginTop: '1rem', position: 'relative' }}>
             <svg viewBox="0 0 400 140" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
