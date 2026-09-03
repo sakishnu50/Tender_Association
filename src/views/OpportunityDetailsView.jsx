@@ -1,159 +1,145 @@
-import React from 'react';
-import { ArrowLeft, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 
-export default function OpportunityDetailsView({ opportunity, onBack, onOpenPursue, onOpenDecline }) {
+import OpportunityHeader from '../components/ui/OpportunityHeader';
+import ScoreBreakdown    from '../components/ui/ScoreBreakdown';
+import AIAnalysis        from '../components/ui/AIAnalysis';
+import SimilarProjects   from '../components/ui/SimilarProjects';
+import AuditTimeline     from '../components/ui/AuditTimeline';
+import AddNoteModal      from '../components/ui/AddNoteModal';
+
+/* ─── Helpers ─── */
+function nowDate() {
+  const d = new Date();
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function nowTime() {
+  return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+let _seq = 100;
+function uid() { return `DYN-${++_seq}`; }
+
+/* ─── Main Component ─── */
+export default function OpportunityDetailsView({ opportunity, onBack }) {
   if (!opportunity) return null;
+
+  // Local status state (decoupled from global list)
+  const [status, setStatus] = useState(opportunity.status || 'New');
+
+  // Embed audit trail as local state seeded from opportunity data
+  const [trail, setTrail] = useState(opportunity.auditTrail || []);
+
+  // Note modal
+  const [noteOpen, setNoteOpen] = useState(false);
+
+  /* ── Action handlers ── */
+  const pushEntry = useCallback((entry) => {
+    setTrail((prev) => [...prev, entry]);
+  }, []);
+
+  const handlePursue = useCallback(() => {
+    setStatus('Pursue');
+    pushEntry({
+      id: uid(), action: 'Status Changed to Pursue',
+      actor: 'Admin', role: 'Manager',
+      date: nowDate(), time: nowTime(), type: 'pursue'
+    });
+  }, [pushEntry]);
+
+  const handleReject = useCallback(() => {
+    setStatus('Rejected');
+    pushEntry({
+      id: uid(), action: 'Status Changed to Rejected',
+      actor: 'Admin', role: 'Manager',
+      date: nowDate(), time: nowTime(), type: 'reject'
+    });
+  }, [pushEntry]);
+
+  const handleReview = useCallback(() => {
+    setStatus('Under Review');
+    pushEntry({
+      id: uid(), action: 'Marked for Review',
+      actor: 'Admin', role: 'Manager',
+      date: nowDate(), time: nowTime(), type: 'review'
+    });
+  }, [pushEntry]);
+
+  const handleNoteSubmit = useCallback((noteText) => {
+    pushEntry({
+      id: uid(), action: 'Note Added',
+      actor: 'Admin', role: 'Manager',
+      date: nowDate(), time: nowTime(),
+      type: 'note', note: noteText
+    });
+  }, [pushEntry]);
 
   return (
     <div className="page-container">
-      <button
-        onClick={onBack}
-        style={{
-          border: 'none',
-          background: 'none',
-          color: 'var(--primary)',
-          fontSize: '0.875rem',
-          fontWeight: '600',
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.4rem',
-          width: 'fit-content'
-        }}
-      >
-        <ArrowLeft size={16} /> Back to Opportunities
-      </button>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-        {/* Left Column: Metadata & Details */}
-        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <h2 style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--text-main)' }}>
-            {opportunity.name}
-          </h2>
+      {/* ── 1. Breadcrumb + Back ── */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <nav className="breadcrumb" aria-label="Breadcrumb">
+          <span>Opportunities</span>
+          <ChevronRight size={13} className="breadcrumb-sep" />
+          <span className="breadcrumb-current">Opportunity Details</span>
+        </nav>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '100px 1fr',
-            gap: '0.75rem',
-            fontSize: '0.875rem'
-          }}>
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Source:</span>
-            <span style={{ fontWeight: '500' }}>{opportunity.source}</span>
-
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Sector:</span>
-            <span style={{ fontWeight: '500' }}>{opportunity.sector}</span>
-
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Location:</span>
-            <span style={{ fontWeight: '500' }}>{opportunity.location}</span>
-
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Project Value:</span>
-            <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{opportunity.value}</span>
-
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Deadline:</span>
-            <span style={{ fontWeight: '600', color: 'var(--danger)' }}>{opportunity.deadline}</span>
-
-            <span style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Type:</span>
-            <span style={{ fontWeight: '500' }}>{opportunity.type}</span>
-          </div>
-
-          <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-            <div style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-              Description:
-            </div>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
-              {opportunity.description}
-            </p>
-          </div>
-
-          {/* Actions Row */}
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <button
-              className="btn btn-success"
-              style={{ flex: 1, padding: '0.65rem' }}
-              onClick={onOpenPursue}
-            >
-              <Check size={16} /> PURSUE OPPORTUNITY
-            </button>
-            <button
-              className="btn btn-danger"
-              style={{ flex: 1, padding: '0.65rem' }}
-              onClick={onOpenDecline}
-            >
-              <X size={16} /> DECLINE OPPORTUNITY
-            </button>
-          </div>
-        </div>
-
-        {/* Right Column: AI Score Breakdown & Attached Docs */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          {/* AI Score Badge Card */}
-          <div className="card" style={{ textAlign: 'center', background: 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)' }}>
-            <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              AI OPPORTUNITY SCORE
-            </div>
-            <div style={{ fontSize: '2.75rem', fontWeight: '900', color: 'var(--text-main)', margin: '0.5rem 0 0.2rem 0' }}>
-              {opportunity.aiScore} <span style={{ fontSize: '1.25rem', color: 'var(--text-muted)', fontWeight: '600' }}>/ 10</span>
-            </div>
-            <div style={{
-              display: 'inline-block',
-              backgroundColor: 'var(--success-bg)',
-              color: 'var(--success-text)',
-              fontWeight: '700',
-              fontSize: '0.875rem',
-              padding: '0.25rem 0.8rem',
-              borderRadius: '9999px',
-              marginBottom: '1.25rem'
-            }}>
-              {opportunity.matchLevel}
-            </div>
-
-            <div style={{ textAlign: 'left', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-              <div style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.75rem' }}>
-                Why this score?
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {opportunity.scoreFactors.map((factor, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
-                    <CheckCircle2 size={16} color="var(--success)" />
-                    <span>{factor}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Attached Documents Card */}
-          <div className="card">
-            <div style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.75rem' }}>
-              Documents
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {opportunity.documents.map((doc, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justify: 'space-between',
-                    padding: '0.6rem 0.8rem',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-subtle)'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: '500' }}>
-                    <FileText size={16} color="var(--primary)" />
-                    <span>{doc}</span>
-                  </div>
-                  <button className="btn btn-outline" style={{ padding: '0.2rem 0.4rem' }}>
-                    <Download size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <button
+          id="btn-back-to-opportunities"
+          onClick={onBack}
+          style={{
+            border: 'none',
+            background: 'none',
+            color: 'var(--primary)',
+            fontSize: '0.875rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+            width: 'fit-content',
+            padding: '0.25rem 0',
+            transition: 'opacity 0.15s'
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >
+          <ArrowLeft size={15} />
+          Back to Opportunities
+        </button>
       </div>
+
+      {/* ── 2. Header Block (existing – keep as-is) ── */}
+      <OpportunityHeader
+        opportunity={opportunity}
+        status={status}
+        onPursue={handlePursue}
+        onReject={handleReject}
+        onReview={handleReview}
+        onAddNote={() => setNoteOpen(true)}
+      />
+
+      {/* ── 3. AI Score Breakdown (full-width) ── */}
+      <ScoreBreakdown
+        breakdown={opportunity.scoreBreakdown || []}
+        overallScore={opportunity.aiScore}
+      />
+
+      {/* ── 4. AI Reason & Recommendation (full-width) ── */}
+      <AIAnalysis analysis={opportunity.aiAnalysis} />
+
+      {/* ── 5. Similar Past Projects (full-width) ── */}
+      <SimilarProjects projects={opportunity.similarProjects || []} />
+
+      {/* ── 6. Embedded Audit Trail (full-width) ── */}
+      <AuditTimeline trail={trail} />
+
+      {/* ── Note Modal ── */}
+      <AddNoteModal
+        isOpen={noteOpen}
+        onClose={() => setNoteOpen(false)}
+        onSubmit={handleNoteSubmit}
+      />
     </div>
   );
 }

@@ -108,8 +108,6 @@ export default function App() {
                   setActiveTab('opportunities');
                   navigate('/opportunities');
                 }}
-                onOpenPursue={() => setIsPursueOpen(true)}
-                onOpenDecline={() => setIsDeclineOpen(true)}
               />
             }
           />
