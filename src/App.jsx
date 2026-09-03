@@ -17,6 +17,7 @@ import UsersRolesView from './views/UsersRolesView';
 import AuditTrailView from './views/AuditTrailView';
 import SettingsView from './views/SettingsView';
 import LoginPageView from './views/LoginPageView';
+import ClientProfileView from './views/ClientProfileView';
 
 import { mockOpportunities } from './data/mockData';
 import { usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
@@ -57,6 +58,7 @@ export default function App() {
     alerts: 'Alerts & Priority Notifications',
     calendar: 'Bid Calendar',
     consortium: 'Consortium Recommendations',
+    client_profile: 'Client Profile Administration',
     reports: 'Reports & Analytics',
     sources: 'Monitored Sources',
     offices: 'Offices Overview',
@@ -119,6 +121,7 @@ export default function App() {
           />
           <Route path="/calendar" element={<BidCalendarView />} />
           <Route path="/consortium" element={<ConsortiumView />} />
+          <Route path="/client-profile" element={<ClientProfileView />} />
           <Route path="/reports" element={<ReportsView />} />
           <Route path="/sources" element={<SourcesView />} />
           <Route path="/offices" element={<OfficesView />} />

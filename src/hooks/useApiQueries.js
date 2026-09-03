@@ -33,6 +33,25 @@ export function useConsortium() {
   });
 }
 
+export function useOpportunityRequirements() {
+  return useQuery({
+    queryKey: ['opportunityRequirements'],
+    queryFn: apiFacade.fetchOpportunityRequirements,
+    staleTime: 1000 * 60 * 5
+  });
+}
+
+export function useUpdateConsortiumStatus() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, status }) => apiFacade.updateConsortiumStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['consortium'] });
+      queryClient.invalidateQueries({ queryKey: ['auditTrail'] });
+    }
+  });
+}
+
 export function useSources() {
   return useQuery({
     queryKey: ['sources'],
