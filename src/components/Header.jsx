@@ -40,29 +40,7 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
           )}
         </button>
 
-        <button className="btn btn-outline" style={{ padding: '0.4rem 0.6rem', position: 'relative' }}>
-          <Bell size={18} color="var(--text-main)" />
-          <span style={{
-            position: 'absolute',
-            top: '4px',
-            right: '4px',
-            width: '8px',
-            height: '8px',
-            borderRadius: '9999px',
-            backgroundColor: 'var(--danger)'
-          }} />
-        </button>
-
-        <div className="user-profile">
-          <div className="user-avatar">
-            X
-          </div>
-          <div className="user-info">
-            <span className="user-name">XYZ</span>
-            <span className="user-role">Admin</span>
-          </div>
-          <ChevronDown size={14} color="var(--text-muted)" />
-        </div>
+        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} />
       </div>
     </header>
   );
