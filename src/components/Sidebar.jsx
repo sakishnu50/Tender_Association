@@ -12,7 +12,8 @@ import {
   UserCheck,
   History,
   Settings,
-  LogIn
+  LogIn,
+  BadgeCheck
 } from 'lucide-react';
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { id: 'alerts', label: 'Alerts', icon: Bell, count: 3, urgent: true, path: '/alerts' },
   { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' },
   { id: 'consortium', label: 'Consortium', icon: Users2, path: '/consortium' },
+  { id: 'client_profile', label: 'Client Profile', icon: BadgeCheck, path: '/client-profile' },
   { id: 'reports', label: 'Reports', icon: BarChart3, path: '/reports' },
   { id: 'sources', label: 'Sources', icon: Globe2, path: '/sources' },
   { id: 'offices', label: 'Offices', icon: Building2, path: '/offices' },
