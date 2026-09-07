@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Eye, Plus, RotateCcw } from 'lucide-react';
+import { Plus, RotateCcw } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities } from '../hooks/useApiQueries';
 
+import OpportunityTable from '../components/OpportunityTable';
+
 export default function OpportunitiesListView({ onSelectOpportunity }) {
-  const { data: fetchedOpps } = useOpportunities();
+  const { data: fetchedOpps, isLoading, isError } = useOpportunities();
   const opportunitiesList = fetchedOpps || mockOpportunities;
 
   const [sourceFilter, setSourceFilter] = useState('');
@@ -15,7 +17,7 @@ export default function OpportunitiesListView({ onSelectOpportunity }) {
   const filteredOpps = opportunitiesList.filter(item => {
     if (sourceFilter && item.source !== sourceFilter) return false;
     if (sectorFilter && item.sector !== sectorFilter) return false;
-    if (locationFilter && item.location !== locationFilter) return false;
+    if (locationFilter && (item.location !== locationFilter && !item.location?.includes(locationFilter))) return false;
     if (statusFilter && item.status !== statusFilter) return false;
     return true;
   });
@@ -88,73 +90,13 @@ export default function OpportunitiesListView({ onSelectOpportunity }) {
         </button>
       </div>
 
-      {/* Opportunities Data Table */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div className="table-container" style={{ border: 'none' }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Project Name</th>
-                <th>Source</th>
-                <th>Sector</th>
-                <th>Location</th>
-                <th>AI Score</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOpps.map((opp) => (
-                <tr key={opp.id}>
-                  <td style={{ fontWeight: '600', color: 'var(--text-main)' }}>{opp.name}</td>
-                  <td>{opp.source}</td>
-                  <td>{opp.sector}</td>
-                  <td>{opp.location}</td>
-                  <td>
-                    <span className="badge badge-info" style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                      {opp.aiScore}
-                    </span>
-                  </td>
-                  <td>{opp.deadline}</td>
-                  <td>
-                    <span className="badge badge-new">{opp.status}</span>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-primary"
-                      style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
-                      onClick={() => onSelectOpportunity(opp)}
-                    >
-                      <Eye size={12} /> View
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination Footer */}
-        <div style={{
-          padding: '0.875rem 1.25rem',
-          borderTop: '1px solid var(--border-color)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '0.875rem',
-          color: 'var(--text-muted)'
-        }}>
-          <div>Showing 1 to {filteredOpps.length} of 150 entries</div>
-          <div style={{ display: 'flex', gap: '0.25rem' }}>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>&lt;</button>
-            <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>1</button>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>2</button>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>3</button>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>&gt;</button>
-          </div>
-        </div>
-      </div>
+      {/* TanStack Opportunities Data Table */}
+      <OpportunityTable
+        data={filteredOpps}
+        onSelectOpportunity={onSelectOpportunity}
+        isLoading={isLoading}
+        isError={isError}
+      />
     </div>
   );
 }
