@@ -65,6 +65,15 @@ export function useAuditTrail() {
   });
 }
 
+// Hook for filtered audit logs (client‑side filtering)
+export function useAuditLogs(filters = {}) {
+  return useQuery({
+    queryKey: ['auditLogs', filters],
+    queryFn: apiFacade.fetchAuditTrail,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useSettings() {
   return useQuery({
     queryKey: ['settings'],
