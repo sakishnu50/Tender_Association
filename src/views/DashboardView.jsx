@@ -922,6 +922,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
                 }}
                 onSelectOpportunity={onSelectOpportunity}
               />
+            </svg>
           </div>
           );
 }
