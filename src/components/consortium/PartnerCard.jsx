@@ -186,38 +186,15 @@ export default function PartnerCard({
           {/* Recommend Button with Quick Menu */}
           <div style={{ position: 'relative', display: 'inline-flex' }}>
             <button
-              className={`btn ${isRecommended ? 'btn-success' : 'btn-primary'}`}
-              style={{
-                fontSize: '0.75rem',
-                padding: '0.45rem 0.85rem',
-                backgroundColor: isRecommended ? 'var(--success)' : 'var(--primary)'
-              }}
-              onClick={handleRecommendClick}
-            >
-              <ThumbsUp size={14} /> {isRecommended ? 'Recommended' : 'Recommend'}
-            </button>
-
-            <button
+              className="btn btn-outline"
+              style={{ fontSize: '0.75rem', padding: '0.45rem 0.7rem' }}
               onClick={(e) => {
                 e.stopPropagation();
                 setShowStatusMenu(!showStatusMenu);
               }}
-              style={{
-                borderLeft: '1px solid rgba(255, 255, 255, 0.3)',
-                borderTop: 'none',
-                borderRight: 'none',
-                borderBottom: 'none',
-                backgroundColor: isRecommended ? 'var(--success)' : 'var(--primary)',
-                color: '#FFFFFF',
-                padding: '0 0.4rem',
-                cursor: 'pointer',
-                borderRadius: '0 var(--radius-md) var(--radius-md) 0',
-                display: 'flex',
-                alignItems: 'center'
-              }}
               title="More Status Options"
             >
-              <ChevronDown size={12} />
+              <ChevronDown size={14} /> <ThumbsUp size={14} /> {isRecommended ? 'Recommended' : 'Recommend'}
             </button>
 
             {/* Dropdown Options */}
