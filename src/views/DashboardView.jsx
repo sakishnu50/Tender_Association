@@ -528,401 +528,407 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
               <line x1="0" y1="30" x2="400" y2="30" stroke="#E2E8F0" strokeDasharray="4 4" />
               <line x1="0" y1="70" x2="400" y2="70" stroke="#E2E8F0" strokeDasharray="4 4" />
               <line x1="0" y1="110" x2="400" y2="110" stroke="#E2E8F0" strokeDasharray="4 4" />
+            </svg>
+          </div>
+        </div>
 
-              {/* 5. Opportunities Workspace (Table / Card Explorer) */}
-              <div className="card">
-                {/* Explorer Header & Controls */}
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                  marginBottom: '1rem',
-                  borderBottom: '1px solid var(--border-color)',
-                  paddingBottom: '1rem'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                          Tender Opportunity Directory
-                        </h3>
-                        <span style={{
-                          fontSize: '0.75rem',
-                          fontWeight: '700',
-                          padding: '0.15rem 0.5rem',
-                          borderRadius: '9999px',
-                          backgroundColor: 'var(--bg-subtle)',
-                          color: 'var(--text-muted)',
-                          border: '1px solid var(--border-color)'
-                        }}>
-                          Showing {filteredOpportunities.length} of {timeFilteredOpportunities.length}
-                        </span>
-                      </div>
-                      {activeKpiFilter !== 'all' && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.3rem' }}>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Filter:</span>
+        {/* 5. Opportunities Workspace (Table / Card Explorer) */}
+
+        <div className="card">
+          {/* Explorer Header & Controls */}
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            marginBottom: '1rem',
+            borderBottom: '1px solid var(--border-color)',
+            paddingBottom: '1rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-main)' }}>
+                    Tender Opportunity Directory
+                  </h3>
+                  <span style={{
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    padding: '0.15rem 0.5rem',
+                    borderRadius: '9999px',
+                    backgroundColor: 'var(--bg-subtle)',
+                    color: 'var(--text-muted)',
+                    border: '1px solid var(--border-color)'
+                  }}>
+                    Showing {filteredOpportunities.length} of {timeFilteredOpportunities.length}
+                  </span>
+                </div>
+                {activeKpiFilter !== 'all' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.3rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Active Filter:</span>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      fontWeight: '700',
+                      backgroundColor: 'var(--primary-light)',
+                      color: 'var(--primary)',
+                      padding: '0.1rem 0.4rem',
+                      borderRadius: '0.25rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.25rem'
+                    }}>
+                      {kpis.find(k => k.key === activeKpiFilter)?.title}
+                      <button
+                        onClick={() => setActiveKpiFilter('all')}
+                        style={{ border: 'none', background: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* View Switcher & Sorting */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                {/* Sort By Dropdown */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem' }}>
+                  <SlidersHorizontal size={14} color="var(--text-muted)" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    style={{
+                      padding: '0.35rem 0.6rem',
+                      borderRadius: '0.375rem',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-main)',
+                      fontSize: '0.75rem',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="score">Sort: Highest AI Score</option>
+                    <option value="deadline">Sort: Submission Deadline</option>
+                    <option value="value">Sort: Tender ID</option>
+                  </select>
+                </div>
+
+                {/* View Mode Toggle */}
+                <div style={{ display: 'flex', backgroundColor: 'var(--bg-subtle)', borderRadius: '0.375rem', border: '1px solid var(--border-color)', padding: '0.15rem' }}>
+                  <button
+                    onClick={() => setViewMode('table')}
+                    title="Table View"
+                    style={{
+                      border: 'none',
+                      background: viewMode === 'table' ? 'var(--bg-card)' : 'transparent',
+                      color: viewMode === 'table' ? 'var(--primary)' : 'var(--text-muted)',
+                      padding: '0.3rem 0.5rem',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <ListIcon size={16} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    title="Grid Cards View"
+                    style={{
+                      border: 'none',
+                      background: viewMode === 'grid' ? 'var(--bg-card)' : 'transparent',
+                      color: viewMode === 'grid' ? 'var(--primary)' : 'var(--text-muted)',
+                      padding: '0.3rem 0.5rem',
+                      borderRadius: '0.25rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <LayoutGrid size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Search & Sector Filters Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.5rem',
+                padding: '0.4rem 0.75rem',
+                flex: '1',
+                minWidth: '220px'
+              }}>
+                <Search size={16} color="var(--text-muted)" />
+                <input
+                  type="text"
+                  placeholder="Search project name, location, agency source..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    outline: 'none',
+                    color: 'var(--text-main)',
+                    width: '100%',
+                    fontSize: '0.8rem'
+                  }}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Sector Filter Chips */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.1rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.2rem', marginRight: '0.2rem' }}>
+                  <Filter size={12} /> Source:
+                </span>
+                {['all', 'World Bank', 'ADB', 'JICA', 'AIIB'].map((sec) => (
+                  <button
+                    key={sec}
+                    onClick={() => setSectorFilter(sec)}
+                    style={{
+                      border: 'none',
+                      padding: '0.25rem 0.6rem',
+                      borderRadius: '9999px',
+                      fontSize: '0.75rem',
+                      fontWeight: sectorFilter === sec ? '700' : '500',
+                      cursor: 'pointer',
+                      backgroundColor: sectorFilter === sec ? 'var(--primary)' : 'var(--bg-subtle)',
+                      color: sectorFilter === sec ? '#FFFFFF' : 'var(--text-muted)',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.15s'
+                    }}
+                  >
+                    {sec === 'all' ? 'All Sources' : sec}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* View Mode 1: Table View */}
+          {viewMode === 'table' ? (
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Tender ID & Project Name</th>
+                    <th>Source Agency</th>
+                    <th>Location</th>
+                    <th>Est. Value</th>
+                    <th>AI Score Match</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOpportunities.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                        No opportunities found matching your active filter criteria.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredOpportunities.map((opp) => (
+                      <tr key={opp.id} style={{ transition: 'background-color 0.15s' }}>
+                        <td>
+                          <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>{opp.name}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{opp.id} • {opp.sector || 'Infrastructure'}</div>
+                        </td>
+                        <td>
+                          <span className="badge badge-info" style={{ fontWeight: '600' }}>
+                            {opp.source}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem' }}>
+                            <MapPin size={12} color="var(--warning)" /> {opp.location}
+                          </span>
+                        </td>
+                        <td style={{ fontWeight: '600' }}>{opp.value || '₹5.00 Cr'}</td>
+                        <td>
+                          <span style={{
+                            fontWeight: '800',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.75rem',
+                            backgroundColor: opp.aiScore >= 8.5 ? '#D1FAE5' : opp.aiScore >= 7.5 ? '#E0F2FE' : '#FEF3C7',
+                            color: opp.aiScore >= 8.5 ? '#065F46' : opp.aiScore >= 7.5 ? '#075985' : '#92400E'
+                          }}>
+                            {opp.aiScore} / 10
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ fontSize: '0.8rem', fontWeight: '500', color: opp.deadline?.includes('Sep') ? 'var(--danger)' : 'var(--text-main)' }}>
+                            {opp.deadline}
+                          </span>
+                        </td>
+                        <td>
                           <span style={{
                             fontSize: '0.7rem',
                             fontWeight: '700',
-                            backgroundColor: 'var(--primary-light)',
-                            color: 'var(--primary)',
-                            padding: '0.1rem 0.4rem',
+                            padding: '0.15rem 0.45rem',
                             borderRadius: '0.25rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.25rem'
+                            backgroundColor: opp.status === 'Pursued' ? 'var(--success-bg)' : opp.status === 'Declined' ? 'var(--danger-bg)' : 'var(--bg-subtle)',
+                            color: opp.status === 'Pursued' ? 'var(--success-text)' : opp.status === 'Declined' ? 'var(--danger-text)' : 'var(--text-muted)'
                           }}>
-                            {kpis.find(k => k.key === activeKpiFilter)?.title}
-                            <button
-                              onClick={() => setActiveKpiFilter('all')}
-                              style={{ border: 'none', background: 'none', color: 'inherit', cursor: 'pointer', fontWeight: 'bold' }}
-                            >
-                              ×
-                            </button>
+                            {opp.status || 'New'}
                           </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* View Switcher & Sorting */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      {/* Sort By Dropdown */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem' }}>
-                        <SlidersHorizontal size={14} color="var(--text-muted)" />
-                        <select
-                          value={sortBy}
-                          onChange={(e) => setSortBy(e.target.value)}
-                          style={{
-                            padding: '0.35rem 0.6rem',
-                            borderRadius: '0.375rem',
-                            border: '1px solid var(--border-color)',
-                            backgroundColor: 'var(--bg-card)',
-                            color: 'var(--text-main)',
-                            fontSize: '0.75rem',
-                            fontWeight: '500',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <option value="score">Sort: Highest AI Score</option>
-                          <option value="deadline">Sort: Submission Deadline</option>
-                          <option value="value">Sort: Tender ID</option>
-                        </select>
-                      </div>
-
-                      {/* View Mode Toggle */}
-                      <div style={{ display: 'flex', backgroundColor: 'var(--bg-subtle)', borderRadius: '0.375rem', border: '1px solid var(--border-color)', padding: '0.15rem' }}>
-                        <button
-                          onClick={() => setViewMode('table')}
-                          title="Table View"
-                          style={{
-                            border: 'none',
-                            background: viewMode === 'table' ? 'var(--bg-card)' : 'transparent',
-                            color: viewMode === 'table' ? 'var(--primary)' : 'var(--text-muted)',
-                            padding: '0.3rem 0.5rem',
-                            borderRadius: '0.25rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <ListIcon size={16} />
-                        </button>
-                        <button
-                          onClick={() => setViewMode('grid')}
-                          title="Grid Cards View"
-                          style={{
-                            border: 'none',
-                            background: viewMode === 'grid' ? 'var(--bg-card)' : 'transparent',
-                            color: viewMode === 'grid' ? 'var(--primary)' : 'var(--text-muted)',
-                            padding: '0.3rem 0.5rem',
-                            borderRadius: '0.25rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <LayoutGrid size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Search & Sector Filters Bar */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                      backgroundColor: 'var(--bg-subtle)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '0.5rem',
-                      padding: '0.4rem 0.75rem',
-                      flex: '1',
-                      minWidth: '220px'
-                    }}>
-                      <Search size={16} color="var(--text-muted)" />
-                      <input
-                        type="text"
-                        placeholder="Search project name, location, agency source..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{
-                          border: 'none',
-                          background: 'transparent',
-                          outline: 'none',
-                          color: 'var(--text-main)',
-                          width: '100%',
-                          fontSize: '0.8rem'
-                        }}
-                      />
-                      {searchTerm && (
-                        <button
-                          onClick={() => setSearchTerm('')}
-                          style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.8rem' }}
-                        >
-                          ✕
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Sector Filter Chips */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.1rem' }}>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.2rem', marginRight: '0.2rem' }}>
-                        <Filter size={12} /> Source:
-                      </span>
-                      {['all', 'World Bank', 'ADB', 'JICA', 'AIIB'].map((sec) => (
-                        <button
-                          key={sec}
-                          onClick={() => setSectorFilter(sec)}
-                          style={{
-                            border: 'none',
-                            padding: '0.25rem 0.6rem',
-                            borderRadius: '9999px',
-                            fontSize: '0.75rem',
-                            fontWeight: sectorFilter === sec ? '700' : '500',
-                            cursor: 'pointer',
-                            backgroundColor: sectorFilter === sec ? 'var(--primary)' : 'var(--bg-subtle)',
-                            color: sectorFilter === sec ? '#FFFFFF' : 'var(--text-muted)',
-                            whiteSpace: 'nowrap',
-                            transition: 'all 0.15s'
-                          }}
-                        >
-                          {sec === 'all' ? 'All Sources' : sec}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* View Mode 1: Table View */}
-                {viewMode === 'table' ? (
-                  <div className="table-container">
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th>Tender ID & Project Name</th>
-                          <th>Source Agency</th>
-                          <th>Location</th>
-                          <th>Est. Value</th>
-                          <th>AI Score Match</th>
-                          <th>Deadline</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredOpportunities.length === 0 ? (
-                          <tr>
-                            <td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                              No opportunities found matching your active filter criteria.
-                            </td>
-                          </tr>
-                        ) : (
-                          filteredOpportunities.map((opp) => (
-                            <tr key={opp.id} style={{ transition: 'background-color 0.15s' }}>
-                              <td>
-                                <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>{opp.name}</div>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{opp.id} • {opp.sector || 'Infrastructure'}</div>
-                              </td>
-                              <td>
-                                <span className="badge badge-info" style={{ fontWeight: '600' }}>
-                                  {opp.source}
-                                </span>
-                              </td>
-                              <td>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem' }}>
-                                  <MapPin size={12} color="var(--warning)" /> {opp.location}
-                                </span>
-                              </td>
-                              <td style={{ fontWeight: '600' }}>{opp.value || '₹5.00 Cr'}</td>
-                              <td>
-                                <span style={{
-                                  fontWeight: '800',
-                                  padding: '0.2rem 0.55rem',
-                                  borderRadius: '9999px',
-                                  fontSize: '0.75rem',
-                                  backgroundColor: opp.aiScore >= 8.5 ? '#D1FAE5' : opp.aiScore >= 7.5 ? '#E0F2FE' : '#FEF3C7',
-                                  color: opp.aiScore >= 8.5 ? '#065F46' : opp.aiScore >= 7.5 ? '#075985' : '#92400E'
-                                }}>
-                                  {opp.aiScore} / 10
-                                </span>
-                              </td>
-                              <td>
-                                <span style={{ fontSize: '0.8rem', fontWeight: '500', color: opp.deadline?.includes('Sep') ? 'var(--danger)' : 'var(--text-main)' }}>
-                                  {opp.deadline}
-                                </span>
-                              </td>
-                              <td>
-                                <span style={{
-                                  fontSize: '0.7rem',
-                                  fontWeight: '700',
-                                  padding: '0.15rem 0.45rem',
-                                  borderRadius: '0.25rem',
-                                  backgroundColor: opp.status === 'Pursued' ? 'var(--success-bg)' : opp.status === 'Declined' ? 'var(--danger-bg)' : 'var(--bg-subtle)',
-                                  color: opp.status === 'Pursued' ? 'var(--success-text)' : opp.status === 'Declined' ? 'var(--danger-text)' : 'var(--text-muted)'
-                                }}>
-                                  {opp.status || 'New'}
-                                </span>
-                              </td>
-                              <td>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                  <button
-                                    className="btn btn-outline"
-                                    style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
-                                    onClick={() => handleOpenQuickView(opp)}
-                                    title="Quick Inspect"
-                                  >
-                                    <Eye size={12} /> Inspect
-                                  </button>
-                                  <button
-                                    className="btn btn-primary"
-                                    style={{ padding: '0.25rem 0.55rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
-                                    onClick={() => onSelectOpportunity(opp)}
-                                  >
-                                    Full View
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  /* View Mode 2: Grid Cards View */
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '1rem',
-                    marginTop: '0.5rem'
-                  }}>
-                    {filteredOpportunities.length === 0 ? (
-                      <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                        No opportunities match your search or filter.
-                      </div>
-                    ) : (
-                      filteredOpportunities.map((opp) => (
-                        <div
-                          key={opp.id}
-                          style={{
-                            borderRadius: '0.75rem',
-                            border: '1px solid var(--border-color)',
-                            padding: '1rem',
-                            backgroundColor: 'var(--bg-card)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            gap: '0.75rem',
-                            boxShadow: 'var(--shadow-sm)'
-                          }}
-                        >
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                              <span className="badge badge-info" style={{ fontSize: '0.7rem', fontWeight: '700' }}>
-                                {opp.source}
-                              </span>
-                              <span style={{
-                                fontSize: '0.75rem',
-                                fontWeight: '800',
-                                backgroundColor: '#D1FAE5',
-                                color: '#065F46',
-                                padding: '0.15rem 0.45rem',
-                                borderRadius: '9999px'
-                              }}>
-                                ★ {opp.aiScore}
-                              </span>
-                            </div>
-
-                            <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.4rem', lineHeight: '1.3' }}>
-                              {opp.name}
-                            </h4>
-
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                              {opp.description || 'Infrastructure development project with high strategic alignment.'}
-                            </p>
-
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span>Location:</span>
-                                <strong style={{ color: 'var(--text-main)' }}>{opp.location}</strong>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span>Est. Value:</span>
-                                <strong style={{ color: 'var(--primary)' }}>{opp.value || '₹5.00 Cr'}</strong>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <span>Deadline:</span>
-                                <strong style={{ color: 'var(--danger)' }}>{opp.deadline}</strong>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.6rem' }}>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                             <button
                               className="btn btn-outline"
-                              style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
                               onClick={() => handleOpenQuickView(opp)}
+                              title="Quick Inspect"
                             >
                               <Eye size={12} /> Inspect
                             </button>
                             <button
                               className="btn btn-primary"
-                              style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                              style={{ padding: '0.25rem 0.55rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
                               onClick={() => onSelectOpportunity(opp)}
                             >
-                              View Details
+                              Full View
                             </button>
                           </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            /* View Mode 2: Grid Cards View */
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '1rem',
+              marginTop: '0.5rem'
+            }}>
+              {filteredOpportunities.length === 0 ? (
+                <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                  No opportunities match your search or filter.
+                </div>
+              ) : (
+                filteredOpportunities.map((opp) => (
+                  <div
+                    key={opp.id}
+                    style={{
+                      borderRadius: '0.75rem',
+                      border: '1px solid var(--border-color)',
+                      padding: '1rem',
+                      backgroundColor: 'var(--bg-card)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      gap: '0.75rem',
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <span className="badge badge-info" style={{ fontSize: '0.7rem', fontWeight: '700' }}>
+                          {opp.source}
+                        </span>
+                        <span style={{
+                          fontSize: '0.75rem',
+                          fontWeight: '800',
+                          backgroundColor: '#D1FAE5',
+                          color: '#065F46',
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '9999px'
+                        }}>
+                          ★ {opp.aiScore}
+                        </span>
+                      </div>
+
+                      <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.4rem', lineHeight: '1.3' }}>
+                        {opp.name}
+                      </h4>
+
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {opp.description || 'Infrastructure development project with high strategic alignment.'}
+                      </p>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Location:</span>
+                          <strong style={{ color: 'var(--text-main)' }}>{opp.location}</strong>
                         </div>
-                      ))
-                    )}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Est. Value:</span>
+                          <strong style={{ color: 'var(--primary)' }}>{opp.value || '₹5.00 Cr'}</strong>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span>Deadline:</span>
+                          <strong style={{ color: 'var(--danger)' }}>{opp.deadline}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.6rem' }}>
+                      <button
+                        className="btn btn-outline"
+                        style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                        onClick={() => handleOpenQuickView(opp)}
+                      >
+                        <Eye size={12} /> Inspect
+                      </button>
+                      <button
+                        className="btn btn-primary"
+                        style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                        onClick={() => onSelectOpportunity(opp)}
+                      >
+                        View Details
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
 
-              {/* 6. Quick View Detail Modal */}
-              <DashboardQuickViewModal
-                opportunity={selectedQuickViewOpp}
-                isOpen={isQuickViewOpen}
-                onClose={() => setIsQuickViewOpen(false)}
-                onPursue={handlePursue}
-                onDecline={handleDecline}
-              />
+        {/* 6. Quick View Detail Modal */}
+        <DashboardQuickViewModal
+          opportunity={selectedQuickViewOpp}
+          isOpen={isQuickViewOpen}
+          onClose={() => setIsQuickViewOpen(false)}
+          onPursue={handlePursue}
+          onDecline={handleDecline}
+        />
 
-              {/* 7. KPI Stat Cards Detail Modal (Opens when any stat card is clicked) */}
-              <KpiDetailModal
-                isOpen={isKpiModalOpen}
-                onClose={() => setIsKpiModalOpen(false)}
-                kpiKey={activeKpiModalKey}
-                kpiTitle={activeKpiModalTitle}
-                opportunities={timeFilteredOpportunities}
-                onInspect={(opp) => {
-                  handleOpenQuickView(opp);
-                }}
-                onSelectOpportunity={onSelectOpportunity}
-              />
-            </svg>
-          </div>
-          );
+        {/* 7. KPI Stat Cards Detail Modal (Opens when any stat card is clicked) */}
+        <KpiDetailModal
+          isOpen={isKpiModalOpen}
+          onClose={() => setIsKpiModalOpen(false)}
+          kpiKey={activeKpiModalKey}
+          kpiTitle={activeKpiModalTitle}
+          opportunities={timeFilteredOpportunities}
+          onInspect={(opp) => {
+            handleOpenQuickView(opp);
+          }}
+          onSelectOpportunity={onSelectOpportunity}
+        />
+
+      </div>
+    </div>
+  );
 }
+
