@@ -1028,3 +1028,227 @@ body {
   .score-row-label { width: 110px; font-size: 0.75rem; }
 }
 
+/* ─── Opportunity List Filter Toolbar & Popover ─── */
+.opp-filter-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.875rem 1.25rem;
+  position: relative;
+}
+
+.opp-search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 460px;
+  min-width: 240px;
+}
+
+.opp-search-wrapper svg.search-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.opp-search-input {
+  width: 100%;
+  padding: 0.55rem 2.25rem 0.55rem 2.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.opp-search-input:focus {
+  border-color: var(--primary);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+}
+
+.opp-search-clear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.opp-search-clear:hover {
+  color: var(--text-main);
+  background: var(--border-color);
+}
+
+.filter-btn-container {
+  position: relative;
+}
+
+.filter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 38px;
+}
+
+.filter-active-count {
+  background-color: var(--primary);
+  color: #FFFFFF;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  min-width: 1.2rem;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.filter-toggle-btn.btn-primary .filter-active-count {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── Vertical Expandable Filter Panel (Reference Sketch) ─── */
+.vertical-filter-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-width: 90vw;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+  padding: 0.75rem;
+  animation: slideUp 0.16s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.vertical-filter-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.35rem;
+}
+
+.vertical-filter-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vertical-filter-reset-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.vertical-filter-reset-btn:hover {
+  color: var(--primary);
+  background: var(--bg-subtle);
+  transform: rotate(-90deg);
+}
+
+.vertical-filter-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.vertical-filter-header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.vertical-filter-header-btn:hover {
+  background: var(--bg-subtle);
+}
+
+.vertical-filter-header-btn.is-active {
+  color: var(--primary);
+}
+
+.vertical-filter-options-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.25rem 0;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.vertical-filter-option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-family: var(--font-family);
+  font-size: 0.825rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.vertical-filter-option-btn:hover {
+  background: var(--border-color);
+}
+
+.vertical-filter-option-btn.selected {
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(29, 78, 216, 0.08);
+}
+
+
+

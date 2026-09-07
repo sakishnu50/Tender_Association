@@ -18,6 +18,7 @@ function pickRichFields(mock) {
   return {
     title:           mock.title || mock.name,
     country:         mock.country,
+    office:          mock.office,
     sourceUrl:       mock.sourceUrl,
     overallScore:    mock.overallScore || mock.aiScore,
     priority:        mock.priority,
@@ -134,6 +135,17 @@ export function useSaveSettings() {
     mutationFn: (newSettings) => apiFacade.saveSettings(newSettings),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] });
+    }
+  });
+}
+
+export function useAddOpportunity() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (newOpp) => apiFacade.addOpportunity(newOpp),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+      queryClient.invalidateQueries({ queryKey: ['auditTrail'] });
     }
   });
 }

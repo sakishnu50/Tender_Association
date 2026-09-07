@@ -102,6 +102,7 @@ export default function App() {
           searchVal={searchVal}
           setSearchVal={setSearchVal}
           activeTabTitle={titlesMap[activeTab]}
+          activeTab={activeTab}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
         />

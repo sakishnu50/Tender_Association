@@ -1,22 +1,24 @@
 import React from 'react';
 import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
 
-export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMode, toggleTheme }) {
+export default function Header({ searchVal, setSearchVal, activeTabTitle, activeTab, darkMode, toggleTheme }) {
   return (
     <header className="top-header">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
         <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
           {activeTabTitle || 'Dashboard'}
         </h2>
-        <div className="header-search">
-          <Search size={16} color="var(--text-muted)" />
-          <input
-            type="text"
-            placeholder="Search project, source, sector..."
-            value={searchVal}
-            onChange={(e) => setSearchVal(e.target.value)}
-          />
-        </div>
+        {activeTab !== 'opportunities' && (
+          <div className="header-search">
+            <Search size={16} color="var(--text-muted)" />
+            <input
+              type="text"
+              placeholder="Search project, source, sector..."
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+            />
+          </div>
+        )}
       </div>
 
       <div className="header-actions">
