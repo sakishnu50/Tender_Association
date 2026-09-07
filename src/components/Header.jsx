@@ -1,7 +1,13 @@
 import React from 'react';
 import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMode, toggleTheme }) {
+  const { user } = useAuth();
+  const userName = user?.name || (user?.email ? user.email.split('@')[0] : 'XYZ');
+  const userRole = user?.role || 'Admin';
+  const initial = userName.charAt(0).toUpperCase();
+
   return (
     <header className="top-header">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -55,11 +61,11 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
 
         <div className="user-profile">
           <div className="user-avatar">
-            X
+            {initial}
           </div>
           <div className="user-info">
-            <span className="user-name">XYZ</span>
-            <span className="user-role">Admin</span>
+            <span className="user-name">{userName}</span>
+            <span className="user-role">{userRole}</span>
           </div>
           <ChevronDown size={14} color="var(--text-muted)" />
         </div>
