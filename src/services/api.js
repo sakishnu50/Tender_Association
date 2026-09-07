@@ -3,7 +3,9 @@ import { apiFacade } from './apiClient';
 export const apiService = {
   login: async (email) => {
     const token = 'enterprise-mock-jwt-token';
-    const user = { name: 'XYZ', email: email || 'xyz10@gmail.com', role: 'Admin', office: 'Chennai' };
+    const rawName = email ? email.split('@')[0] : 'XYZ';
+    const formattedName = rawName.replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const user = { name: formattedName || 'XYZ', email: email || 'xyz10@gmail.com', role: 'Admin', office: 'Chennai' };
     localStorage.setItem('iot_token', token);
     localStorage.setItem('iot_user', JSON.stringify(user));
     return { success: true, token, user };
