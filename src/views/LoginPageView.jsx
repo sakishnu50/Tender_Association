@@ -66,7 +66,7 @@ export default function LoginPageView({ onLoginSuccess }) {
           </div>
 
           <div style={{ fontSize: '0.75rem', color: '#64748B', borderTop: '1px solid #334155', paddingTop: '1rem' }}>
-            © 2028 Infrastructure Tracker Inc.
+            © 2026 Infrastructure Tracker Inc.
           </div>
         </div>
 
