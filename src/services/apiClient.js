@@ -94,6 +94,23 @@ export const apiFacade = {
     return { success: true, message: 'Opportunity DECLINED.' };
   },
 
+  createOpportunity: async (opportunity) => {
+    const opps = getStorage('iot_opportunities', mockOpportunities);
+    const updatedOpps = [opportunity, ...opps];
+    setStorage('iot_opportunities', updatedOpps);
+
+    const logs = getStorage('iot_audit_trail', mockAuditTrail);
+    const newLog = {
+      user: 'Ravi Kumar',
+      action: 'Created Opportunity',
+      details: opportunity.name || opportunity.id,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    setStorage('iot_audit_trail', [newLog, ...logs]);
+
+    return { success: true, data: opportunity };
+  },
+
   saveSettings: async (settings) => {
     setStorage('iot_settings', settings);
     return { success: true, data: settings };

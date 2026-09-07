@@ -8,15 +8,17 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
         <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
           {activeTabTitle || 'Dashboard'}
         </h2>
-        <div className="header-search">
-          <Search size={16} color="var(--text-muted)" />
-          <input
-            type="text"
-            placeholder="Search project, source, sector..."
-            value={searchVal}
-            onChange={(e) => setSearchVal(e.target.value)}
-          />
-        </div>
+        {activeTabTitle !== 'Opportunities List' && (
+          <div className="header-search">
+            <Search size={16} color="var(--text-muted)" />
+            <input
+              type="text"
+              placeholder="Search project, source, sector..."
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+            />
+          </div>
+        )}
       </div>
 
       <div className="header-actions">
