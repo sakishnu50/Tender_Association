@@ -77,7 +77,7 @@ export const apiFacade = {
     const partner = list.find(item => item.id === id);
     const partnerName = partner ? partner.name : id;
     const logs = getStorage('iot_audit_trail', mockAuditTrail);
-    
+
     let actionLabel = 'Updated Partner Status';
     if (status === 'recommended') actionLabel = 'Recommended Partner';
     else if (status === 'shortlisted') actionLabel = 'Shortlisted Partner';
@@ -130,75 +130,21 @@ export const apiFacade = {
     return { success: true, message: 'Opportunity DECLINED.' };
   },
 
-  addOpportunity: async (opportunity) => {
+  createOpportunity: async (opportunity) => {
     const opps = getStorage('iot_opportunities', mockOpportunities);
-    const newId = `OPP-${String(opps.length + 1).padStart(3, '0')}`;
-    const fullOpp = {
-      id: newId,
-      name: opportunity.name || 'New Opportunity',
-      title: opportunity.name || 'New Opportunity',
-      source: opportunity.source || 'World Bank',
-      sector: opportunity.sector || 'Infrastructure',
-      location: opportunity.location || 'Tamil Nadu, India',
-      country: opportunity.country || 'India',
-      priority: (opportunity.priority || 'HIGH').toUpperCase(),
-      status: opportunity.status || 'New',
-      office: opportunity.office || 'Chennai',
-      deadline: opportunity.deadline || '15 Oct 2026',
-      value: opportunity.value || '₹5.00 Crore',
-      aiScore: parseFloat(opportunity.aiScore) || 8.5,
-      overallScore: parseFloat(opportunity.aiScore) || 8.5,
-      matchLevel: 'High Match',
-      type: opportunity.type || 'Construction',
-      procurementType: 'National Competitive Bidding',
-      description: opportunity.description || `${opportunity.name || 'New Opportunity'} project initiative.`,
-      scoreFactors: [
-        'Sector Match',
-        'Country/Market Match',
-        'Past Experience',
-        'Capability Match',
-        'Strategic/Priority Fit'
-      ],
-      scoreBreakdown: [
-        { label: 'Sector Match', score: 8.5, max: 10 },
-        { label: 'Country/Market Match', score: 8.5, max: 10 },
-        { label: 'Past Experience', score: 8.0, max: 10 },
-        { label: 'Capability Match', score: 8.5, max: 10 },
-        { label: 'Strategic/Priority Fit', score: 8.0, max: 10 }
-      ],
-      aiAnalysis: {
-        summary: `AI evaluated ${opportunity.name || 'this opportunity'} as a viable opportunity.`,
-        strengths: ['Relevant sector capabilities', 'Regional office availability'],
-        risks: ['Standard competitive procurement'],
-        recommendation: 'Recommended – Evaluate and Pursue'
-      },
-      similarProjects: [],
-      documents: [],
-      auditTrail: [
-        {
-          id: `AT-${Date.now()}`,
-          action: 'Opportunity Created',
-          actor: 'Ravi Kumar',
-          role: 'Admin',
-          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          type: 'create'
-        }
-      ]
-    };
-    const updated = [fullOpp, ...opps];
-    setStorage('iot_opportunities', updated);
+    const updatedOpps = [opportunity, ...opps];
+    setStorage('iot_opportunities', updatedOpps);
 
     const logs = getStorage('iot_audit_trail', mockAuditTrail);
     const newLog = {
       user: 'Ravi Kumar',
       action: 'Created Opportunity',
-      details: fullOpp.name,
+      details: opportunity.name || opportunity.id,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
     setStorage('iot_audit_trail', [newLog, ...logs]);
 
-    return { success: true, data: fullOpp };
+    return { success: true, data: opportunity };
   },
 
   saveSettings: async (settings) => {
