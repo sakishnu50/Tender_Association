@@ -183,13 +183,9 @@ export default function App() {
           <Route path="/sources" element={<SourcesView />} />
           <Route path="/offices" element={<OfficesView />} />
           <Route path="/users" element={<UsersRolesView />} />
-<<<<<<< HEAD
-          <Route path="/audit" element={<AuditTrailView />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-=======
           <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
           <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
->>>>>>> 90bb78c (Update audit trail functionality)
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/settings" element={<SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />} />
           <Route
             path="/login"
