@@ -91,16 +91,16 @@ export default function Header({
 
   return (
     <header className="top-header">
-      {/* Expanded Search Bar (50-60% width) - Dashboard heading removed */}
-      <div className="header-search">
-        <Search size={17} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+      {/* Expanded Search Bar (50-60% width) */}
+      <div className="header-search" style={{ position: 'relative' }}>
+        <Search size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
         <input
           type="text"
-          placeholder="Search project, tender ID, source, sector..."
+          placeholder="Search tenders, IDs, sources, sectors..."
           value={searchVal || ''}
           onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
         />
-        {searchVal && (
+        {searchVal ? (
           <button
             onClick={() => setSearchVal && setSearchVal('')}
             style={{
@@ -109,25 +109,41 @@ export default function Header({
               color: 'var(--text-muted)',
               cursor: 'pointer',
               display: 'flex',
-              alignItems: 'center'
+              alignItems: 'center',
+              padding: '2px'
             }}
             title="Clear search"
           >
-            <X size={15} />
+            <X size={14} />
           </button>
+        ) : (
+          <span style={{
+            fontSize: '0.675rem',
+            fontWeight: '600',
+            color: 'var(--text-muted)',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            padding: '0.1rem 0.4rem',
+            borderRadius: '0.25rem',
+            boxShadow: 'var(--shadow-xs)',
+            pointerEvents: 'none'
+          }}>
+            ⌘K
+          </span>
         )}
       </div>
 
       {/* Header Action Controls */}
-      <div className="header-actions">
+      <div className="header-actions" style={{ gap: '0.65rem' }}>
         {/* Refresh Button */}
         <button
           className="btn-header-action"
           onClick={handleRefreshClick}
           title="Refresh Dashboard Data"
           disabled={isRefreshing}
+          style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
-          <RefreshCw size={16} className={isRefreshing ? 'spin-icon' : ''} />
+          <RefreshCw size={15} className={isRefreshing ? 'spin-icon' : ''} />
           <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
         </button>
 
@@ -136,8 +152,9 @@ export default function Header({
           className="btn-header-blue"
           onClick={handleExportCSVClick}
           title="Export Data as CSV File"
+          style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
-          <Download size={16} />
+          <Download size={15} />
           <span>Export CSV</span>
         </button>
 
@@ -146,8 +163,9 @@ export default function Header({
           className="btn-header-blue-alt"
           onClick={handleDownloadPDFClick}
           title="Download Dashboard PDF Report"
+          style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
-          <FileText size={16} />
+          <FileText size={15} />
           <span>Download PDF</span>
         </button>
 
@@ -160,8 +178,9 @@ export default function Header({
               setShowProfileMenu(false);
             }}
             title="Notifications (3 Urgent Alerts)"
+            style={{ position: 'relative', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
-            <Bell size={18} color="var(--text-main)" />
+            <Bell size={17} color="var(--text-main)" />
             <span className="notification-badge-count">3</span>
           </button>
 
@@ -170,25 +189,25 @@ export default function Header({
             <div
               style={{
                 position: 'absolute',
-                top: 'calc(100% + 8px)',
+                top: 'calc(100% + 10px)',
                 right: 0,
-                width: '320px',
+                width: '330px',
                 backgroundColor: 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '0.75rem',
-                boxShadow: 'var(--shadow-lg)',
+                borderRadius: '0.85rem',
+                boxShadow: 'var(--shadow-xl)',
                 zIndex: 100,
-                padding: '0.75rem',
-                animation: 'fadeIn 0.15s ease'
+                padding: '0.85rem',
+                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>Notifications</span>
-                <span style={{ fontSize: '0.7rem', fontWeight: '700', backgroundColor: 'var(--danger-bg)', color: 'var(--danger-text)', padding: '0.1rem 0.4rem', borderRadius: '9999px' }}>
-                  3 Unread
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.65rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.65rem' }}>
+                <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)' }}>Notifications</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: '700', backgroundColor: 'var(--danger-bg)', color: 'var(--danger-text)', padding: '0.15rem 0.5rem', borderRadius: '9999px', border: '1px solid var(--danger-border)' }}>
+                  3 Urgent
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
                 {sampleNotifications.map((n) => (
                   <div
                     key={n.id}
@@ -197,20 +216,21 @@ export default function Header({
                       navigate('/alerts');
                     }}
                     style={{
-                      padding: '0.5rem 0.6rem',
-                      borderRadius: '0.5rem',
+                      padding: '0.6rem 0.75rem',
+                      borderRadius: '0.6rem',
                       backgroundColor: 'var(--bg-subtle)',
+                      border: '1px solid var(--border-color)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'flex-start',
-                      gap: '0.5rem',
+                      gap: '0.6rem',
                       transition: 'all 0.15s ease'
                     }}
                   >
                     <AlertTriangle size={15} color={n.urgent ? 'var(--danger)' : 'var(--warning)'} style={{ marginTop: 2, flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.2' }}>{n.title}</div>
-                      <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>{n.time}</div>
+                      <div style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.25' }}>{n.title}</div>
+                      <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{n.time}</div>
                     </div>
                   </div>
                 ))}
@@ -222,22 +242,23 @@ export default function Header({
                 }}
                 style={{
                   width: '100%',
-                  marginTop: '0.6rem',
-                  padding: '0.35rem',
+                  marginTop: '0.75rem',
+                  padding: '0.45rem',
                   border: 'none',
                   background: 'var(--primary-light)',
                   color: 'var(--primary)',
                   fontWeight: '700',
-                  fontSize: '0.75rem',
-                  borderRadius: '0.375rem',
+                  fontSize: '0.775rem',
+                  borderRadius: '0.5rem',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.25rem'
+                  gap: '0.35rem',
+                  transition: 'all 0.15s ease'
                 }}
               >
-                View All Alerts <ExternalLink size={12} />
+                View All Alerts <ExternalLink size={13} />
               </button>
             </div>
           )}
@@ -252,9 +273,22 @@ export default function Header({
               setShowNotifications(false);
             }}
             title={`User Profile: ${user.name} (${user.role || 'Admin'})`}
+            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
-            <div className="header-user-avatar">
-              {user.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'JD'}
+            <div style={{ position: 'relative' }}>
+              <div className="header-user-avatar">
+                {user.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'JD'}
+              </div>
+              <span style={{
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#10B981',
+                border: '1.5px solid var(--bg-card)'
+              }} />
             </div>
             <div className="header-user-info">
               <span className="header-user-name">{user.name || 'John Doe'}</span>
@@ -268,21 +302,33 @@ export default function Header({
             <div
               style={{
                 position: 'absolute',
-                top: 'calc(100% + 8px)',
+                top: 'calc(100% + 10px)',
                 right: 0,
-                width: '220px',
+                width: '230px',
                 backgroundColor: 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
-                borderRadius: '0.75rem',
-                boxShadow: 'var(--shadow-lg)',
+                borderRadius: '0.85rem',
+                boxShadow: 'var(--shadow-xl)',
                 zIndex: 100,
-                padding: '0.6rem',
-                animation: 'fadeIn 0.15s ease'
+                padding: '0.75rem',
+                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
-              <div style={{ padding: '0.4rem 0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.4rem' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>{user.name || 'John Doe'}</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{user.email || 'johndoe@tender.org'}</div>
+              <div style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '0.825rem', fontWeight: '700', color: 'var(--text-main)' }}>{user.name || 'John Doe'}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>{user.email || 'johndoe@tender.org'}</div>
+                <div style={{
+                  display: 'inline-block',
+                  marginTop: '6px',
+                  fontSize: '0.65rem',
+                  fontWeight: '700',
+                  color: 'var(--primary)',
+                  backgroundColor: 'var(--primary-light)',
+                  padding: '0.1rem 0.45rem',
+                  borderRadius: '0.25rem'
+                }}>
+                  {user.role || 'Super Admin'}
+                </div>
               </div>
               <button
                 onClick={() => {
@@ -293,19 +339,20 @@ export default function Header({
                   width: '100%',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.4rem 0.5rem',
+                  gap: '0.55rem',
+                  padding: '0.5rem 0.6rem',
                   border: 'none',
                   background: 'transparent',
                   color: 'var(--text-main)',
-                  fontSize: '0.775rem',
+                  fontSize: '0.8rem',
                   fontWeight: '500',
-                  borderRadius: '0.375rem',
+                  borderRadius: '0.4rem',
                   cursor: 'pointer',
-                  textAlign: 'left'
+                  textAlign: 'left',
+                  transition: 'background 0.15s ease'
                 }}
               >
-                <Settings size={14} color="var(--text-muted)" /> Account Settings
+                <Settings size={15} color="var(--text-muted)" /> Account Settings
               </button>
               {auth?.logout && (
                 <button
@@ -318,20 +365,21 @@ export default function Header({
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
-                    padding: '0.4rem 0.5rem',
+                    gap: '0.55rem',
+                    padding: '0.5rem 0.6rem',
                     border: 'none',
                     background: 'transparent',
                     color: 'var(--danger)',
-                    fontSize: '0.775rem',
+                    fontSize: '0.8rem',
                     fontWeight: '600',
-                    borderRadius: '0.375rem',
+                    borderRadius: '0.4rem',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    marginTop: '0.2rem'
+                    marginTop: '0.2rem',
+                    transition: 'background 0.15s ease'
                   }}
                 >
-                  <LogOut size={14} /> Log Out
+                  <LogOut size={15} /> Log Out
                 </button>
               )}
             </div>
@@ -348,7 +396,7 @@ export default function Header({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.1rem',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           {darkMode ? (
