@@ -66,10 +66,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         }}>
           IOT
         </div>
-        <div className="sidebar-brand-title">
-          Infrastructure<br />
-          Opportunity Tracker
-        </div>
       </div>
 
       <nav className="sidebar-nav">

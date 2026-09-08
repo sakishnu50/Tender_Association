@@ -122,7 +122,7 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
   }, [timeRange]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.25rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '24px', marginBottom: '32px' }}>
       {/* Analytics Navigation Bar */}
       <div style={{
         display: 'flex',
