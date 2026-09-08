@@ -95,6 +95,20 @@ export default function App() {
     login: 'Login Page'
   };
 
+  // Derived filtered opportunities for global actions
+  const filteredOpportunities = React.useMemo(() => {
+    if (!searchVal || !searchVal.trim()) return mockOpportunities;
+    const term = searchVal.trim().toLowerCase();
+    return mockOpportunities.filter((o) => {
+      const name = (o.name || o.title || '').toLowerCase();
+      const id = (o.id || '').toLowerCase();
+      const source = (o.source || '').toLowerCase();
+      const sector = (o.sector || '').toLowerCase();
+      const location = (o.location || o.country || '').toLowerCase();
+      return name.includes(term) || id.includes(term) || source.includes(term) || sector.includes(term) || location.includes(term);
+    });
+  }, [searchVal]);
+
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
@@ -109,6 +123,8 @@ export default function App() {
           activeTab={activeTab}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
+          opportunities={mockOpportunities}
+          filteredOpportunities={filteredOpportunities}
         />
 
         {/* Declarative View Router */}
@@ -117,6 +133,8 @@ export default function App() {
             path="/"
             element={
               <DashboardView
+                searchVal={searchVal}
+                setSearchVal={setSearchVal}
                 onSelectOpportunity={handleSelectOpportunity}
                 onViewAll={() => {
                   setActiveTab('opportunities');
@@ -127,7 +145,12 @@ export default function App() {
           />
           <Route
             path="/opportunities"
-            element={<OpportunitiesListView onSelectOpportunity={handleSelectOpportunity} />}
+            element={
+              <OpportunitiesListView
+                searchVal={searchVal}
+                onSelectOpportunity={handleSelectOpportunity}
+              />
+            }
           />
           <Route
             path="/opportunities/details"

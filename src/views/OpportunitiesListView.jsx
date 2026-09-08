@@ -7,7 +7,7 @@ import { useOpportunities, useCreateOpportunity } from '../hooks/useApiQueries';
 import OpportunityTable from '../components/OpportunityTable';
 import AddOpportunityModal from '../components/ui/AddOpportunityModal';
 
-export default function OpportunitiesListView({ onSelectOpportunity }) {
+export default function OpportunitiesListView({ onSelectOpportunity, searchVal = '' }) {
   const { data: fetchedOpps, isLoading, isError } = useOpportunities();
   const createMutation = useCreateOpportunity();
   const opportunitiesList = fetchedOpps || mockOpportunities;
@@ -162,13 +162,15 @@ export default function OpportunitiesListView({ onSelectOpportunity }) {
   };
 
   const filteredOpps = opportunitiesList.filter((item) => {
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+    const effectiveSearch = (searchVal || searchTerm || '').trim().toLowerCase();
+    if (effectiveSearch) {
       const name = (item.name || item.title || '').toLowerCase();
+      const id = (item.id || '').toLowerCase();
       const source = (item.source || '').toLowerCase();
       const sector = (item.sector || '').toLowerCase();
       const location = (item.location || item.country || '').toLowerCase();
-      if (!name.includes(term) && !source.includes(term) && !sector.includes(term) && !location.includes(term)) {
+
+      if (!name.includes(effectiveSearch) && !id.includes(effectiveSearch) && !source.includes(effectiveSearch) && !sector.includes(effectiveSearch) && !location.includes(effectiveSearch)) {
         return false;
       }
     }

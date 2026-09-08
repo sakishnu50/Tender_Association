@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
   RefreshCw,
   Download,
   FileText,
+  Table,
   Bell,
   Sun,
   Moon,
@@ -16,6 +17,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { exportService } from '../services/exportService';
 import { mockOpportunities } from '../data/mockData';
 
 export default function Header({
@@ -27,60 +29,89 @@ export default function Header({
   toggleTheme,
   onRefresh,
   onExportCSV,
-  onDownloadPDF
+  onDownloadPDF,
+  opportunities = mockOpportunities,
+  filteredOpportunities = null
 }) {
   const navigate = useNavigate();
   const auth = useAuth();
   const user = auth?.user || { name: 'John Doe', role: 'Admin', email: 'johndoe@tender.org' };
 
+  const inputRef = useRef(null);
+  const downloadMenuRef = useRef(null);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadingLabel, setDownloadingLabel] = useState('');
+
+  const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
+
+  // Keyboard shortcut listener (Cmd+K / Ctrl+K focus, Escape clear)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+      if (e.key === 'Escape' && document.activeElement === inputRef.current) {
+        if (setSearchVal) setSearchVal('');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setSearchVal]);
+
+  // Click outside listener for dropdown menus
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(event.target)) {
+        setShowDownloadMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleRefreshClick = async () => {
     setIsRefreshing(true);
     if (onRefresh) {
       await onRefresh();
     } else {
-      await new Promise((res) => setTimeout(res, 800));
+      await new Promise((res) => setTimeout(res, 700));
     }
     setIsRefreshing(false);
   };
 
-  const handleExportCSVClick = () => {
+  const handleDownloadCSV = async () => {
+    setShowDownloadMenu(false);
     if (onExportCSV) {
       onExportCSV();
-    } else {
-      const headers = ['ID', 'Name', 'Source', 'Sector', 'Location', 'Value', 'AI Score', 'Deadline', 'Status'];
-      const rows = mockOpportunities.map((o) => [
-        o.id,
-        `"${o.name}"`,
-        o.source,
-        o.sector || 'N/A',
-        o.location,
-        o.value || 'N/A',
-        o.aiScore,
-        o.deadline,
-        o.status || 'New'
-      ]);
-      const csvContent = [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `Tender_Export_${new Date().toISOString().slice(0, 10)}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      return;
     }
+    setIsDownloading(true);
+    setDownloadingLabel('Exporting CSV...');
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const dateStr = new Date().toISOString().slice(0, 10);
+    exportService.exportToExcel(effectiveData, `Tender_Export_${dateStr}.csv`);
+    setIsDownloading(false);
   };
 
-  const handleDownloadPDFClick = () => {
+  const handleDownloadPDF = async () => {
+    setShowDownloadMenu(false);
     if (onDownloadPDF) {
       onDownloadPDF();
-    } else {
-      window.print();
+      return;
     }
+    setIsDownloading(true);
+    setDownloadingLabel('Generating PDF...');
+    await new Promise((resolve) => setTimeout(resolve, 450));
+    const dateStr = new Date().toISOString().slice(0, 10);
+    exportService.exportToPDF(effectiveData, `Tender_Report_${dateStr}.pdf`);
+    setIsDownloading(false);
   };
 
   const sampleNotifications = [
@@ -91,12 +122,13 @@ export default function Header({
 
   return (
     <header className="top-header">
-      {/* Expanded Search Bar (50-60% width) */}
+      {/* Real-Time Search Bar */}
       <div className="header-search" style={{ position: 'relative' }}>
         <Search size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
         <input
+          ref={inputRef}
           type="text"
-          placeholder="Search tenders, IDs, sources, sectors..."
+          placeholder="Search project name, tender ID, source, sector..."
           value={searchVal || ''}
           onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
         />
@@ -112,7 +144,7 @@ export default function Header({
               alignItems: 'center',
               padding: '2px'
             }}
-            title="Clear search"
+            title="Clear search (Esc)"
           >
             <X size={14} />
           </button>
@@ -135,7 +167,7 @@ export default function Header({
 
       {/* Header Action Controls */}
       <div className="header-actions" style={{ gap: '0.65rem' }}>
-        {/* Refresh Button */}
+        {/* 1. Refresh Button */}
         <button
           className="btn-header-action"
           onClick={handleRefreshClick}
@@ -147,35 +179,148 @@ export default function Header({
           <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
         </button>
 
-        {/* Export CSV Button */}
-        <button
-          className="btn-header-blue"
-          onClick={handleExportCSVClick}
-          title="Export Data as CSV File"
-          style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
-        >
-          <Download size={15} />
-          <span>Export CSV</span>
-        </button>
+        {/* 2. Combined Single Download Button with Dropdown (Positioned after Refresh) */}
+        <div style={{ position: 'relative' }} ref={downloadMenuRef}>
+          <button
+            className="btn-header-blue"
+            onClick={() => {
+              setShowDownloadMenu(!showDownloadMenu);
+              setShowNotifications(false);
+              setShowProfileMenu(false);
+            }}
+            title="Download or Export Tenders Data"
+            disabled={isDownloading}
+            style={{
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}
+          >
+            {isDownloading ? (
+              <>
+                <RefreshCw size={15} className="spin-icon" />
+                <span>{downloadingLabel || 'Downloading...'}</span>
+              </>
+            ) : (
+              <>
+                <Download size={15} />
+                <span>Download</span>
+                <ChevronDown size={13} style={{ marginLeft: 1, opacity: 0.85 }} />
+              </>
+            )}
+          </button>
 
-        {/* Download PDF Button */}
-        <button
-          className="btn-header-blue-alt"
-          onClick={handleDownloadPDFClick}
-          title="Download Dashboard PDF Report"
-          style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
-        >
-          <FileText size={15} />
-          <span>Download PDF</span>
-        </button>
+          {showDownloadMenu && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                width: '230px',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.75rem',
+                boxShadow: 'var(--shadow-xl)',
+                zIndex: 110,
+                padding: '0.5rem',
+                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              <div style={{ padding: '0.35rem 0.6rem', fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Export Options
+              </div>
 
-        {/* Notifications Bell Icon with Badge */}
+              {/* Option 1: Download CSV */}
+              <button
+                onClick={handleDownloadCSV}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  padding: '0.55rem 0.65rem',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-main)',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'background 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  color: '#10B981',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <Table size={15} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>Download CSV</div>
+                  <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>Spreadsheet data (.csv)</div>
+                </div>
+              </button>
+
+              {/* Option 2: Download PDF */}
+              <button
+                onClick={handleDownloadPDF}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  padding: '0.55rem 0.65rem',
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-main)',
+                  borderRadius: '0.5rem',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  marginTop: '0.2rem',
+                  transition: 'background 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+              >
+                <div style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(37, 99, 235, 0.12)',
+                  color: '#2563EB',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <FileText size={15} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>Download PDF</div>
+                  <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>Intelligence report (.pdf)</div>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* 3. Notifications Bell Icon with Badge */}
         <div style={{ position: 'relative' }}>
           <button
             className="icon-btn-header"
             onClick={() => {
               setShowNotifications(!showNotifications);
               setShowProfileMenu(false);
+              setShowDownloadMenu(false);
             }}
             title="Notifications (3 Urgent Alerts)"
             style={{ position: 'relative', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -264,13 +409,34 @@ export default function Header({
           )}
         </div>
 
-        {/* User Profile Avatar */}
+        {/* 4. Dark / Light Theme Toggle (Positioned before User Profile) */}
+        <button
+          className="icon-btn-header"
+          onClick={toggleTheme}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          style={{
+            padding: '0.4rem 0.6rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
+          {darkMode ? (
+            <Sun size={18} color="#F59E0B" />
+          ) : (
+            <Moon size={18} color="#6366F1" />
+          )}
+        </button>
+
+        {/* 5. User Profile Avatar & Dropdown (On the far right) */}
         <div style={{ position: 'relative' }}>
           <div
             className="header-user-profile"
             onClick={() => {
               setShowProfileMenu(!showProfileMenu);
               setShowNotifications(false);
+              setShowDownloadMenu(false);
             }}
             title={`User Profile: ${user.name} (${user.role || 'Admin'})`}
             style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
@@ -386,26 +552,6 @@ export default function Header({
           )}
         </div>
 
-        {/* Dark / Light Theme Toggle */}
-        <button
-          className="icon-btn-header"
-          onClick={toggleTheme}
-          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          style={{
-            padding: '0.4rem 0.6rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          {darkMode ? (
-            <Sun size={18} color="#F59E0B" />
-          ) : (
-            <Moon size={18} color="#6366F1" />
-          )}
-        </button>
-
         <div
           id="header-actions-portal"
           style={{
@@ -418,3 +564,4 @@ export default function Header({
     </header>
   );
 }
+

@@ -98,21 +98,17 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </div>
 
       {/* Navigation Sections */}
-      <nav className="sidebar-nav" style={{ padding: '1rem 0.65rem' }}>
+      <nav className="sidebar-nav" style={{ padding: '0.75rem 0.65rem' }}>
         {navSections.map((section, idx) => (
-          <div key={section.title} style={{ marginBottom: idx < navSections.length - 1 ? '1.15rem' : '0' }}>
-            <div style={{
-              fontSize: '0.65rem',
-              fontWeight: '700',
-              color: '#64748B',
-              letterSpacing: '0.08em',
-              padding: '0 0.6rem 0.4rem 0.6rem',
-              textTransform: 'uppercase'
-            }}>
-              {section.title}
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+          <div
+            key={idx}
+            style={{
+              marginBottom: idx < navSections.length - 1 ? '0.75rem' : '0',
+              paddingBottom: idx < navSections.length - 1 ? '0.75rem' : '0',
+              borderBottom: idx < navSections.length - 1 ? '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))' : 'none'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;

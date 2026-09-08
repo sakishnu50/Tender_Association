@@ -20,7 +20,8 @@ import {
   Zap,
   RefreshCw,
   SlidersHorizontal,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
@@ -28,7 +29,7 @@ import DashboardAnalytics from '../components/dashboard/DashboardAnalytics';
 import DashboardQuickViewModal from '../components/dashboard/DashboardQuickViewModal';
 import KpiDetailModal from '../components/dashboard/KpiDetailModal';
 
-export default function DashboardView({ onSelectOpportunity, onViewAll }) {
+export default function DashboardView({ onSelectOpportunity, onViewAll, searchVal = '', setSearchVal }) {
   const queryClient = useQueryClient();
   const { data: fetchedOpps, refetch } = useOpportunities();
   const opportunities = fetchedOpps || mockOpportunities;
@@ -37,13 +38,24 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
   const pursueMutation = usePursueOpportunity();
   const declineMutation = useDeclineOpportunity();
 
-  // Dashboard Interactive States
+  // Dashboard Interactive States (timeRange persisted in localStorage)
   const [activeKpiFilter, setActiveKpiFilter] = useState('all'); // all, highMatch, highPriority, closingSoon, pursued
   const [sectorFilter, setSectorFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('score'); // score, deadline, value
   const [viewMode, setViewMode] = useState('table'); // table or grid
-  const [timeRange, setTimeRange] = useState('month'); // week, month, quarter, all
+  const [timeRange, setTimeRange] = useState(() => {
+    return localStorage.getItem('dashboard_time_period') || 'all';
+  });
+  const [isFilterLoading, setIsFilterLoading] = useState(false);
+
+  const handleTimeRangeChange = (newPeriod) => {
+    if (newPeriod === timeRange) return;
+    setIsFilterLoading(true);
+    setTimeRange(newPeriod);
+    localStorage.setItem('dashboard_time_period', newPeriod);
+    setTimeout(() => setIsFilterLoading(false), 200);
+  };
 
   // Modals state
   const [selectedQuickViewOpp, setSelectedQuickViewOpp] = useState(null);
@@ -97,6 +109,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
 
   // Filtered & Sorted Opportunities for main directory table/grid
   const filteredOpportunities = useMemo(() => {
+    const effectiveSearch = (searchVal || searchTerm || '').trim().toLowerCase();
     return timeFilteredOpportunities
       .filter((opp) => {
         // KPI Filter
@@ -110,14 +123,14 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
           return false;
         }
 
-        // Search Term Filter
-        if (searchTerm.trim() !== '') {
-          const term = searchTerm.toLowerCase();
-          const nameMatch = opp.name?.toLowerCase().includes(term);
-          const sourceMatch = opp.source?.toLowerCase().includes(term);
-          const locMatch = opp.location?.toLowerCase().includes(term);
-          const sectorMatch = opp.sector?.toLowerCase().includes(term);
-          if (!nameMatch && !sourceMatch && !locMatch && !sectorMatch) return false;
+        // Search Term Filter (works across project name, tender ID, source, sector, location)
+        if (effectiveSearch !== '') {
+          const nameMatch = (opp.name || opp.title || '').toLowerCase().includes(effectiveSearch);
+          const idMatch = (opp.id || '').toLowerCase().includes(effectiveSearch);
+          const sourceMatch = (opp.source || '').toLowerCase().includes(effectiveSearch);
+          const sectorMatch = (opp.sector || '').toLowerCase().includes(effectiveSearch);
+          const locMatch = (opp.location || '').toLowerCase().includes(effectiveSearch);
+          if (!nameMatch && !idMatch && !sourceMatch && !sectorMatch && !locMatch) return false;
         }
 
         return true;
@@ -128,7 +141,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
         if (sortBy === 'value') return (b.id || '').localeCompare(a.id || '');
         return 0;
       });
-  }, [timeFilteredOpportunities, activeKpiFilter, sectorFilter, searchTerm, sortBy]);
+  }, [timeFilteredOpportunities, activeKpiFilter, sectorFilter, searchTerm, searchVal, sortBy]);
 
   // Export Dashboard Summary as CSV
   const handleExportCSV = () => {
@@ -177,15 +190,49 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
     alert(`Opportunity "${opp.name}" DECLINED.`);
   };
 
+  // Metric trend and text mapping per time range
+  const periodMetricsMap = {
+    all: {
+      totalPct: '+14.2%', totalText: '+14% vs last period', totalIsPos: true,
+      highMatchPct: '+8.5%', highMatchText: 'Strong Client Fit', highMatchIsPos: true,
+      urgentPct: '+24.0%', urgentText: 'Requires Action', urgentIsPos: false,
+      closingPct: '-3.2%', closingText: 'Tight Timeline', closingIsPos: false,
+      pursuedPct: '+18.6%', pursuedText: 'Active Pipeline', pursuedIsPos: true
+    },
+    week: {
+      totalPct: '+5.1%', totalText: '+2 this week', totalIsPos: true,
+      highMatchPct: '+12.0%', highMatchText: 'High conversion', highMatchIsPos: true,
+      urgentPct: '+15.4%', urgentText: '2 due this week', urgentIsPos: false,
+      closingPct: '+8.0%', closingText: 'Urgent deadlines', closingIsPos: false,
+      pursuedPct: '+6.2%', pursuedText: '1 submitted', pursuedIsPos: true
+    },
+    month: {
+      totalPct: '+11.3%', totalText: '+6 this month', totalIsPos: true,
+      highMatchPct: '+9.4%', highMatchText: 'Monthly benchmark', highMatchIsPos: true,
+      urgentPct: '+18.2%', urgentText: 'Monthly priority', urgentIsPos: false,
+      closingPct: '-1.5%', closingText: 'Month-end target', closingIsPos: false,
+      pursuedPct: '+14.0%', pursuedText: 'Monthly pipeline', pursuedIsPos: true
+    },
+    quarter: {
+      totalPct: '+16.8%', totalText: 'Q3 Cumulative', totalIsPos: true,
+      highMatchPct: '+10.2%', highMatchText: 'Quarterly target', highMatchIsPos: true,
+      urgentPct: '+22.5%', urgentText: 'Q3 Focus Tenders', urgentIsPos: false,
+      closingPct: '-4.1%', closingText: 'Quarterly queue', closingIsPos: false,
+      pursuedPct: '+21.0%', pursuedText: 'Quarterly growth', pursuedIsPos: true
+    }
+  };
+
+  const periodMetrics = periodMetricsMap[timeRange] || periodMetricsMap.all;
+
   // KPI Stat Cards definitions with Enterprise Color Coding & Trending Indicators
   const kpis = [
     {
       key: 'all',
       title: 'Total Opportunities',
       value: timeFilteredOpportunities.length,
-      percentage: '+14.2%',
-      isPositive: true,
-      changeText: timeRange === 'week' ? '+2 this week' : timeRange === 'month' ? '+4 this month' : '+14% vs last period',
+      percentage: periodMetrics.totalPct,
+      isPositive: periodMetrics.totalIsPos,
+      changeText: periodMetrics.totalText,
       icon: TrendingUp,
       color: '#2563EB',
       bg: 'rgba(37, 99, 235, 0.1)',
@@ -195,9 +242,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       key: 'highMatch',
       title: 'High AI Match (8.5+)',
       value: timeFilteredOpportunities.filter(o => (o.aiScore || 0) >= 8.5).length,
-      percentage: '+8.5%',
-      isPositive: true,
-      changeText: 'Strong Client Fit',
+      percentage: periodMetrics.highMatchPct,
+      isPositive: periodMetrics.highMatchIsPos,
+      changeText: periodMetrics.highMatchText,
       icon: Award,
       color: '#10B981',
       bg: 'rgba(16, 185, 129, 0.1)',
@@ -207,9 +254,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       key: 'highPriority',
       title: 'Urgent & High Priority',
       value: timeFilteredOpportunities.filter(o => o.status === 'High Priority' || (o.aiScore || 0) >= 9.0).length,
-      percentage: '+24.0%',
-      isPositive: false,
-      changeText: 'Requires Action',
+      percentage: periodMetrics.urgentPct,
+      isPositive: periodMetrics.urgentIsPos,
+      changeText: periodMetrics.urgentText,
       icon: AlertTriangle,
       color: '#EF4444',
       bg: 'rgba(239, 68, 68, 0.1)',
@@ -219,9 +266,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       key: 'closingSoon',
       title: 'Closing Soon (< 7 Days)',
       value: timeFilteredOpportunities.filter(o => o.deadline?.includes('15 Sep') || o.deadline?.includes('20 Sep') || (o.aiScore || 0) >= 8.5).length,
-      percentage: '-3.2%',
-      isPositive: false,
-      changeText: 'Tight Timeline',
+      percentage: periodMetrics.closingPct,
+      isPositive: periodMetrics.closingIsPos,
+      changeText: periodMetrics.closingText,
       icon: Clock,
       color: '#F59E0B',
       bg: 'rgba(245, 158, 11, 0.1)',
@@ -231,9 +278,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       key: 'pursued',
       title: 'Pursued Tenders',
       value: timeFilteredOpportunities.filter(o => o.status === 'Pursued').length,
-      percentage: '+18.6%',
-      isPositive: true,
-      changeText: 'Active Pipeline',
+      percentage: periodMetrics.pursuedPct,
+      isPositive: periodMetrics.pursuedIsPos,
+      changeText: periodMetrics.pursuedText,
       icon: CheckCircle,
       color: '#0284C7',
       bg: 'rgba(2, 132, 199, 0.1)',
@@ -281,39 +328,8 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
           </span>
         </div>
 
-        {/* Toolbar Time Filter Controls */}
+        {/* Toolbar Quick Indicators */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: 'var(--bg-subtle)',
-            borderRadius: '0.6rem',
-            border: '1px solid var(--border-color)',
-            padding: '0.25rem'
-          }}>
-            {['week', 'month', 'quarter', 'all'].map((t) => (
-              <button
-                key={t}
-                onClick={() => setTimeRange(t)}
-                style={{
-                  border: 'none',
-                  background: timeRange === t ? 'var(--bg-card)' : 'transparent',
-                  color: timeRange === t ? 'var(--primary)' : 'var(--text-muted)',
-                  fontSize: '0.775rem',
-                  fontWeight: timeRange === t ? '700' : '500',
-                  padding: '0.35rem 0.75rem',
-                  borderRadius: '0.4rem',
-                  cursor: 'pointer',
-                  boxShadow: timeRange === t ? 'var(--shadow-sm)' : 'none',
-                  textTransform: 'capitalize',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {t === 'all' ? 'All Time' : `This ${t.charAt(0).toUpperCase() + t.slice(1)}`}
-              </button>
-            ))}
-          </div>
-
           {lastRefreshedTime && (
             <span style={{
               fontSize: '0.725rem',
@@ -330,6 +346,64 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
               ✓ Refreshed {lastRefreshedTime}
             </span>
           )}
+        </div>
+      </div>
+
+      {/* Time Period Filter Bar (Positioned above Metric Cards Grid) */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1rem',
+        marginTop: '4px',
+        marginBottom: '-8px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <h2 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
+            Key Performance Indicators
+          </h2>
+          {isFilterLoading && (
+            <span style={{ fontSize: '0.725rem', color: 'var(--primary)', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+              <RefreshCw size={12} className="spin-icon" /> Updating period...
+            </span>
+          )}
+        </div>
+
+        {/* Single Unified Time Period Filter Control */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          backgroundColor: 'var(--bg-card)',
+          padding: '0.35rem 0.85rem',
+          borderRadius: '9999px',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-xs)'
+        }}>
+          <Calendar size={14} color="var(--primary)" />
+          <span style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+            Time Period:
+          </span>
+          <select
+            value={timeRange}
+            onChange={(e) => handleTimeRangeChange(e.target.value)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--primary)',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              outline: 'none',
+              padding: '0.1rem 0.25rem'
+            }}
+          >
+            <option value="all">All Time</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+          </select>
         </div>
       </div>
 
