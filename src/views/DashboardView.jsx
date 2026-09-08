@@ -227,25 +227,21 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
   ];
 
   return (
-    <div className="page-container" style={{ gap: '1.25rem' }}>
+    <div className="page-container" style={{ padding: '32px', gap: '32px' }}>
       {/* 1. Welcome & Actions Hero Toolbar */}
       <div style={{
         backgroundColor: 'var(--bg-card)',
         borderRadius: '1rem',
-        padding: '1.25rem 1.5rem',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow-sm)',
+        padding: '24px 28px',
+        marginBottom: '32px',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1rem'
+        gap: '1.25rem'
       }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <h1 style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--text-main)' }}>
-              Procurement & Tender Workspace
-            </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <span style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -260,9 +256,6 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
               <Sparkles size={12} /> AI Automated Intelligence
             </span>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Real-time monitoring across World Bank, ADB, JICA, and Indian Infrastructure sectors
-          </p>
         </div>
 
         {/* Toolbar Action Controls */}
@@ -333,8 +326,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       {/* 2. Clickable KPI Tiles Row (Opens Filtered Details Modal) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '24px',
+        marginBottom: '32px'
       }}>
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
@@ -346,6 +340,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
               className="card"
               title={`Click to view list of ${kpi.title}`}
               style={{
+                padding: '20px',
                 cursor: 'pointer',
                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 border: isActive ? `2px solid ${kpi.color}` : '1px solid var(--border-color)',
@@ -409,14 +404,14 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       </div>
 
       {/* 3. Action Required & Urgent Tenders Feed */}
-      <div className="card" style={{ padding: '1.25rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <div style={{ padding: '0.35rem', borderRadius: '0.5rem', backgroundColor: 'var(--danger-bg)', color: 'var(--danger)' }}>
-              <Zap size={18} />
+      <div className="card" style={{ padding: '28px', marginBottom: '32px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <div style={{ padding: '0.4rem', borderRadius: '0.5rem', backgroundColor: 'var(--danger-bg)', color: 'var(--danger)' }}>
+              <Zap size={20} />
             </div>
             <div>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)', marginTop: '0' }}>
                 Urgent Attention & High-Match Feed
               </h3>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
@@ -428,7 +423,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
           <button
             onClick={onViewAll}
             className="btn btn-outline"
-            style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
           >
             View All ({opportunities.length}) <ArrowUpRight size={12} />
           </button>
@@ -437,7 +432,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '0.85rem'
+          gap: '24px'
         }}>
           {timeFilteredOpportunities.slice(0, 3).map((opp) => (
             <div
@@ -445,12 +440,12 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
               style={{
                 borderRadius: '0.75rem',
                 border: '1px solid var(--border-color)',
-                padding: '0.9rem',
+                padding: '20px',
                 backgroundColor: 'var(--bg-subtle)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: '0.75rem',
+                gap: '1rem',
                 transition: 'all 0.15s ease'
               }}
             >
@@ -515,26 +510,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
 
       {/* 4. Interactive Recharts Visual Analytics (wired to timeRange) */}
       <DashboardAnalytics timeRange={timeRange} />
-      {/* Visual Analytics Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
-        {/* Trend Line Chart SVG */}
-        <div className="card">
-          <div className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Opportunities Trend</span>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Apr - Oct 2026</span>
-          </div>
-          <div style={{ width: '100%', height: '160px', marginTop: '1rem', position: 'relative' }}>
-            <svg viewBox="0 0 400 140" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-              <line x1="0" y1="30" x2="400" y2="30" stroke="#E2E8F0" strokeDasharray="4 4" />
-              <line x1="0" y1="70" x2="400" y2="70" stroke="#E2E8F0" strokeDasharray="4 4" />
-              <line x1="0" y1="110" x2="400" y2="110" stroke="#E2E8F0" strokeDasharray="4 4" />
-            </svg>
-          </div>
-        </div>
 
-        {/* 5. Opportunities Workspace (Table / Card Explorer) */}
-
-        <div className="card">
+      {/* 5. Opportunities Workspace (Table / Card Explorer) */}
+      <div className="card" style={{ padding: '28px', marginBottom: '32px' }}>
           {/* Explorer Header & Controls */}
           <div style={{
             display: 'flex',
@@ -926,8 +904,6 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
           }}
           onSelectOpportunity={onSelectOpportunity}
         />
-
-      </div>
     </div>
   );
 }

@@ -8,6 +8,8 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, active
         <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
           {activeTabTitle || 'Dashboard'}
         </h2>
+        
+        {/* Keep only one search bar - conditional version */}
         {activeTab !== 'opportunities' && (
           <div className="header-search">
             <Search size={16} color="var(--text-muted)" />
