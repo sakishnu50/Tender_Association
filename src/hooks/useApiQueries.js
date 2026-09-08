@@ -157,6 +157,17 @@ export function useDeclineOpportunity() {
   });
 }
 
+export function useCreateOpportunity() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (opportunity) => apiFacade.createOpportunity(opportunity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+      queryClient.invalidateQueries({ queryKey: ['auditTrail'] });
+    }
+  });
+}
+
 export function useSaveSettings() {
   const queryClient = useQueryClient();
   return useMutation({

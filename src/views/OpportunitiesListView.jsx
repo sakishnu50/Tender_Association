@@ -1,640 +1,469 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Eye, Plus, RotateCcw, Search, SlidersHorizontal, X, Check, ChevronDown, ChevronUp } from 'lucide-react';
-import { mockOpportunities } from '../data/mockData';
-import { useOpportunities, useAddOpportunity } from '../hooks/useApiQueries';
+import { Search, Filter, Plus, RotateCcw, Check } from 'lucide-react';
+import { mockOpportunities, mockOffices } from '../data/mockData';
+import { useOpportunities, useCreateOpportunity } from '../hooks/useApiQueries';
+
+import OpportunityTable from '../components/OpportunityTable';
 import AddOpportunityModal from '../components/ui/AddOpportunityModal';
 
-// Fallback office map to ensure office resolution even if using older cached data
-const defaultOfficeMap = {
-  'OPP-001': 'Chennai',
-  'OPP-002': 'Bangalore',
-  'OPP-003': 'Mumbai',
-  'OPP-004': 'Delhi',
-  'OPP-005': 'Kolkata'
-};
-
 export default function OpportunitiesListView({ onSelectOpportunity }) {
-  const { data: fetchedOpps } = useOpportunities();
+  const { data: fetchedOpps, isLoading, isError } = useOpportunities();
+  const createMutation = useCreateOpportunity();
   const opportunitiesList = fetchedOpps || mockOpportunities;
-  const addOpportunityMutation = useAddOpportunity();
 
-  // Add Opportunity modal state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [expandedFilter, setExpandedFilter] = useState(null);
 
-  // React Router search params for persistent URL state & history
-  const [searchParams, setSearchParams] = useSearchParams();
+  const filterDropdownRef = useRef(null);
 
-  // Active filters derived directly from URL query parameters
-  const activeSearch = searchParams.get('search') || '';
-  const activeSource = searchParams.get('source') || '';
-  const activeSector = searchParams.get('sector') || '';
-  const activeLocation = searchParams.get('location') || searchParams.get('country') || '';
-  const activePriority = searchParams.get('priority') || '';
-  const activeStatus = searchParams.get('status') || '';
-  const activeOffice = searchParams.get('office') || '';
-
-  // Local state for the quick-search input, synced with URL activeSearch
-  const [searchInput, setSearchInput] = useState(activeSearch);
-  const [prevActiveSearch, setPrevActiveSearch] = useState(activeSearch);
-
-  // Sync search input if activeSearch in URL changes externally (e.g. browser Back/Forward, Reset)
-  if (prevActiveSearch !== activeSearch) {
-    setPrevActiveSearch(activeSearch);
-    setSearchInput(activeSearch);
-  }
-
-  // Debounce search query update to URL search params
+  // Close dropdown when clicking outside
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchInput !== activeSearch) {
-        const newParams = new URLSearchParams(searchParams);
-        if (searchInput.trim()) {
-          newParams.set('search', searchInput.trim());
-        } else {
-          newParams.delete('search');
-        }
-        setSearchParams(newParams);
+    const handleClickOutside = (event) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
+        setShowFilters(false);
       }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchInput, activeSearch, searchParams, setSearchParams]);
-
-  // Filter panel state & expanded accordion category
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState(null);
-  const filterContainerRef = useRef(null);
-
-  const handleToggleCategory = (categoryKey) => {
-    setExpandedCategory(prev => (prev === categoryKey ? null : categoryKey));
-  };
-
-  // Close filter panel on outside click or Escape key
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (filterContainerRef.current && !filterContainerRef.current.contains(event.target)) {
-        setIsFilterOpen(false);
-      }
-    }
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') {
-        setIsFilterOpen(false);
-      }
-    }
-
-    if (isFilterOpen) {
+    };
+    if (showFilters) {
       document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isFilterOpen]);
+  }, [showFilters]);
 
-  // Dynamic filter options derived from current opportunities data
-  const dynamicSources = useMemo(() => {
-    return Array.from(new Set(opportunitiesList.map(o => o.source).filter(Boolean))).sort();
-  }, [opportunitiesList]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const dynamicSectors = useMemo(() => {
-    return Array.from(new Set(opportunitiesList.map(o => o.sector).filter(Boolean))).sort();
-  }, [opportunitiesList]);
+  // Read URL query parameters
+  const sourceFilter = searchParams.get('source') || '';
+  const sectorFilter = searchParams.get('sector') || '';
+  const locationFilter = searchParams.get('location') || '';
+  const priorityFilter = searchParams.get('priority') || '';
+  const statusFilter = searchParams.get('status') || '';
+  const officeFilter = searchParams.get('office') || '';
+  const searchTerm = searchParams.get('search') || searchParams.get('q') || '';
 
-  const dynamicLocations = useMemo(() => {
-    const locSet = new Set();
-    opportunitiesList.forEach(o => {
-      if (o.location) {
-        const primaryLoc = o.location.split(',')[0].trim();
-        if (primaryLoc) locSet.add(primaryLoc);
-      }
-      if (o.country) {
-        locSet.add(o.country);
-      }
-    });
-    return Array.from(locSet).sort();
-  }, [opportunitiesList]);
-
-  const dynamicPriorities = useMemo(() => {
-    const prioSet = new Set(['High', 'Medium', 'Low']);
-    opportunitiesList.forEach(o => {
-      if (o.priority) {
-        const formatted = o.priority.charAt(0).toUpperCase() + o.priority.slice(1).toLowerCase();
-        prioSet.add(formatted);
-      }
-    });
-    return Array.from(prioSet);
-  }, [opportunitiesList]);
-
-  const dynamicStatuses = useMemo(() => {
-    const statusSet = new Set(['New', 'In Review', 'Pursued', 'Declined', 'Closed']);
-    opportunitiesList.forEach(o => {
-      if (o.status) statusSet.add(o.status);
-    });
-    return Array.from(statusSet);
-  }, [opportunitiesList]);
-
-  const dynamicOffices = useMemo(() => {
-    const officeSet = new Set();
-    opportunitiesList.forEach(o => {
-      const officeVal = o.office || defaultOfficeMap[o.id];
-      if (officeVal) officeSet.add(officeVal);
-    });
-    return Array.from(officeSet).sort();
-  }, [opportunitiesList]);
-
-  // Active filter count (excluding search bar, as search has its own dedicated input)
-  const activeFilterCount = useMemo(() => {
-    let count = 0;
-    if (activeSource) count++;
-    if (activeSector) count++;
-    if (activeLocation) count++;
-    if (activePriority) count++;
-    if (activeStatus) count++;
-    if (activeOffice) count++;
-    return count;
-  }, [activeSource, activeSector, activeLocation, activePriority, activeStatus, activeOffice]);
-
-  // Handle immediate filter selection
-  const handleSelectOption = (filterKey, value) => {
-    const newParams = new URLSearchParams(searchParams);
-
-    const currentVal = (filterKey === 'location')
-      ? (searchParams.get('location') || searchParams.get('country') || '')
-      : (searchParams.get(filterKey) || '');
-
-    // If clicking "All" or clicking the already selected value, deselect it
-    if (!value || value === 'All' || currentVal.toLowerCase() === value.toLowerCase()) {
-      if (filterKey === 'location') {
-        newParams.delete('location');
-        newParams.delete('country');
+  const handleSearchChange = (val) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (val) {
+        next.set('search', val);
       } else {
-        newParams.delete(filterKey);
+        next.delete('search');
+        next.delete('q');
       }
-    } else {
-      if (filterKey === 'location') {
-        if (value.toLowerCase() === 'india') {
-          newParams.delete('location');
-          newParams.set('country', value);
-        } else {
-          newParams.delete('country');
-          newParams.set('location', value);
-        }
+      return next;
+    }, { replace: true });
+  };
+
+  const handleFilterSelect = (key, val) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      const currentVal = next.get(key) || '';
+      if (currentVal.toLowerCase() === val.toLowerCase()) {
+        next.delete(key);
       } else {
-        newParams.set(filterKey, value);
+        next.set(key, val);
+      }
+      return next;
+    });
+  };
+
+  const resetFilters = () => {
+    setSearchParams(new URLSearchParams());
+  };
+
+  // Dynamic Options derived from data
+  const sourceOptions = useMemo(() => {
+    const set = new Set();
+    opportunitiesList.forEach((item) => {
+      if (item.source) set.add(item.source);
+    });
+    return Array.from(set);
+  }, [opportunitiesList]);
+
+  const sectorOptions = useMemo(() => {
+    const set = new Set();
+    opportunitiesList.forEach((item) => {
+      if (item.sector) set.add(item.sector);
+    });
+    return Array.from(set);
+  }, [opportunitiesList]);
+
+  const locationOptions = useMemo(() => {
+    const set = new Set();
+    opportunitiesList.forEach((item) => {
+      if (item.location) {
+        const primaryLoc = item.location.split(',')[0].trim();
+        if (primaryLoc) set.add(primaryLoc);
+      }
+      if (item.country) {
+        set.add(item.country);
+      }
+    });
+    return Array.from(set);
+  }, [opportunitiesList]);
+
+  const priorityOptions = useMemo(() => {
+    const set = new Set();
+    opportunitiesList.forEach((item) => {
+      if (item.priority) {
+        const formatted = item.priority.charAt(0).toUpperCase() + item.priority.slice(1).toLowerCase();
+        set.add(formatted);
+      }
+    });
+    ['High', 'Medium', 'Low'].forEach((p) => set.add(p));
+    return Array.from(set);
+  }, [opportunitiesList]);
+
+  const statusOptions = useMemo(() => {
+    const set = new Set();
+    opportunitiesList.forEach((item) => {
+      if (item.status) set.add(item.status);
+    });
+    ['New', 'Pursued', 'Declined'].forEach((s) => set.add(s));
+    return Array.from(set);
+  }, [opportunitiesList]);
+
+  const officeOptions = useMemo(() => {
+    const set = new Set();
+    opportunitiesList.forEach((item) => {
+      if (item.office) set.add(item.office);
+    });
+    if (Array.isArray(mockOffices)) {
+      mockOffices.forEach((off) => {
+        if (off.name) set.add(off.name);
+      });
+    }
+    return Array.from(set);
+  }, [opportunitiesList]);
+
+  const filterCategories = [
+    { id: 'source', label: 'Sources', options: sourceOptions, selected: sourceFilter },
+    { id: 'sector', label: 'Sector', options: sectorOptions, selected: sectorFilter },
+    { id: 'location', label: 'Country / Location', options: locationOptions, selected: locationFilter },
+    { id: 'priority', label: 'Priority', options: priorityOptions, selected: priorityFilter },
+    { id: 'status', label: 'Status', options: statusOptions, selected: statusFilter },
+    { id: 'office', label: 'Office', options: officeOptions, selected: officeFilter }
+  ];
+
+  const activeFilterCount = [
+    sourceFilter,
+    sectorFilter,
+    locationFilter,
+    priorityFilter,
+    statusFilter,
+    officeFilter
+  ].filter(Boolean).length;
+
+  const handleAddOpportunity = async (newOpportunity) => {
+    await createMutation.mutateAsync(newOpportunity);
+  };
+
+  const filteredOpps = opportunitiesList.filter((item) => {
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const name = (item.name || item.title || '').toLowerCase();
+      const source = (item.source || '').toLowerCase();
+      const sector = (item.sector || '').toLowerCase();
+      const location = (item.location || item.country || '').toLowerCase();
+      if (!name.includes(term) && !source.includes(term) && !sector.includes(term) && !location.includes(term)) {
+        return false;
       }
     }
 
-    setSearchParams(newParams);
-  };
+    if (sourceFilter && (item.source || '').toLowerCase() !== sourceFilter.toLowerCase()) {
+      return false;
+    }
 
-  // Reset all filters, search query, and clear URL parameters
-  const handleResetAllFilters = () => {
-    setSearchInput('');
-    setSearchParams(new URLSearchParams());
-    setExpandedCategory(null);
-  };
+    if (sectorFilter && (item.sector || '').toLowerCase() !== sectorFilter.toLowerCase()) {
+      return false;
+    }
 
-  // Filtered opportunities matching search + all active filters
-  const filteredOpps = useMemo(() => {
-    return opportunitiesList.filter(item => {
-      // 1. Search Query: matches name/title primarily, or source/sector
-      if (activeSearch.trim()) {
-        const q = activeSearch.trim().toLowerCase();
-        const matchName = item.name?.toLowerCase().includes(q) || item.title?.toLowerCase().includes(q);
-        const matchSource = item.source?.toLowerCase().includes(q);
-        const matchSector = item.sector?.toLowerCase().includes(q);
-        if (!matchName && !matchSource && !matchSector) return false;
-      }
-
-      // 2. Source Filter
-      if (activeSource && item.source?.toLowerCase() !== activeSource.toLowerCase()) {
+    if (locationFilter) {
+      const itemLoc = (item.location || '').toLowerCase();
+      const itemCountry = (item.country || '').toLowerCase();
+      const filterLoc = locationFilter.toLowerCase();
+      if (!itemLoc.includes(filterLoc) && !itemCountry.includes(filterLoc)) {
         return false;
       }
+    }
 
-      // 3. Sector Filter
-      if (activeSector && item.sector?.toLowerCase() !== activeSector.toLowerCase()) {
+    if (priorityFilter && (item.priority || '').toLowerCase() !== priorityFilter.toLowerCase()) {
+      return false;
+    }
+
+    if (statusFilter && (item.status || '').toLowerCase() !== statusFilter.toLowerCase()) {
+      return false;
+    }
+
+    if (officeFilter) {
+      const derivedOffice = item.office || (
+        item.location?.includes('Tamil Nadu') ? 'Chennai' :
+        item.location?.includes('Karnataka') ? 'Bangalore' :
+        item.location?.includes('Maharashtra') ? 'Mumbai' :
+        item.location?.includes('Delhi') ? 'Delhi' :
+        item.location?.includes('Gujarat') ? 'Kolkata' : ''
+      );
+      if (derivedOffice.toLowerCase() !== officeFilter.toLowerCase()) {
         return false;
       }
+    }
 
-      // 4. Country / Location Filter
-      if (activeLocation) {
-        const locLower = activeLocation.toLowerCase();
-        const matchLoc = item.location?.toLowerCase().includes(locLower);
-        const matchCountry = item.country?.toLowerCase().includes(locLower);
-        if (!matchLoc && !matchCountry) return false;
-      }
-
-      // 5. Priority Filter (case-insensitive)
-      if (activePriority && item.priority?.toLowerCase() !== activePriority.toLowerCase()) {
-        return false;
-      }
-
-      // 6. Status Filter (case-insensitive)
-      if (activeStatus && item.status?.toLowerCase() !== activeStatus.toLowerCase()) {
-        return false;
-      }
-
-      // 7. Office Filter
-      if (activeOffice) {
-        const itemOffice = item.office || defaultOfficeMap[item.id] || '';
-        if (itemOffice.toLowerCase() !== activeOffice.toLowerCase()) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [opportunitiesList, activeSearch, activeSource, activeSector, activeLocation, activePriority, activeStatus, activeOffice]);
-
-  const handleAddOpportunity = async (newOppData) => {
-    await addOpportunityMutation.mutateAsync(newOppData);
-  };
+    return true;
+  });
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <h2 className="page-title">Opportunities</h2>
-        <button
-          id="add-opportunity-btn"
-          className="btn btn-primary"
-          onClick={() => setIsAddModalOpen(true)}
-          title="Add a new opportunity"
-        >
-          <Plus size={16} /> Add Opportunity
-        </button>
-      </div>
-
-      {/* Clean Quick-Search & Filter Toolbar */}
-      <div className="card opp-filter-toolbar">
-        {/* Quick Search Bar */}
-        <div className="opp-search-wrapper">
-          <Search size={16} className="search-icon" />
-          <input
-            id="opportunity-search-input"
-            type="text"
-            className="opp-search-input"
-            placeholder="Search opportunities by project name..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+    <div className="page-container" style={{ padding: '1rem 1.5rem', gap: '0.875rem', width: '100%', boxSizing: 'border-box' }}>
+      {/* Top Search & Actions Row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', width: '100%' }}>
+        {/* Wide Search Bar */}
+        <div style={{ position: 'relative', flex: 1 }}>
+          <Search
+            size={15}
+            color="var(--text-muted)"
+            style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }}
           />
-          {searchInput && (
-            <button
-              className="opp-search-clear"
-              onClick={() => setSearchInput('')}
-              title="Clear search"
-            >
-              <X size={14} />
-            </button>
-          )}
+          <input
+            type="text"
+            placeholder="Search opportunities by project name..."
+            value={searchTerm}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            style={{
+              width: '100%',
+              height: '36px',
+              padding: '0 0.85rem 0 2.4rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)',
+              fontSize: '0.875rem',
+              outline: 'none',
+              boxSizing: 'border-box'
+            }}
+          />
         </div>
 
-        {/* Filters Button & Popover */}
-        <div className="filter-btn-container" ref={filterContainerRef}>
+        {/* Filter Button & Floating Dropdown Container */}
+        <div ref={filterDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
+          {/* Filter Icon Button */}
           <button
-            id="filters-button"
-            className={`filter-toggle-btn ${activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => setIsFilterOpen(prev => !prev)}
-            aria-expanded={isFilterOpen}
-            title="Toggle filter options"
+            type="button"
+            className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
+            style={{
+              height: '36px',
+              padding: activeFilterCount > 0 ? '0 0.65rem' : '0',
+              width: activeFilterCount > 0 ? 'auto' : '36px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.35rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              flexShrink: 0
+            }}
+            onClick={() => setShowFilters((prev) => !prev)}
+            title="Filter options"
+            aria-label="Filter options"
+            aria-expanded={showFilters}
           >
-            <SlidersHorizontal size={16} />
+            <Filter size={15} />
             {activeFilterCount > 0 && (
-              <span className="filter-active-count" id="active-filter-badge">
+              <span style={{ fontSize: '0.75rem', fontWeight: '700', lineHeight: 1 }}>
                 {activeFilterCount}
               </span>
             )}
           </button>
 
-          {/* Vertical Expandable Filter Panel */}
-          {isFilterOpen && (
-            <div className="vertical-filter-panel" id="vertical-filter-panel">
-              <div className="vertical-filter-topbar">
-                <span className="vertical-filter-title">Filters</span>
-                <button
-                  id="reset-filter-icon-btn"
-                  className="vertical-filter-reset-btn"
-                  onClick={handleResetAllFilters}
-                  title="Reset all filters"
-                >
-                  <RotateCcw size={14} />
-                </button>
-              </div>
+          {/* Floating Dropdown Filter Panel */}
+          {showFilters && (
+            <div
+              className="card"
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 6px)',
+                right: 0,
+                zIndex: 1000,
+                width: '280px',
+                padding: '0.625rem 0.75rem',
+                borderRadius: 'var(--radius-md, 8px)',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-card)',
+                boxShadow: 'var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.2))',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.2rem'
+              }}
+            >
+              {filterCategories.map((cat, idx) => {
+                const isExpanded = expandedFilter === cat.id;
+                const isSelected = Boolean(cat.selected);
 
-              {/* 1. Sources */}
-              <div className="vertical-filter-item">
-                <button
-                  id="filter-heading-sources"
-                  className={`vertical-filter-header-btn ${activeSource ? 'is-active' : ''}`}
-                  onClick={() => handleToggleCategory('sources')}
-                >
-                  <span>Sources</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activeSource && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{activeSource}</span>}
-                    {expandedCategory === 'sources' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  </div>
-                </button>
-                {expandedCategory === 'sources' && (
-                  <div className="vertical-filter-options-box" id="options-sources">
-                    <button
-                      className={`vertical-filter-option-btn ${!activeSource ? 'selected' : ''}`}
-                      onClick={() => handleSelectOption('source', '')}
+                return (
+                  <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                    {/* Filter Item Row */}
+                    <div
+                      onClick={() => setExpandedFilter(isExpanded ? null : cat.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.45rem 0.5rem',
+                        borderRadius: 'var(--radius-sm, 6px)',
+                        cursor: 'pointer',
+                        fontWeight: isSelected ? '600' : '500',
+                        fontSize: '0.875rem',
+                        color: isSelected ? 'var(--primary)' : 'var(--text-main)',
+                        backgroundColor: isExpanded
+                          ? 'var(--bg-subtle)'
+                          : 'transparent',
+                        userSelect: 'none',
+                        transition: 'background-color 0.15s ease'
+                      }}
                     >
-                      <span>All Sources</span>
-                      {!activeSource && <Check size={14} color="var(--primary)" />}
-                    </button>
-                    {dynamicSources.map(src => (
-                      <button
-                        key={src}
-                        className={`vertical-filter-option-btn ${activeSource.toLowerCase() === src.toLowerCase() ? 'selected' : ''}`}
-                        onClick={() => handleSelectOption('source', src)}
-                      >
-                        <span>{src}</span>
-                        {activeSource.toLowerCase() === src.toLowerCase() && <Check size={14} color="var(--primary)" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span>{cat.label}</span>
+                        {isSelected && (
+                          <span
+                            style={{
+                              fontSize: '0.75rem',
+                              color: 'var(--primary)',
+                              fontWeight: '600'
+                            }}
+                          >
+                            ({cat.selected})
+                          </span>
+                        )}
+                      </div>
 
-              {/* 2. Sector */}
-              <div className="vertical-filter-item">
-                <button
-                  id="filter-heading-sector"
-                  className={`vertical-filter-header-btn ${activeSector ? 'is-active' : ''}`}
-                  onClick={() => handleToggleCategory('sector')}
-                >
-                  <span>Sector</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activeSector && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{activeSector}</span>}
-                    {expandedCategory === 'sector' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  </div>
-                </button>
-                {expandedCategory === 'sector' && (
-                  <div className="vertical-filter-options-box" id="options-sector">
-                    <button
-                      className={`vertical-filter-option-btn ${!activeSector ? 'selected' : ''}`}
-                      onClick={() => handleSelectOption('sector', '')}
-                    >
-                      <span>All Sectors</span>
-                      {!activeSector && <Check size={14} color="var(--primary)" />}
-                    </button>
-                    {dynamicSectors.map(sec => (
-                      <button
-                        key={sec}
-                        className={`vertical-filter-option-btn ${activeSector.toLowerCase() === sec.toLowerCase() ? 'selected' : ''}`}
-                        onClick={() => handleSelectOption('sector', sec)}
-                      >
-                        <span>{sec}</span>
-                        {activeSector.toLowerCase() === sec.toLowerCase() && <Check size={14} color="var(--primary)" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      {/* Reset/Refresh icon inside first row as per reference sketch */}
+                      {idx === 0 ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            resetFilters();
+                          }}
+                          title="Reset all filters"
+                          aria-label="Reset all filters"
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '0.2rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: activeFilterCount > 0 ? 'var(--primary)' : 'var(--text-muted)',
+                            borderRadius: '4px'
+                          }}
+                        >
+                          <RotateCcw size={14} />
+                        </button>
+                      ) : null}
+                    </div>
 
-              {/* 3. Country / Location */}
-              <div className="vertical-filter-item">
-                <button
-                  id="filter-heading-location"
-                  className={`vertical-filter-header-btn ${activeLocation ? 'is-active' : ''}`}
-                  onClick={() => handleToggleCategory('location')}
-                >
-                  <span>Location</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activeLocation && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{activeLocation}</span>}
-                    {expandedCategory === 'location' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  </div>
-                </button>
-                {expandedCategory === 'location' && (
-                  <div className="vertical-filter-options-box" id="options-location">
-                    <button
-                      className={`vertical-filter-option-btn ${!activeLocation ? 'selected' : ''}`}
-                      onClick={() => handleSelectOption('location', '')}
-                    >
-                      <span>All Locations</span>
-                      {!activeLocation && <Check size={14} color="var(--primary)" />}
-                    </button>
-                    {dynamicLocations.map(loc => (
-                      <button
-                        key={loc}
-                        className={`vertical-filter-option-btn ${activeLocation.toLowerCase() === loc.toLowerCase() ? 'selected' : ''}`}
-                        onClick={() => handleSelectOption('location', loc)}
+                    {/* Expandable Filter Options Box directly below filter item */}
+                    {isExpanded && (
+                      <div
+                        style={{
+                          margin: '0.25rem 0 0.4rem 0',
+                          padding: '0.25rem',
+                          border: '1px solid var(--border-color)',
+                          borderRadius: 'var(--radius-sm, 6px)',
+                          backgroundColor: 'var(--bg-subtle)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.15rem',
+                          maxHeight: '170px',
+                          overflowY: 'auto'
+                        }}
                       >
-                        <span>{loc}</span>
-                        {activeLocation.toLowerCase() === loc.toLowerCase() && <Check size={14} color="var(--primary)" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                        {cat.options.map((opt) => {
+                          const optSelected =
+                            cat.selected &&
+                            (cat.selected.toLowerCase() === opt.toLowerCase() ||
+                             (cat.id === 'location' && opt.toLowerCase().includes(cat.selected.toLowerCase())));
 
-              {/* 4. Priority */}
-              <div className="vertical-filter-item">
-                <button
-                  id="filter-heading-priority"
-                  className={`vertical-filter-header-btn ${activePriority ? 'is-active' : ''}`}
-                  onClick={() => handleToggleCategory('priority')}
-                >
-                  <span>Priority</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activePriority && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{activePriority}</span>}
-                    {expandedCategory === 'priority' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          return (
+                            <div
+                              key={opt}
+                              onClick={() => handleFilterSelect(cat.id, opt)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.45rem',
+                                padding: '0.35rem 0.5rem',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '0.8125rem',
+                                color: optSelected ? 'var(--primary)' : 'var(--text-main)',
+                                backgroundColor: optSelected
+                                  ? 'var(--primary-light, rgba(29, 78, 216, 0.08))'
+                                  : 'transparent',
+                                fontWeight: optSelected ? '600' : '400',
+                                transition: 'background-color 0.15s ease'
+                              }}
+                            >
+                              <span
+                                style={{
+                                  width: '14px',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                {optSelected ? <Check size={13} color="var(--primary)" /> : null}
+                              </span>
+                              <span>{opt}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                </button>
-                {expandedCategory === 'priority' && (
-                  <div className="vertical-filter-options-box" id="options-priority">
-                    <button
-                      className={`vertical-filter-option-btn ${!activePriority ? 'selected' : ''}`}
-                      onClick={() => handleSelectOption('priority', '')}
-                    >
-                      <span>All Priorities</span>
-                      {!activePriority && <Check size={14} color="var(--primary)" />}
-                    </button>
-                    {dynamicPriorities.map(prio => (
-                      <button
-                        key={prio}
-                        className={`vertical-filter-option-btn ${activePriority.toLowerCase() === prio.toLowerCase() ? 'selected' : ''}`}
-                        onClick={() => handleSelectOption('priority', prio)}
-                      >
-                        <span>{prio}</span>
-                        {activePriority.toLowerCase() === prio.toLowerCase() && <Check size={14} color="var(--primary)" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* 5. Status */}
-              <div className="vertical-filter-item">
-                <button
-                  id="filter-heading-status"
-                  className={`vertical-filter-header-btn ${activeStatus ? 'is-active' : ''}`}
-                  onClick={() => handleToggleCategory('status')}
-                >
-                  <span>Status</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activeStatus && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{activeStatus}</span>}
-                    {expandedCategory === 'status' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  </div>
-                </button>
-                {expandedCategory === 'status' && (
-                  <div className="vertical-filter-options-box" id="options-status">
-                    <button
-                      className={`vertical-filter-option-btn ${!activeStatus ? 'selected' : ''}`}
-                      onClick={() => handleSelectOption('status', '')}
-                    >
-                      <span>All Status</span>
-                      {!activeStatus && <Check size={14} color="var(--primary)" />}
-                    </button>
-                    {dynamicStatuses.map(st => (
-                      <button
-                        key={st}
-                        className={`vertical-filter-option-btn ${activeStatus.toLowerCase() === st.toLowerCase() ? 'selected' : ''}`}
-                        onClick={() => handleSelectOption('status', st)}
-                      >
-                        <span>{st}</span>
-                        {activeStatus.toLowerCase() === st.toLowerCase() && <Check size={14} color="var(--primary)" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* 6. Office */}
-              <div className="vertical-filter-item">
-                <button
-                  id="filter-heading-office"
-                  className={`vertical-filter-header-btn ${activeOffice ? 'is-active' : ''}`}
-                  onClick={() => handleToggleCategory('office')}
-                >
-                  <span>Office</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    {activeOffice && <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{activeOffice}</span>}
-                    {expandedCategory === 'office' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  </div>
-                </button>
-                {expandedCategory === 'office' && (
-                  <div className="vertical-filter-options-box" id="options-office">
-                    <button
-                      className={`vertical-filter-option-btn ${!activeOffice ? 'selected' : ''}`}
-                      onClick={() => handleSelectOption('office', '')}
-                    >
-                      <span>All Offices</span>
-                      {!activeOffice && <Check size={14} color="var(--primary)" />}
-                    </button>
-                    {dynamicOffices.map(off => (
-                      <button
-                        key={off}
-                        className={`vertical-filter-option-btn ${activeOffice.toLowerCase() === off.toLowerCase() ? 'selected' : ''}`}
-                        onClick={() => handleSelectOption('office', off)}
-                      >
-                        <span>{off}</span>
-                        {activeOffice.toLowerCase() === off.toLowerCase() && <Check size={14} color="var(--primary)" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                );
+              })}
             </div>
           )}
         </div>
+
+        {/* Compact Add Opportunity Button */}
+        <button
+          type="button"
+          className="btn btn-primary"
+          style={{
+            height: '36px',
+            padding: '0 0.85rem',
+            fontSize: '0.8125rem',
+            gap: '0.35rem',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 'var(--radius-md, 6px)',
+            flexShrink: 0,
+            whiteSpace: 'nowrap'
+          }}
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          <Plus size={15} /> Add Opportunity
+        </button>
       </div>
 
-      {/* Opportunities Data Table */}
-      <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div className="table-container" style={{ border: 'none' }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Project Name</th>
-                <th>Source</th>
-                <th>Sector</th>
-                <th>Location</th>
-                <th>AI Score</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOpps.length > 0 ? (
-                filteredOpps.map((opp) => (
-                  <tr key={opp.id}>
-                    <td style={{ fontWeight: '600', color: 'var(--text-main)' }}>{opp.name}</td>
-                    <td>{opp.source}</td>
-                    <td>{opp.sector}</td>
-                    <td>{opp.location}</td>
-                    <td>
-                      <span className="badge badge-info" style={{ fontSize: '0.8rem', fontWeight: '700' }}>
-                        {opp.aiScore}
-                      </span>
-                    </td>
-                    <td>{opp.deadline}</td>
-                    <td>
-                      <span className="badge badge-new">{opp.status}</span>
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-primary"
-                        style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
-                        onClick={() => onSelectOpportunity(opp)}
-                      >
-                        <Eye size={12} /> View
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ fontSize: '1rem', fontWeight: '600', color: 'var(--text-main)' }}>No matching opportunities found</span>
-                      <span style={{ fontSize: '0.875rem' }}>Try adjusting your search keywords or clearing active filters.</span>
-                      <button
-                        className="btn btn-outline"
-                        onClick={handleResetAllFilters}
-                        style={{ marginTop: '0.5rem', fontSize: '0.8rem' }}
-                      >
-                        <RotateCcw size={14} /> Clear all filters
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      {/* TanStack Opportunities Data Table */}
+      <OpportunityTable
+        data={filteredOpps}
+        onSelectOpportunity={onSelectOpportunity}
+        isLoading={isLoading}
+        isError={isError}
+      />
 
-        {/* Pagination Footer */}
-        <div style={{
-          padding: '0.875rem 1.25rem',
-          borderTop: '1px solid var(--border-color)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          fontSize: '0.875rem',
-          color: 'var(--text-muted)'
-        }}>
-          <div>
-            Showing {filteredOpps.length > 0 ? 1 : 0} to {filteredOpps.length} of {opportunitiesList.length} entries
-          </div>
-          <div style={{ display: 'flex', gap: '0.25rem' }}>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>&lt;</button>
-            <button className="btn btn-primary" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>1</button>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>2</button>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>3</button>
-            <button className="btn btn-outline" style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem' }}>&gt;</button>
-        </div>
-      </div>
+      {/* Add Opportunity Popup Modal */}
+      <AddOpportunityModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddOpportunity}
+      />
     </div>
-
-    {/* Add Opportunity Modal */}
-    <AddOpportunityModal
-      isOpen={isAddModalOpen}
-      onClose={() => setIsAddModalOpen(false)}
-      onAdd={handleAddOpportunity}
-    />
-  </div>
   );
 }

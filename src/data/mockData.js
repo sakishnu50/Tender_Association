@@ -417,6 +417,286 @@ export const mockOpportunities = [
       { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '02 Sep 2026', time: '03:00 PM', type: 'collect' },
       { id: 'AT-02', action: 'AI Score Calculated', actor: 'AI Engine', role: 'AI', date: '02 Sep 2026', time: '03:05 PM', type: 'ai' }
     ]
+  },
+  {
+    id: 'OPP-006',
+    name: 'Renewable Energy Solar Corridor',
+    title: 'Renewable Energy Solar Corridor',
+    organization: 'World Bank – Energy Practice',
+    source: 'World Bank',
+    sourceUrl: 'https://projects.worldbank.org/en/projects-operations/project-detail/P182901',
+    country: 'India',
+    sector: 'Infrastructure',
+    location: 'Tamil Nadu, India',
+    value: '₹14.20 Crore',
+    deadline: '12 Oct 2026',
+    status: 'New',
+    aiScore: 8.9,
+    overallScore: 8.9,
+    matchLevel: 'Strong Match',
+    priority: 'HIGH',
+    type: 'Solar Grid',
+    procurementType: 'International Competitive Bidding',
+    description: 'Grid-scale 500MW photovoltaic park installation with high-voltage distribution substations.',
+    scoreFactors: ['Sector Match', 'Past Experience', 'Strategic/Priority Fit'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 8.8, max: 10 },
+      { label: 'Country/Market Match', score: 9.0, max: 10 },
+      { label: 'Past Experience', score: 8.7, max: 10 },
+      { label: 'Capability Match', score: 9.1, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 8.9, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'High relevance tender for expanding sustainable renewable infrastructure footprint.',
+      strengths: ['Proven utility solar engineering partners', 'Strong presence in Tamil Nadu'],
+      risks: ['Strict commissioning schedule'],
+      recommendation: 'Highly Recommended – Pursue'
+    },
+    similarProjects: [],
+    documents: ['Solar_Corridor_RFP.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '04 Sep 2026', time: '09:15 AM', type: 'collect' }
+    ]
+  },
+  {
+    id: 'OPP-007',
+    name: 'Smart Water Metering Network',
+    title: 'Smart Water Metering Network',
+    organization: 'Asian Development Bank (ADB)',
+    source: 'ADB',
+    sourceUrl: 'https://www.adb.org/projects/54124-002/main',
+    country: 'India',
+    sector: 'Water',
+    location: 'Karnataka, India',
+    value: '₹3.80 Crore',
+    deadline: '18 Oct 2026',
+    status: 'New',
+    aiScore: 7.8,
+    overallScore: 7.8,
+    matchLevel: 'Moderate Match',
+    priority: 'MEDIUM',
+    type: 'Smart Utilities',
+    procurementType: 'National Competitive Bidding',
+    description: 'IoT-enabled ultrasonic water meter installation and telemetry integration for 150,000 households.',
+    scoreFactors: ['Sector Match', 'Capability Match'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 8.0, max: 10 },
+      { label: 'Country/Market Match', score: 8.2, max: 10 },
+      { label: 'Past Experience', score: 7.3, max: 10 },
+      { label: 'Capability Match', score: 7.9, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 7.6, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'Solid project fit with IoT utilities experience.',
+      strengths: ['Deep familiarity with urban telemetry'],
+      risks: ['Household access coordination'],
+      recommendation: 'Recommended – Evaluate'
+    },
+    similarProjects: [],
+    documents: ['Smart_Meter_Specs.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '04 Sep 2026', time: '11:30 AM', type: 'collect' }
+    ]
+  },
+  {
+    id: 'OPP-008',
+    name: 'Coastal Expressway Bridge Package',
+    title: 'Coastal Expressway Bridge Package',
+    organization: 'Japan International Cooperation Agency (JICA)',
+    source: 'JICA',
+    sourceUrl: 'https://www.jica.go.jp/english/our_work/projects/index.html',
+    country: 'India',
+    sector: 'Transport',
+    location: 'Maharashtra, India',
+    value: '₹22.00 Crore',
+    deadline: '22 Oct 2026',
+    status: 'New',
+    aiScore: 9.4,
+    overallScore: 9.4,
+    matchLevel: 'Strong Match',
+    priority: 'HIGH',
+    type: 'Bridge & Marine Civil',
+    procurementType: 'International Competitive Bidding',
+    description: 'Construction of 3.2km 8-lane cable-stayed sea bridge with marine piling foundations.',
+    scoreFactors: ['Past Experience', 'Capability Match', 'Sector Match'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 9.6, max: 10 },
+      { label: 'Country/Market Match', score: 9.2, max: 10 },
+      { label: 'Past Experience', score: 9.5, max: 10 },
+      { label: 'Capability Match', score: 9.4, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 9.3, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'Top tier match with premium score and heavy civil engineering alignment.',
+      strengths: ['Outstanding bridge construction track record', 'JICA compliance familiarity'],
+      risks: ['Monsoon weather window management'],
+      recommendation: 'Highly Recommended – Pursue'
+    },
+    similarProjects: [],
+    documents: ['Sea_Bridge_Drawings.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '04 Sep 2026', time: '02:00 PM', type: 'collect' }
+    ]
+  },
+  {
+    id: 'OPP-009',
+    name: 'River Basin Flood Mitigation System',
+    title: 'River Basin Flood Mitigation System',
+    organization: 'Asian Infrastructure Investment Bank (AIIB)',
+    source: 'AIIB',
+    sourceUrl: 'https://www.aiib.org/en/projects/details/index.html',
+    country: 'India',
+    sector: 'Water',
+    location: 'Delhi, India',
+    value: '₹7.50 Crore',
+    deadline: '28 Oct 2026',
+    status: 'New',
+    aiScore: 8.3,
+    overallScore: 8.3,
+    matchLevel: 'High Match',
+    priority: 'HIGH',
+    type: 'Hydraulic Engineering',
+    procurementType: 'International Competitive Bidding',
+    description: 'Embankment reinforcement, automated sluice gates, and stormwater pumping stations.',
+    scoreFactors: ['Sector Match', 'Capability Match'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 8.5, max: 10 },
+      { label: 'Country/Market Match', score: 8.4, max: 10 },
+      { label: 'Past Experience', score: 8.1, max: 10 },
+      { label: 'Capability Match', score: 8.3, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 8.2, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'Strong civil flood defense project with sound environmental metrics.',
+      strengths: ['Hydraulic engineering capability', 'Delhi regional proximity'],
+      risks: ['Environmental clearance milestones'],
+      recommendation: 'Recommended – Pursue'
+    },
+    similarProjects: [],
+    documents: ['Flood_Defense_Brief.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '05 Sep 2026', time: '10:00 AM', type: 'collect' }
+    ]
+  },
+  {
+    id: 'OPP-010',
+    name: 'High-Speed Rail Feeder Corridor',
+    title: 'High-Speed Rail Feeder Corridor',
+    organization: 'Japan International Cooperation Agency (JICA)',
+    source: 'JICA',
+    sourceUrl: 'https://www.jica.go.jp/english/our_work/projects/index.html',
+    country: 'India',
+    sector: 'Transport',
+    location: 'Gujarat, India',
+    value: '₹18.40 Crore',
+    deadline: '02 Nov 2026',
+    status: 'New',
+    aiScore: 8.6,
+    overallScore: 8.6,
+    matchLevel: 'High Match',
+    priority: 'HIGH',
+    type: 'Railway Civil Works',
+    procurementType: 'International Competitive Bidding',
+    description: 'Dedicated feeder rail alignment civil formation, bridges, and station interchange terminals.',
+    scoreFactors: ['Sector Match', 'Past Experience'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 8.8, max: 10 },
+      { label: 'Country/Market Match', score: 8.7, max: 10 },
+      { label: 'Past Experience', score: 8.4, max: 10 },
+      { label: 'Capability Match', score: 8.8, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 8.3, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'Strategic transportation package supporting major transit corridors.',
+      strengths: ['JICA standard compliance', 'Deep rail trackbed civil experience'],
+      risks: ['Multi-agency right of way'],
+      recommendation: 'Recommended – Pursue'
+    },
+    similarProjects: [],
+    documents: ['HSR_Feeder_Tender.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '05 Sep 2026', time: '01:20 PM', type: 'collect' }
+    ]
+  },
+  {
+    id: 'OPP-011',
+    name: 'Integrated Multi-Modal Logistics Hub',
+    title: 'Integrated Multi-Modal Logistics Hub',
+    organization: 'World Bank – Trade & Transport',
+    source: 'World Bank',
+    sourceUrl: 'https://projects.worldbank.org/en/projects-operations/project-detail/P184000',
+    country: 'India',
+    sector: 'Infrastructure',
+    location: 'Maharashtra, India',
+    value: '₹15.00 Crore',
+    deadline: '10 Nov 2026',
+    status: 'New',
+    aiScore: 7.9,
+    overallScore: 7.9,
+    matchLevel: 'Moderate Match',
+    priority: 'MEDIUM',
+    type: 'Logistics Facility',
+    procurementType: 'International Competitive Bidding',
+    description: 'Dry port, automated warehousing, internal rail siding, and container storage yards.',
+    scoreFactors: ['Capability Match', 'Sector Match'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 8.0, max: 10 },
+      { label: 'Country/Market Match', score: 8.0, max: 10 },
+      { label: 'Past Experience', score: 7.5, max: 10 },
+      { label: 'Capability Match', score: 8.2, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 7.8, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'Multi-modal park expanding freight handling capabilities.',
+      strengths: ['Heavy warehousing build capability'],
+      risks: ['Automation technology vendor lock-in'],
+      recommendation: 'Evaluate'
+    },
+    similarProjects: [],
+    documents: ['Logistics_Hub_Specs.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '05 Sep 2026', time: '03:45 PM', type: 'collect' }
+    ]
+  },
+  {
+    id: 'OPP-012',
+    name: 'District Wastewater Reclamation Facility',
+    title: 'District Wastewater Reclamation Facility',
+    organization: 'Asian Development Bank (ADB)',
+    source: 'ADB',
+    sourceUrl: 'https://www.adb.org/projects/54125-003/main',
+    country: 'India',
+    sector: 'Water',
+    location: 'Tamil Nadu, India',
+    value: '₹5.60 Crore',
+    deadline: '15 Nov 2026',
+    status: 'New',
+    aiScore: 8.5,
+    overallScore: 8.5,
+    matchLevel: 'High Match',
+    priority: 'HIGH',
+    type: 'Water Reclamation',
+    procurementType: 'National Competitive Bidding',
+    description: 'Advanced membrane bioreactor (MBR) wastewater reclamation facility for industrial reuse.',
+    scoreFactors: ['Sector Match', 'Capability Match', 'Past Experience'],
+    scoreBreakdown: [
+      { label: 'Sector Match', score: 8.7, max: 10 },
+      { label: 'Country/Market Match', score: 8.9, max: 10 },
+      { label: 'Past Experience', score: 8.4, max: 10 },
+      { label: 'Capability Match', score: 8.5, max: 10 },
+      { label: 'Strategic/Priority Fit', score: 8.0, max: 10 }
+    ],
+    aiAnalysis: {
+      summary: 'Excellent environmental engineering tender located in primary operating zone.',
+      strengths: ['MBR treatment facility track record', 'Tamil Nadu regional engineering capacity'],
+      risks: ['Strict biological discharge standards'],
+      recommendation: 'Highly Recommended – Pursue'
+    },
+    similarProjects: [],
+    documents: ['Reclamation_Facility_RFP.pdf'],
+    auditTrail: [
+      { id: 'AT-01', action: 'Tender Collected', actor: 'System', role: 'System', date: '06 Sep 2026', time: '09:00 AM', type: 'collect' }
+    ]
   }
 ];
 

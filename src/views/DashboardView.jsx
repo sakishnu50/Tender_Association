@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   TrendingUp,
+  TrendingDown,
   AlertTriangle,
   Clock,
   CheckCircle,
@@ -12,14 +13,14 @@ import {
   LayoutGrid,
   List as ListIcon,
   Download,
-  Calendar,
   Building2,
   MapPin,
   Sparkles,
   Award,
   Zap,
   RefreshCw,
-  SlidersHorizontal
+  SlidersHorizontal,
+  ChevronRight
 } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
@@ -64,7 +65,6 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
   };
 
   // Filter opportunities by timeRange - strictly cumulative subset logic:
-  // weekOpportunities ⊆ monthOpportunities ⊆ quarterOpportunities ⊆ allOpportunities
   const timeFilteredOpportunities = useMemo(() => {
     return opportunities.filter((opp, idx) => {
       if (timeRange === 'all') return true;
@@ -125,7 +125,8 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
       .sort((a, b) => {
         if (sortBy === 'score') return (b.aiScore || 0) - (a.aiScore || 0);
         if (sortBy === 'deadline') return a.deadline?.localeCompare(b.deadline);
-        return (b.id || '').localeCompare(a.id || '');
+        if (sortBy === 'value') return (b.id || '').localeCompare(a.id || '');
+        return 0;
       });
   }, [timeFilteredOpportunities, activeKpiFilter, sectorFilter, searchTerm, sortBy]);
 
@@ -176,92 +177,120 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
     alert(`Opportunity "${opp.name}" DECLINED.`);
   };
 
-  // Stat Card Definitions pulling 100% from timeFilteredOpportunities to guarantee consistency:
-  // Week ≤ Month ≤ Quarter ≤ All Time
+  // KPI Stat Cards definitions with Enterprise Color Coding & Trending Indicators
   const kpis = [
     {
       key: 'all',
       title: 'Total Opportunities',
       value: timeFilteredOpportunities.length,
-      change: timeRange === 'week' ? '+2 this week' : timeRange === 'month' ? '+4 this month' : '+14% this quarter',
+      percentage: '+14.2%',
+      isPositive: true,
+      changeText: timeRange === 'week' ? '+2 this week' : timeRange === 'month' ? '+4 this month' : '+14% vs last period',
       icon: TrendingUp,
-      color: 'var(--primary)',
-      bg: 'var(--primary-light)'
+      color: '#2563EB',
+      bg: 'rgba(37, 99, 235, 0.1)',
+      borderAccent: '#2563EB'
     },
     {
       key: 'highMatch',
       title: 'High AI Match (8.5+)',
       value: timeFilteredOpportunities.filter(o => (o.aiScore || 0) >= 8.5).length,
-      change: 'Strong Fit',
+      percentage: '+8.5%',
+      isPositive: true,
+      changeText: 'Strong Client Fit',
       icon: Award,
       color: '#10B981',
-      bg: '#D1FAE5'
+      bg: 'rgba(16, 185, 129, 0.1)',
+      borderAccent: '#10B981'
     },
     {
       key: 'highPriority',
       title: 'Urgent & High Priority',
       value: timeFilteredOpportunities.filter(o => o.status === 'High Priority' || (o.aiScore || 0) >= 9.0).length,
-      change: 'Needs Attention',
+      percentage: '+24.0%',
+      isPositive: false,
+      changeText: 'Requires Action',
       icon: AlertTriangle,
-      color: 'var(--danger)',
-      bg: 'var(--danger-bg)'
+      color: '#EF4444',
+      bg: 'rgba(239, 68, 68, 0.1)',
+      borderAccent: '#EF4444'
     },
     {
       key: 'closingSoon',
       title: 'Closing Soon (< 7 Days)',
       value: timeFilteredOpportunities.filter(o => o.deadline?.includes('15 Sep') || o.deadline?.includes('20 Sep') || (o.aiScore || 0) >= 8.5).length,
-      change: 'Action Required',
+      percentage: '-3.2%',
+      isPositive: false,
+      changeText: 'Tight Timeline',
       icon: Clock,
       color: '#F59E0B',
-      bg: '#FEF3C7'
+      bg: 'rgba(245, 158, 11, 0.1)',
+      borderAccent: '#F59E0B'
     },
     {
       key: 'pursued',
       title: 'Pursued Tenders',
       value: timeFilteredOpportunities.filter(o => o.status === 'Pursued').length,
-      change: 'In Pipeline',
+      percentage: '+18.6%',
+      isPositive: true,
+      changeText: 'Active Pipeline',
       icon: CheckCircle,
       color: '#0284C7',
-      bg: '#E0F2FE'
+      bg: 'rgba(2, 132, 199, 0.1)',
+      borderAccent: '#0284C7'
     }
   ];
 
   return (
     <div className="page-container" style={{ padding: '32px', gap: '32px' }}>
-      {/* 1. Welcome & Actions Hero Toolbar */}
+      {/* 1. Welcome & Hero Toolbar (Title, AI Engine Active & Filters) */}
       <div style={{
         backgroundColor: 'var(--bg-card)',
         borderRadius: '1rem',
         padding: '24px 28px',
-        marginBottom: '32px',
+        border: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow-sm)',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '1.25rem'
       }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              fontSize: '0.75rem',
-              fontWeight: '700',
-              padding: '0.2rem 0.6rem',
-              borderRadius: '9999px',
-              backgroundColor: 'var(--primary-light)',
-              color: 'var(--primary)'
-            }}>
-              <Sparkles size={12} /> AI Automated Intelligence
-            </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em', margin: 0 }}>
+              Enterprise Intelligence Dashboard
+            </h1>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0 }}>
+              Real-time tender tracking, AI matching scores & pipeline analytics
+            </p>
           </div>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+            fontSize: '0.725rem',
+            fontWeight: '700',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '9999px',
+            backgroundColor: 'var(--primary-light)',
+            color: 'var(--primary)',
+            border: '1px solid var(--primary-border)'
+          }}>
+            <Sparkles size={13} /> AI Engine Active
+          </span>
         </div>
 
-        {/* Toolbar Action Controls */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-          {/* Time Filter Selector (Fully Functional & Consistent) */}
-          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'var(--bg-subtle)', borderRadius: '0.5rem', border: '1px solid var(--border-color)', padding: '0.2rem' }}>
+        {/* Toolbar Time Filter Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: 'var(--bg-subtle)',
+            borderRadius: '0.6rem',
+            border: '1px solid var(--border-color)',
+            padding: '0.25rem'
+          }}>
             {['week', 'month', 'quarter', 'all'].map((t) => (
               <button
                 key={t}
@@ -270,10 +299,10 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
                   border: 'none',
                   background: timeRange === t ? 'var(--bg-card)' : 'transparent',
                   color: timeRange === t ? 'var(--primary)' : 'var(--text-muted)',
-                  fontSize: '0.75rem',
+                  fontSize: '0.775rem',
                   fontWeight: timeRange === t ? '700' : '500',
-                  padding: '0.3rem 0.65rem',
-                  borderRadius: '0.375rem',
+                  padding: '0.35rem 0.75rem',
+                  borderRadius: '0.4rem',
                   cursor: 'pointer',
                   boxShadow: timeRange === t ? 'var(--shadow-sm)' : 'none',
                   textTransform: 'capitalize',
@@ -285,117 +314,140 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
             ))}
           </div>
 
-          <button
-            className="btn btn-outline"
-            onClick={handleRefresh}
-            title="Refresh Data"
-            disabled={isRefreshing}
-            style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem', cursor: isRefreshing ? 'wait' : 'pointer' }}
-          >
-            <RefreshCw size={14} className={isRefreshing ? 'spin-icon' : ''} />
-            <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-          </button>
-
           {lastRefreshedTime && (
             <span style={{
-              fontSize: '0.7rem',
+              fontSize: '0.725rem',
               fontWeight: '600',
               color: 'var(--success-text)',
               backgroundColor: 'var(--success-bg)',
-              padding: '0.2rem 0.5rem',
-              borderRadius: '0.25rem',
+              border: '1px solid var(--success-border)',
+              padding: '0.25rem 0.6rem',
+              borderRadius: '0.4rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.2rem'
+              gap: '0.25rem'
             }}>
               ✓ Refreshed {lastRefreshedTime}
             </span>
           )}
-
-          <button
-            className="btn btn-primary"
-            onClick={handleExportCSV}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-          >
-            <Download size={14} />
-            <span>Export CSV</span>
-          </button>
         </div>
       </div>
 
-      {/* 2. Clickable KPI Tiles Row (Opens Filtered Details Modal) */}
+      {/* 2. Enterprise Metric KPI Cards Grid */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
         gap: '24px',
-        marginBottom: '32px'
       }}>
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           const isActive = activeKpiFilter === kpi.key;
+          const TrendIcon = kpi.isPositive ? TrendingUp : TrendingDown;
+
           return (
             <div
               key={kpi.key}
               onClick={() => handleStatCardClick(kpi)}
               className="card"
-              title={`Click to view list of ${kpi.title}`}
+              title={`Click to filter list by ${kpi.title}`}
               style={{
-                padding: '20px',
+                padding: '24px',
                 cursor: 'pointer',
-                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                border: isActive ? `2px solid ${kpi.color}` : '1px solid var(--border-color)',
-                boxShadow: isActive ? 'var(--shadow-md)' : 'var(--shadow-sm)',
+                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                borderRadius: '0.85rem',
+                border: isActive ? `2px solid ${kpi.borderAccent}` : '1px solid var(--border-color)',
+                boxShadow: isActive ? 'var(--shadow-card-hover)' : 'var(--shadow-sm)',
                 position: 'relative',
                 overflow: 'hidden',
-                backgroundColor: isActive ? 'var(--bg-subtle)' : 'var(--bg-card)'
+                backgroundColor: 'var(--bg-card)',
+                transform: isActive ? 'translateY(-2px)' : 'none'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+              {/* Top Row: Title & Icon Box */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <span style={{
+                  fontSize: '0.775rem',
+                  fontWeight: '700',
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em'
+                }}>
                   {kpi.title}
                 </span>
+
                 <div style={{
-                  padding: '0.4rem',
-                  borderRadius: '0.5rem',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '0.65rem',
                   backgroundColor: kpi.bg,
                   color: kpi.color,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  boxShadow: `0 4px 10px ${kpi.bg}`,
+                  flexShrink: 0
                 }}>
-                  <Icon size={18} />
+                  <Icon size={20} />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '1.85rem', fontWeight: '800', color: 'var(--text-main)' }}>
+              {/* Middle Row: Numeric Value & Trending Pill */}
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
+                <span style={{ fontSize: '2.1rem', fontWeight: '800', color: 'var(--text-main)', tracking: '-0.03em', lineHeight: '1' }}>
                   {kpi.value}
                 </span>
-                <span style={{ fontSize: '0.7rem', fontWeight: '600', color: kpi.color }}>
-                  {kpi.change}
-                </span>
+
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  fontSize: '0.725rem',
+                  fontWeight: '700',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '9999px',
+                  backgroundColor: kpi.isPositive ? 'var(--success-bg)' : 'var(--danger-bg)',
+                  color: kpi.isPositive ? 'var(--success-text)' : 'var(--danger-text)',
+                  border: `1px solid ${kpi.isPositive ? 'var(--success-border)' : 'var(--danger-border)'}`
+                }}>
+                  <TrendIcon size={12} />
+                  <span>{kpi.percentage}</span>
+                </div>
               </div>
 
+              {/* Bottom Row: Change Subtext & View List Link */}
               <div style={{
-                marginTop: '0.5rem',
-                fontSize: '0.7rem',
-                color: 'var(--primary)',
-                fontWeight: '600',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.2rem'
+                justifyContent: 'space-between',
+                paddingTop: '0.75rem',
+                borderTop: '1px solid var(--border-color)',
+                marginTop: '0.25rem'
               }}>
-                View List <ArrowUpRight size={12} />
+                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '500' }}>
+                  {kpi.changeText}
+                </span>
+
+                <span style={{
+                  fontSize: '0.75rem',
+                  color: kpi.color,
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.2rem',
+                  transition: 'transform 0.15s ease'
+                }}>
+                  View List <ChevronRight size={13} />
+                </span>
               </div>
 
               {isActive && (
                 <div style={{
                   position: 'absolute',
-                  bottom: 0,
+                  top: 0,
                   left: 0,
-                  right: 0,
-                  height: '3px',
-                  backgroundColor: kpi.color
+                  bottom: 0,
+                  width: '4px',
+                  backgroundColor: kpi.borderAccent
                 }} />
               )}
             </div>
