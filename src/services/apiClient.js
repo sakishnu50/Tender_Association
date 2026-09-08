@@ -60,7 +60,7 @@ export const apiFacade = {
   fetchSources: async () => mockSources,
   fetchOffices: async () => mockOffices,
   fetchUsers: async () => mockUsers,
-  fetchAuditTrail: async () => getStorage('iot_audit_trail', mockAuditTrail),
+  fetchAuditTrail: async () => (await import('../services/auditService')).getAuditLogs(),
   fetchSettings: async () => getStorage('iot_settings', {
     highPriority: true,
     deadlineAlerts: true,
@@ -95,37 +95,61 @@ export const apiFacade = {
   },
 
   pursueOpportunity: async (id, details) => {
+    const { logAuditEvent } = await import('../services/auditService');
     const opps = getStorage('iot_opportunities', mockOpportunities);
+    const targetOpp = opps.find(o => o.id === id);
+    
+    // Update opportunity status
     const updatedOpps = opps.map(o => o.id === id ? { ...o, status: 'Pursued' } : o);
     setStorage('iot_opportunities', updatedOpps);
 
-    const targetOpp = opps.find(o => o.id === id);
-    const logs = getStorage('iot_audit_trail', mockAuditTrail);
-    const newLog = {
+    // Log audit event
+    logAuditEvent({
       user: 'Ravi Kumar',
-      action: 'Pursued Opportunity',
-      details: targetOpp ? targetOpp.name : id,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setStorage('iot_audit_trail', [newLog, ...logs]);
+      userName: 'Ravi Kumar',
+      userRole: 'Manager',
+      action: 'Decision Updated',
+      opportunityId: id,
+      recordId: id,
+      recordName: targetOpp ? targetOpp.name : id,
+      opportunityTitle: targetOpp ? targetOpp.name : id,
+      office: 'Chennai Office',
+      details: 'Management decision - PURSUE',
+      previousValue: 'Pending',
+      newValue: 'Pursue',
+      priority: targetOpp?.priority || 'MEDIUM',
+      source: 'Decision Module',
+    });
 
     return { success: true, message: 'Opportunity marked as PURSUED!' };
   },
 
   declineOpportunity: async (id, details) => {
+    const { logAuditEvent } = await import('../services/auditService');
     const opps = getStorage('iot_opportunities', mockOpportunities);
+    const targetOpp = opps.find(o => o.id === id);
+    
+    // Update opportunity status
     const updatedOpps = opps.map(o => o.id === id ? { ...o, status: 'Declined' } : o);
     setStorage('iot_opportunities', updatedOpps);
 
-    const targetOpp = opps.find(o => o.id === id);
-    const logs = getStorage('iot_audit_trail', mockAuditTrail);
-    const newLog = {
+    // Log audit event
+    logAuditEvent({
       user: 'Ravi Kumar',
-      action: 'Declined Opportunity',
-      details: targetOpp ? targetOpp.name : id,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    setStorage('iot_audit_trail', [newLog, ...logs]);
+      userName: 'Ravi Kumar',
+      userRole: 'Manager',
+      action: 'Decision Updated',
+      opportunityId: id,
+      recordId: id,
+      recordName: targetOpp ? targetOpp.name : id,
+      opportunityTitle: targetOpp ? targetOpp.name : id,
+      office: 'Chennai Office',
+      details: 'Management decision - DECLINE',
+      previousValue: 'Pending',
+      newValue: 'Decline',
+      priority: targetOpp?.priority || 'MEDIUM',
+      source: 'Decision Module',
+    });
 
     return { success: true, message: 'Opportunity DECLINED.' };
   },

@@ -14,7 +14,8 @@ import ReportsView from './views/ReportsView';
 import SourcesView from './views/SourcesView';
 import OfficesView from './views/OfficesView';
 import UsersRolesView from './views/UsersRolesView';
-import AuditTrailView from './views/AuditTrailView';
+import AuditTrail from './components/AuditTrail/AuditTrail.jsx';
+import AuditRecordDetailsPage from './components/AuditTrail/AuditRecordDetailsPage.jsx';
 import SettingsView from './views/SettingsView';
 import LoginPageView from './views/LoginPageView';
 import Dashboard from './views/Dashboard';
@@ -182,8 +183,13 @@ export default function App() {
           <Route path="/sources" element={<SourcesView />} />
           <Route path="/offices" element={<OfficesView />} />
           <Route path="/users" element={<UsersRolesView />} />
+<<<<<<< HEAD
           <Route path="/audit" element={<AuditTrailView />} />
           <Route path="/dashboard" element={<Dashboard />} />
+=======
+          <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
+          <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
+>>>>>>> 90bb78c (Update audit trail functionality)
           <Route path="/settings" element={<SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />} />
           <Route
             path="/login"
