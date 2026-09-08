@@ -9,25 +9,25 @@ function mergeWithMock(fetchedList) {
   if (!fetchedList || !fetchedList.length) return fetchedList;
   return fetchedList.map((item) => {
     const mock = mockOpportunities.find((m) => m.id === item.id);
-    return mock ? { ...mock, ...item, ...pickRichFields(mock) } : item;
+    return mock ? { ...mock, ...item, ...pickRichFields(mock, item) } : item;
   });
 }
 
 // Returns only the rich fields that the API does not supply.
-function pickRichFields(mock) {
+function pickRichFields(mock, item = {}) {
   return {
-    title:           mock.title || mock.name,
-    country:         mock.country,
-    office:          mock.office,
-    sourceUrl:       mock.sourceUrl,
-    overallScore:    mock.overallScore || mock.aiScore,
-    priority:        mock.priority,
-    organization:    mock.organization,
-    procurementType: mock.procurementType,
-    scoreBreakdown:  mock.scoreBreakdown,
-    aiAnalysis:      mock.aiAnalysis,
-    similarProjects: mock.similarProjects,
-    auditTrail:      mock.auditTrail
+    title:           item.title || item.name || mock.title || mock.name,
+    country:         item.country || mock.country,
+    office:          item.office || mock.office,
+    sourceUrl:       item.sourceUrl || mock.sourceUrl,
+    overallScore:    item.overallScore || item.aiScore || mock.overallScore || mock.aiScore,
+    priority:        item.priority || mock.priority,
+    organization:    item.organization || mock.organization,
+    procurementType: item.procurementType || mock.procurementType,
+    scoreBreakdown:  item.scoreBreakdown || mock.scoreBreakdown,
+    aiAnalysis:      item.aiAnalysis || mock.aiAnalysis,
+    similarProjects: item.similarProjects || mock.similarProjects,
+    auditTrail:      item.auditTrail || mock.auditTrail
   };
 }
 
@@ -118,6 +118,15 @@ export function useAuditTrail() {
   });
 }
 
+// Hook for filtered audit logs (client‑side filtering)
+export function useAuditLogs(filters = {}) {
+  return useQuery({
+    queryKey: ['auditLogs', filters],
+    queryFn: apiFacade.fetchAuditTrail,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
 export function useSettings() {
   return useQuery({
     queryKey: ['settings'],
@@ -179,3 +188,15 @@ export function useAddOpportunity() {
     }
   });
 }
+
+export function useUpdateOpportunityPriority() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, priority }) => apiFacade.updateOpportunityPriority(id, priority),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+      queryClient.invalidateQueries({ queryKey: ['auditTrail'] });
+    }
+  });
+}
+
