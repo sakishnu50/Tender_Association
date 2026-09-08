@@ -1,13 +1,27 @@
 import React from 'react';
 import { Search, Sun, Moon } from 'lucide-react';
 
-export default function Header({ searchVal, setSearchVal, activeTabTitle, activeTab, darkMode, toggleTheme }) {
+export default function Header({
+  searchVal,
+  setSearchVal,
+  activeTabTitle,
+  activeTab,
+  darkMode,
+  toggleTheme,
+}) {
   return (
     <header className="top-header">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
+        <h2
+          style={{
+            fontSize: '1.125rem',
+            fontWeight: '700',
+            color: 'var(--text-main)',
+          }}
+        >
           {activeTabTitle || 'Dashboard'}
         </h2>
+
         {activeTabTitle !== 'Opportunities List' && (
           <div className="header-search">
             <Search size={16} color="var(--text-muted)" />
@@ -26,13 +40,13 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, active
         <button
           className="btn btn-outline"
           onClick={toggleTheme}
-          title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           style={{
             padding: '0.4rem 0.6rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.1rem'
+            fontSize: '1.1rem',
           }}
         >
           {darkMode ? (
@@ -42,7 +56,14 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, active
           )}
         </button>
 
-        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} />
+        <div
+          id="header-actions-portal"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+          }}
+        />
       </div>
     </header>
   );
