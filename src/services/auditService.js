@@ -1,120 +1,46 @@
 // src/services/auditService.js
+import { mockOpportunities } from '../data/mockData';
 
 const STORAGE_KEY = 'auditLogs';
 const eventTarget = new EventTarget();
 
-export const INITIAL_AUDIT_LOGS = [
-  {
-    id: 'AUD-001',
-    timestamp: '25 Aug · 08:15',
-    user: 'Arjun Rao',
-    action: 'Opportunity detected',
-    opportunity: 'Consultancy Services for Highway Development',
-    opportunityId: 'MA-26-0101',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-002',
-    timestamp: '25 Aug · 09:30',
-    user: 'Arjun Rao',
-    action: 'AI score generated',
-    opportunity: 'Urban Water Resilience Program',
-    opportunityId: 'MA-26-0102',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-003',
-    timestamp: '25 Aug · 10:30',
-    user: 'Arjun Rao',
-    action: 'Opportunity detected',
-    opportunity: 'Nairobi Metropolitan Transport Study',
-    opportunityId: 'MA-26-0103',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-004',
-    timestamp: '25 Aug · 11:30',
-    user: 'Arjun Rao',
-    action: 'AI score generated',
-    opportunity: 'Smart City Digital Command Centre',
-    opportunityId: 'MA-26-0104',
-    change: 'MEDIUM'
-  },
-  {
-    id: 'AUD-005',
-    timestamp: '25 Aug · 12:30',
-    user: 'Arjun Rao',
-    action: 'Opportunity detected',
-    opportunity: 'Kuala Lumpur Bridge Engineering Services',
-    opportunityId: 'MA-26-0105',
-    change: 'MEDIUM'
-  },
-  {
-    id: 'AUD-006',
-    timestamp: '25 Aug · 13:30',
-    user: 'Arjun Rao',
-    action: 'AI score generated',
-    opportunity: 'Abu Dhabi Municipal Buildings Program',
-    opportunityId: 'MA-26-0106',
-    change: 'MEDIUM'
-  },
-  {
-    id: 'AUD-007',
-    timestamp: '25 Aug · 14:30',
-    user: 'Arjun Rao',
-    action: 'Opportunity detected',
-    opportunity: 'Coastal Flood Protection Advisory',
-    opportunityId: 'MA-26-0107',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-008',
-    timestamp: '25 Aug · 15:30',
-    user: 'Arjun Rao',
-    action: 'AI score generated',
-    opportunity: 'Kathmandu Ring Road Expansion',
-    opportunityId: 'MA-26-0108',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-009',
-    timestamp: '25 Aug · 16:30',
-    user: 'Arjun Rao',
-    action: 'Opportunity detected',
-    opportunity: 'Bengaluru Transit Oriented Development',
-    opportunityId: 'MA-26-0109',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-010',
-    timestamp: '25 Aug · 17:30',
-    user: 'Arjun Rao',
-    action: 'AI score generated',
-    opportunity: 'Penang Water Treatment Upgrade',
-    opportunityId: 'MA-26-0110',
-    change: 'MEDIUM'
-  },
-  {
-    id: 'AUD-011',
-    timestamp: '25 Aug · 18:30',
-    user: 'Arjun Rao',
-    action: 'Opportunity detected',
-    opportunity: 'Mombasa Port Access Road',
-    opportunityId: 'MA-26-0111',
-    change: 'HIGH'
-  },
-  {
-    id: 'AUD-012',
-    timestamp: '25 Aug · 19:30',
-    user: 'Arjun Rao',
-    action: 'AI score generated',
-    opportunity: 'Dubai Green Buildings Audit',
-    opportunityId: 'MA-26-0112',
-    change: 'LOW'
-  }
-];
+export const INITIAL_AUDIT_LOGS = [];
 
-function parseAuditDate(value) {
+export function normalizePriorityCase(val) {
+  if (!val) return 'Medium';
+  const str = String(val).trim().toUpperCase();
+  if (str === 'HIGH') return 'High';
+  if (str === 'MEDIUM') return 'Medium';
+  if (str === 'LOW') return 'Low';
+  return val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+}
+
+export function formatAuditTime(dateInput = new Date()) {
+  const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (Number.isNaN(d.getTime())) return '10:30 AM';
+  return d.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
+export function formatAuditDate(dateInput = new Date()) {
+  const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
+  if (Number.isNaN(d.getTime())) return '08-Sep-2026';
+  const day = String(d.getDate()).padStart(2, '0');
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = monthNames[d.getMonth()];
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+export function parseAuditDate(value, record = {}) {
+  if (record && record.createdAt) {
+    const time = new Date(record.createdAt).getTime();
+    if (!Number.isNaN(time)) return time;
+  }
+
   if (!value) return 0;
 
   if (value instanceof Date && !Number.isNaN(value.getTime())) {
@@ -126,6 +52,14 @@ function parseAuditDate(value) {
     if (isoMatch) {
       const date = new Date(`${isoMatch[1]}T${isoMatch[2]}:00`);
       if (!Number.isNaN(date.getTime())) return date.getTime();
+    }
+
+    // Format: 08-Sep-2026
+    const dmyMatch = value.match(/(\d{1,2})-(\w{3})-(\d{4})/);
+    if (dmyMatch) {
+      const [, day, month, year] = dmyMatch;
+      const monthIndex = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(month);
+      return new Date(Number(year), monthIndex, Number(day)).getTime();
     }
 
     const compactMatch = value.match(/(\d{1,2})\s+(\w{3})\s+·\s*(\d{2}:\d{2})/);
@@ -140,49 +74,146 @@ function parseAuditDate(value) {
   return 0;
 }
 
-function normalizeAuditRecord(record) {
+export function normalizeAuditRecord(record) {
+  const id = record.id || `AUD-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`;
+  const date = record.date || formatAuditDate(record.createdAt || new Date());
+  const timestamp = record.timestamp || formatAuditTime(record.createdAt || new Date());
+  const user = record.user || record.userName || 'Admin';
+  const action = record.action || 'Priority Assigned';
+  const opportunity = record.opportunity || record.opportunityTitle || record.recordName || 'Untitled opportunity';
+  const opportunityId = record.opportunityId || record.recordId || 'OPP-001';
+  
+  let change = record.change;
+  if (!change) {
+    if (record.previousPriority && record.newPriority && record.previousPriority !== record.newPriority) {
+      change = `${normalizePriorityCase(record.previousPriority)} → ${normalizePriorityCase(record.newPriority)}`;
+    } else if (record.newPriority) {
+      change = normalizePriorityCase(record.newPriority);
+    } else if (record.priority) {
+      change = normalizePriorityCase(record.priority);
+    } else {
+      change = 'Medium';
+    }
+  }
+
+  const priority = (record.priority || record.newPriority || (change.includes('→') ? change.split('→')[1] : change) || 'MEDIUM').toString().trim().toUpperCase();
+
   return {
-    id: record.id || `AUD-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
-    timestamp: record.timestamp || '25 Aug · 00:00',
-    user: record.user || record.userName || 'Arjun Rao',
-    action: record.action || 'Opportunity detected',
-    opportunity: record.opportunity || record.opportunityTitle || record.recordName || 'Untitled opportunity',
-    opportunityId: record.opportunityId || record.recordId || 'Unknown',
-    change: record.change || record.priority || 'MEDIUM'
+    ...record,
+    id,
+    timestamp,
+    date,
+    user,
+    userName: user,
+    action,
+    opportunity,
+    opportunityTitle: opportunity,
+    recordName: opportunity,
+    opportunityId,
+    recordId: opportunityId,
+    change,
+    priority,
+    previousPriority: record.previousPriority || record.previousValue || null,
+    newPriority: record.newPriority || record.newValue || (change.includes('→') ? change.split('→')[1].trim() : change),
+    previousValue: record.previousValue || record.previousPriority || null,
+    newValue: record.newValue || record.newPriority || (change.includes('→') ? change.split('→')[1].trim() : change),
+    details: record.details || (change.includes('→') ? `Priority changed: ${change}` : `Priority: ${change}`),
+    createdAt: record.createdAt || new Date().toISOString()
   };
+}
+
+function getStoredOpportunities() {
+  try {
+    const raw = localStorage.getItem('iot_opportunities');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {
+    // fallback
+  }
+  return mockOpportunities;
+}
+
+function generateInitialOpportunityLogs() {
+  const opps = getStoredOpportunities();
+  const times = ['10:30 AM', '11:15 AM', '11:45 AM', '12:30 PM', '02:00 PM', '02:45 PM', '03:15 PM', '04:00 PM'];
+  
+  return opps.map((opp, index) => {
+    const p = normalizePriorityCase(opp.priority || 'Medium');
+    const time = times[index % times.length];
+    return normalizeAuditRecord({
+      id: `AUD-${opp.id}-INIT`,
+      opportunityId: opp.id,
+      opportunity: opp.name || opp.title || `Opportunity ${opp.id}`,
+      user: opp.auditTrail?.[0]?.actor || 'Admin',
+      userRole: opp.auditTrail?.[0]?.role || 'Admin',
+      action: 'Opportunity Registered',
+      timestamp: time,
+      date: '08-Sep-2026',
+      change: p,
+      priority: p.toUpperCase(),
+      previousPriority: null,
+      newPriority: p,
+      details: `Initial system prediction: ${p}`,
+      createdAt: new Date(2026, 8, 8, 10, 30 + index * 15).toISOString()
+    });
+  });
 }
 
 function parseLogs() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [...INITIAL_AUDIT_LOGS];
+    if (!raw) return [];
     const arr = JSON.parse(raw);
-    return Array.isArray(arr) ? arr.map(normalizeAuditRecord) : [...INITIAL_AUDIT_LOGS];
+    return Array.isArray(arr) ? arr.map(normalizeAuditRecord) : [];
   } catch (e) {
     console.warn('Failed to parse audit logs:', e);
-    return [...INITIAL_AUDIT_LOGS];
+    return [];
   }
 }
 
 function saveLogs(logs) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
-  eventTarget.dispatchEvent(new CustomEvent('auditChange', { detail: logs }));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    eventTarget.dispatchEvent(new CustomEvent('auditChange', { detail: logs }));
+  } catch (e) {
+    console.error('Failed to save audit logs:', e);
+  }
 }
 
 function ensureSeedData() {
-  const existing = parseLogs();
-  const matchesSeed = existing.length === INITIAL_AUDIT_LOGS.length && existing.every((log, index) => {
-    const expected = INITIAL_AUDIT_LOGS[index];
-    return log.timestamp === expected.timestamp &&
-      log.user === expected.user &&
-      log.action === expected.action &&
-      log.opportunity === expected.opportunity &&
-      log.opportunityId === expected.opportunityId &&
-      log.change === expected.change;
-  });
-
-  if (!matchesSeed) {
-    saveLogs(INITIAL_AUDIT_LOGS.map(normalizeAuditRecord));
+  const existingRaw = localStorage.getItem(STORAGE_KEY);
+  if (!existingRaw) {
+    const initial = generateInitialOpportunityLogs();
+    saveLogs(initial);
+  } else {
+    // Make sure all existing opportunities are represented in auditLogs
+    const existing = parseLogs();
+    const opps = getStoredOpportunities();
+    const missingOpps = opps.filter(opp => !existing.some(log => log.opportunityId === opp.id));
+    if (missingOpps.length > 0) {
+      const newSeed = missingOpps.map((opp, index) => {
+        const p = normalizePriorityCase(opp.priority || 'Medium');
+        return normalizeAuditRecord({
+          id: `AUD-${opp.id}-INIT`,
+          opportunityId: opp.id,
+          opportunity: opp.name || opp.title,
+          user: 'Admin',
+          userRole: 'Admin',
+          action: 'Opportunity Registered',
+          timestamp: '10:30 AM',
+          date: '08-Sep-2026',
+          change: p,
+          priority: p.toUpperCase(),
+          previousPriority: null,
+          newPriority: p,
+          details: `Initial system prediction: ${p}`,
+          createdAt: new Date().toISOString()
+        });
+      });
+      saveLogs([...existing, ...newSeed]);
+    }
   }
 }
 
@@ -190,20 +221,76 @@ export function logAuditEvent(event) {
   const logs = parseLogs();
   const newEvent = normalizeAuditRecord({
     ...event,
-    timestamp: event.timestamp || new Date().toISOString(),
+    timestamp: event.timestamp || formatAuditTime(),
+    date: event.date || formatAuditDate(),
+    createdAt: event.createdAt || new Date().toISOString()
   });
   logs.unshift(newEvent);
   saveLogs(logs);
   return newEvent;
 }
 
-export function getAuditLogs() {
+export function addAuditLog(record) {
+  return logAuditEvent(record);
+}
+
+export function recordPriorityChange({
+  opportunityId,
+  opportunityName,
+  previousPriority,
+  newPriority,
+  user = 'Admin',
+  userRole = 'Admin'
+}) {
+  const prevNorm = normalizePriorityCase(previousPriority);
+  const newNorm = normalizePriorityCase(newPriority);
+
+  // If priority has not changed, do not create an unnecessary audit record (Req 6)
+  if (prevNorm.toLowerCase() === newNorm.toLowerCase()) {
+    return null;
+  }
+
+  const now = new Date();
+  const dateStr = formatAuditDate(now);
+  const timeStr = formatAuditTime(now);
+
+  const newLog = normalizeAuditRecord({
+    id: `AUD-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    opportunityId,
+    opportunity: opportunityName,
+    opportunityTitle: opportunityName,
+    recordName: opportunityName,
+    recordId: opportunityId,
+    user: user || 'Admin',
+    userName: user || 'Admin',
+    userRole: userRole || 'Admin',
+    action: 'Priority Changed',
+    previousPriority: prevNorm,
+    newPriority: newNorm,
+    previousValue: prevNorm,
+    newValue: newNorm,
+    change: `${prevNorm} → ${newNorm}`,
+    priority: newNorm.toUpperCase(),
+    date: dateStr,
+    timestamp: timeStr,
+    createdAt: now.toISOString(),
+    details: `Priority changed: ${prevNorm} → ${newNorm}`
+  });
+
   const logs = parseLogs();
-  return [...logs].sort((a, b) => parseAuditDate(a.timestamp) - parseAuditDate(b.timestamp));
+  logs.unshift(newLog);
+  saveLogs(logs);
+  return newLog;
+}
+
+export function getAuditLogs() {
+  ensureSeedData();
+  const logs = parseLogs();
+  return [...logs];
 }
 
 export function getAuditLogById(id) {
-  const logs = parseLogs();
+  const logs = getAuditLogs();
   return logs.find((log) => log.id === id) || null;
 }
 
@@ -215,7 +302,8 @@ export function deleteAuditLog(id) {
 
 export function clearAuditLogs() {
   localStorage.removeItem(STORAGE_KEY);
-  saveLogs([...INITIAL_AUDIT_LOGS]);
+  const fresh = generateInitialOpportunityLogs();
+  saveLogs(fresh);
   eventTarget.dispatchEvent(new CustomEvent('auditClear'));
 }
 
@@ -227,14 +315,16 @@ export function subscribe(listener) {
 
 export function exportAuditLogs(logs = null) {
   const data = Array.isArray(logs) ? logs : getAuditLogs();
-  const header = ['Timestamp', 'User', 'Action', 'Opportunity', 'Opportunity ID', 'Change'];
+  const header = ['Opportunity ID', 'Opportunity', 'User', 'Timestamp', 'Date', 'Change', 'Action', 'Details'];
   const rows = data.map((entry) => [
-    entry.timestamp || '',
-    entry.user || '',
-    entry.action || '',
-    entry.opportunity || '',
     entry.opportunityId || '',
-    entry.change || ''
+    entry.opportunity || '',
+    entry.user || '',
+    entry.timestamp || '',
+    entry.date || '',
+    entry.change || '',
+    entry.action || '',
+    entry.details || ''
   ].map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`));
 
   const csvContent = [header.join(','), ...rows.map((row) => row.join(','))].join('\n');
@@ -242,7 +332,7 @@ export function exportAuditLogs(logs = null) {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'audit-trail.csv';
+  link.download = `audit-trail-${formatAuditDate()}.csv`;
   link.style.display = 'none';
   document.body.appendChild(link);
   link.click();
@@ -250,8 +340,5 @@ export function exportAuditLogs(logs = null) {
   URL.revokeObjectURL(url);
 }
 
-function seedIfEmpty() {
-  ensureSeedData();
-}
-
-seedIfEmpty();
+// Initial check
+ensureSeedData();

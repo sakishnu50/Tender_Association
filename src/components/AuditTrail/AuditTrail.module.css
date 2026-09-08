@@ -187,9 +187,9 @@
 }
 
 .priorityHigh {
-  background: #166534;
+  background: #991B1B;
   color: #FFFFFF;
-  border: 1px solid #15803D;
+  border: 1px solid #B91C1C;
 }
 
 .priorityMedium {
@@ -199,9 +199,9 @@
 }
 
 .priorityLow {
-  background: #991B1B;
+  background: #166534;
   color: #FFFFFF;
-  border: 1px solid #B91C1C;
+  border: 1px solid #15803D;
 }
 
 .emptyState {
@@ -411,9 +411,9 @@
 }
 
 .priorityHigh {
-  background: #166534;
+  background: #991B1B;
   color: #FFFFFF;
-  border: 1px solid #15803D;
+  border: 1px solid #B91C1C;
 }
 
 .priorityMedium {
@@ -423,9 +423,9 @@
 }
 
 .priorityLow {
-  background: #991B1B;
+  background: #166534;
   color: #FFFFFF;
-  border: 1px solid #B91C1C;
+  border: 1px solid #15803D;
 }
 
 .timelineList {
@@ -906,4 +906,485 @@
   .drawer {
     width: 100%;
   }
+}
+
+/* ==========================================================================
+   Table Columns & Interactive Elements
+   ========================================================================== */
+
+.opportunityIdBadge {
+  display: inline-block;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  background: var(--bg-subtle, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary, #2563eb);
+}
+
+.opportunityNameWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.opportunityTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.35;
+}
+
+.actionSubtext {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+}
+
+.userCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.userName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.userRoleTag {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--bg-subtle, #f1f5f9);
+  border: 1px solid var(--border-color, #e2e8f0);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+}
+
+.timestampCell,
+.dateCell {
+  font-size: 0.84rem;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.changeCellGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.changeArrow {
+  color: var(--text-muted, #64748b);
+  flex-shrink: 0;
+}
+
+.actionsContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.editButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  background: var(--primary, #2563eb);
+  color: #ffffff;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.editButton:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.viewIconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  background: var(--bg-subtle, #f8fafc);
+  border: 1px solid var(--border-color, #e2e8f0);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.viewIconBtn:hover {
+  border-color: var(--primary, #2563eb);
+  color: var(--primary, #2563eb);
+}
+
+/* ==========================================================================
+   Toast Notification Banner
+   ========================================================================== */
+
+.toastNotification {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toastSuccess {
+  background: rgba(22, 101, 52, 0.1);
+  border: 1px solid #16a34a;
+  color: #15803d;
+}
+
+[data-theme="dark"] .toastSuccess {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: #22c55e;
+  color: #4ade80;
+}
+
+.toastError {
+  background: rgba(185, 28, 28, 0.1);
+  border: 1px solid #dc2626;
+  color: #b91c1c;
+}
+
+[data-theme="dark"] .toastError {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: #ef4444;
+  color: #f87171;
+}
+
+.toastContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toastIcon {
+  flex-shrink: 0;
+}
+
+.toastMessage {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.toastDetails {
+  font-size: 0.78rem;
+  margin: 0.2rem 0 0 0;
+  opacity: 0.85;
+}
+
+.toastCloseBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Edit Priority Modal
+   ========================================================================== */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1300;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalCard {
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: modalScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.modalSubtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted, #64748b);
+  margin: 0.25rem 0 0;
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #64748b);
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.modalCloseBtn:hover {
+  color: var(--text-main);
+}
+
+.modalContextBox {
+  background: var(--bg-subtle, #f8fafc);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contextRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.contextLabel {
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.contextValueId {
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--primary, #2563eb);
+}
+
+.contextValueName {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.modalBody {
+  padding: 1.25rem 1.5rem;
+}
+
+.sectionHeading {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.75rem;
+}
+
+.priorityOptionsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.priorityOptionCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  background: var(--bg-subtle, #f8fafc);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.priorityOptionCard:hover {
+  border-color: var(--primary, #2563eb);
+}
+
+.priorityOptionSelected {
+  border-color: var(--primary, #2563eb);
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.optionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.optionRadio {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color, #cbd5e1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.optionRadioChecked {
+  border-color: var(--primary, #2563eb);
+}
+
+.radioDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary, #2563eb);
+}
+
+.optionDescription {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.changePreviewBox {
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.changePreviewHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary, #2563eb);
+}
+
+.previewIcon {
+  flex-shrink: 0;
+}
+
+.changePreviewDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.88rem;
+  color: var(--text-main);
+}
+
+.changePreviewMeta {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+}
+
+.unchangedNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted, #64748b);
+  background: var(--bg-subtle, #f8fafc);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  padding: 0.65rem 0.85rem;
+  border-radius: 6px;
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-subtle, #f8fafc);
+}
+
+.cancelBtn {
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
+  background: var(--bg-card, #ffffff);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cancelBtn:hover {
+  background: var(--bg-subtle, #f1f5f9);
+}
+
+.saveBtn {
+  padding: 0.55rem 1.35rem;
+  border-radius: 6px;
+  border: none;
+  background: var(--primary, #2563eb);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.saveBtn:hover {
+  opacity: 0.92;
 }

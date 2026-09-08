@@ -1,60 +1,58 @@
 // src/components/AuditTrail/AuditTrail.jsx
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuditTrail } from '../../hooks/useApiQueries';
+import { CheckCircle2, X } from 'lucide-react';
+import { useAuditTrail, useOpportunities, useUpdateOpportunityPriority } from '../../hooks/useApiQueries';
+import { useAuth } from '../../context/AuthContext';
+import { recordPriorityChange, parseAuditDate, normalizePriorityCase, subscribe } from '../../services/auditService';
 import AuditFilters from './AuditFilters';
 import AuditTable from './AuditTable';
+import EditPriorityModal from './EditPriorityModal';
 import styles from './AuditTrail.module.css';
 
 const AUDIT_TRAIL_STATE_KEY = 'auditTrailState';
 
-const INITIAL_AUDIT_LOGS = [
-  { timestamp: '25 Aug · 08:15', user: 'Arjun Rao', action: 'Opportunity detected', opportunity: 'Consultancy Services for Highway Development', opportunityId: 'MA-26-0101', change: 'HIGH' },
-  { timestamp: '25 Aug · 09:30', user: 'Arjun Rao', action: 'AI score generated', opportunity: 'Urban Water Resilience Program', opportunityId: 'MA-26-0102', change: 'HIGH' },
-  { timestamp: '25 Aug · 10:30', user: 'Arjun Rao', action: 'Opportunity detected', opportunity: 'Nairobi Metropolitan Transport Study', opportunityId: 'MA-26-0103', change: 'HIGH' },
-  { timestamp: '25 Aug · 11:30', user: 'Arjun Rao', action: 'AI score generated', opportunity: 'Smart City Digital Command Centre', opportunityId: 'MA-26-0104', change: 'MEDIUM' },
-  { timestamp: '25 Aug · 12:30', user: 'Arjun Rao', action: 'Opportunity detected', opportunity: 'Kuala Lumpur Bridge Engineering Services', opportunityId: 'MA-26-0105', change: 'MEDIUM' },
-  { timestamp: '25 Aug · 13:30', user: 'Arjun Rao', action: 'AI score generated', opportunity: 'Abu Dhabi Municipal Buildings Program', opportunityId: 'MA-26-0106', change: 'MEDIUM' },
-  { timestamp: '25 Aug · 14:30', user: 'Arjun Rao', action: 'Opportunity detected', opportunity: 'Coastal Flood Protection Advisory', opportunityId: 'MA-26-0107', change: 'HIGH' },
-  { timestamp: '25 Aug · 15:30', user: 'Arjun Rao', action: 'AI score generated', opportunity: 'Kathmandu Ring Road Expansion', opportunityId: 'MA-26-0108', change: 'HIGH' },
-  { timestamp: '25 Aug · 16:30', user: 'Arjun Rao', action: 'Opportunity detected', opportunity: 'Bengaluru Transit Oriented Development', opportunityId: 'MA-26-0109', change: 'HIGH' },
-  { timestamp: '25 Aug · 17:30', user: 'Arjun Rao', action: 'AI score generated', opportunity: 'Penang Water Treatment Upgrade', opportunityId: 'MA-26-0110', change: 'MEDIUM' },
-  { timestamp: '25 Aug · 18:30', user: 'Arjun Rao', action: 'Opportunity detected', opportunity: 'Mombasa Port Access Road', opportunityId: 'MA-26-0111', change: 'HIGH' },
-  { timestamp: '25 Aug · 19:30', user: 'Arjun Rao', action: 'AI score generated', opportunity: 'Dubai Green Buildings Audit', opportunityId: 'MA-26-0112', change: 'LOW' }
-];
-
-function parseAuditDate(value) {
-  if (!value) return 0;
-
-  const isoMatch = value.match(/(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/);
-  if (isoMatch) {
-    const parsed = new Date(`${isoMatch[1]}T${isoMatch[2]}:00`);
-    if (!Number.isNaN(parsed.getTime())) return parsed.getTime();
-  }
-
-  const textMatch = value.match(/(\d{1,2})\s+(\w{3})\s+·\s*(\d{2}:\d{2})/);
-  if (textMatch) {
-    const [, day, month, time] = textMatch;
-    const monthIndex = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(month);
-    const parsed = new Date(new Date().getFullYear(), monthIndex, Number(day), Number(time.split(':')[0]), Number(time.split(':')[1]));
-    if (!Number.isNaN(parsed.getTime())) return parsed.getTime();
-  }
-
-  return 0;
-}
-
 export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) {
-  const { data: rawLogs } = useAuditTrail();
-  const logs = Array.isArray(rawLogs) && rawLogs.length ? rawLogs : INITIAL_AUDIT_LOGS;
+  const { data: rawLogs, refetch: refetchAuditLogs } = useAuditTrail();
+  const { data: opportunitiesList = [] } = useOpportunities();
+  const updatePriorityMutation = useUpdateOpportunityPriority();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
+  const [localLogs, setLocalLogs] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All Users');
   const [selectedAction, setSelectedAction] = useState('All Actions');
   const [selectedPriority, setSelectedPriority] = useState('All Priorities');
   const [selectedDate, setSelectedDate] = useState('All dates');
-  const [sortBy, setSortBy] = useState('oldest');
+  const [sortBy, setSortBy] = useState('newest');
 
+  // Edit Priority Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingOpportunity, setEditingOpportunity] = useState(null);
+
+  // Success Notification State
+  const [notification, setNotification] = useState(null);
+
+  // Listen for audit logs updates from auditService
+  useEffect(() => {
+    const unsubscribe = subscribe((updatedLogs) => {
+      if (Array.isArray(updatedLogs)) {
+        setLocalLogs(updatedLogs);
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (Array.isArray(rawLogs) && rawLogs.length) {
+      setLocalLogs(rawLogs);
+    }
+  }, [rawLogs]);
+
+  const logs = localLogs.length ? localLogs : (Array.isArray(rawLogs) ? rawLogs : []);
+
+  // Restore persistent filter/search/sort state
   useEffect(() => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(AUDIT_TRAIL_STATE_KEY) || '{}');
@@ -65,10 +63,11 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
       if (saved.sortBy) setSortBy(saved.sortBy);
       if (typeof saved.searchVal === 'string') setSearchVal(saved.searchVal);
     } catch {
-      // ignore persisted state parse issues
+      // ignore parse errors
     }
   }, [setSearchVal]);
 
+  // Persist filter state
   useEffect(() => {
     try {
       sessionStorage.setItem(AUDIT_TRAIL_STATE_KEY, JSON.stringify({
@@ -80,18 +79,33 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         searchVal
       }));
     } catch {
-      // ignore storage write issues
+      // ignore write errors
     }
   }, [selectedUser, selectedAction, selectedPriority, selectedDate, sortBy, searchVal]);
 
+  // Dismiss notification after timeout
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
   const users = useMemo(() => ['All Users', ...Array.from(new Set(logs.map((log) => log.user))).filter(Boolean)], [logs]);
   const actions = useMemo(() => ['All Actions', ...Array.from(new Set(logs.map((log) => log.action))).filter(Boolean)], [logs]);
-  const priorities = ['All Priorities', 'HIGH', 'MEDIUM', 'LOW'];
-  const dateOptions = ['All dates', '25 Aug'];
+  const priorities = ['All Priorities', 'High', 'Medium', 'Low'];
+
+  const dateOptions = useMemo(() => {
+    const uniqueDates = Array.from(
+      new Set(
+        logs.map((log) => log.date || (log.timestamp && log.timestamp.includes('·') ? log.timestamp.split('·')[0].trim() : null))
+      )
+    ).filter(Boolean);
+    return ['All dates', ...uniqueDates];
+  }, [logs]);
 
   const getSearchableValues = (record) => {
     const values = [];
-
     const collect = (value) => {
       if (value === null || value === undefined) return;
       if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
@@ -106,7 +120,6 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         Object.values(value).forEach(collect);
       }
     };
-
     collect(record);
     return values;
   };
@@ -117,14 +130,22 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
     return logs.filter((log) => {
       if (selectedUser !== 'All Users' && log.user !== selectedUser) return false;
       if (selectedAction !== 'All Actions' && log.action !== selectedAction) return false;
-      if (selectedPriority !== 'All Priorities' && log.change !== selectedPriority) return false;
-      if (selectedDate !== 'All dates' && !log.timestamp.includes(selectedDate)) return false;
+
+      if (selectedPriority !== 'All Priorities') {
+        const changeStr = String(log.change || log.priority || '').toUpperCase();
+        const filterStr = selectedPriority.toUpperCase();
+        if (!changeStr.includes(filterStr)) return false;
+      }
+
+      if (selectedDate !== 'All dates') {
+        const matchDate = log.date === selectedDate || (log.timestamp && log.timestamp.includes(selectedDate));
+        if (!matchDate) return false;
+      }
 
       if (term) {
         const matchesSearch = getSearchableValues(log).some((field) =>
           String(field || '').toLowerCase().includes(term)
         );
-
         if (!matchesSearch) return false;
       }
 
@@ -137,7 +158,7 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
 
     switch (sortBy) {
       case 'oldest':
-        return copy.sort((a, b) => parseAuditDate(a.timestamp) - parseAuditDate(b.timestamp));
+        return copy.sort((a, b) => parseAuditDate(a.timestamp, a) - parseAuditDate(b.timestamp, b));
       case 'user':
         return copy.sort((a, b) => (a.user || '').localeCompare(b.user || ''));
       case 'action':
@@ -148,16 +169,31 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         return copy.sort((a, b) => (a.change || '').localeCompare(b.change || ''));
       case 'newest':
       default:
-        return copy.sort((a, b) => parseAuditDate(b.timestamp) - parseAuditDate(a.timestamp));
+        return copy.sort((a, b) => parseAuditDate(b.timestamp, b) - parseAuditDate(a.timestamp, a));
     }
   }, [filteredRecords, sortBy]);
+
+  const tableRecords = useMemo(() => sortedRecords.map((log) => {
+    const opportunity = opportunitiesList.find(
+      (item) => item.id === log.opportunityId || item.name === log.opportunity
+    );
+    const normalizedPriority = normalizePriorityCase(
+      opportunity?.priority || log.priority || log.newPriority || 'Medium'
+    );
+    return {
+      ...log,
+      currentPriority: ['High', 'Medium', 'Low'].includes(normalizedPriority)
+        ? normalizedPriority
+        : 'Medium'
+    };
+  }), [sortedRecords, opportunitiesList]);
 
   const clearAllFilters = () => {
     setSelectedUser('All Users');
     setSelectedAction('All Actions');
     setSelectedPriority('All Priorities');
     setSelectedDate('All dates');
-    setSortBy('oldest');
+    setSortBy('newest');
     setSearchVal('');
   };
 
@@ -166,16 +202,108 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
     selectedAction !== 'All Actions' ||
     selectedPriority !== 'All Priorities' ||
     selectedDate !== 'All dates' ||
-    sortBy !== 'oldest' ||
+    sortBy !== 'newest' ||
     (searchVal || '').trim() !== '';
+
+  // Open Edit Priority Modal
+  const handleOpenEdit = useCallback((log) => {
+    const matchedOpp = opportunitiesList.find(
+      (o) => o.id === log.opportunityId || o.name === log.opportunity
+    );
+
+    const currentPri = matchedOpp?.priority || log.newPriority || log.priority || 'Medium';
+
+    setEditingOpportunity({
+      id: log.opportunityId || matchedOpp?.id || 'OPP-001',
+      name: log.opportunity || matchedOpp?.name || 'Opportunity',
+      currentPriority: normalizePriorityCase(currentPri)
+    });
+    setIsEditModalOpen(true);
+  }, [opportunitiesList]);
+
+  // Handle Save Priority from Modal
+  const handleSavePriority = async ({ opportunityId, opportunityName, previousPriority, newPriority, isChanged }) => {
+    setIsEditModalOpen(false);
+
+    // If Admin selects the same priority, do not create an unnecessary audit record (Req 6)
+    if (!isChanged) {
+      return;
+    }
+
+    try {
+      // 1. Update opportunity's priority in persistence layer & query cache
+      await updatePriorityMutation.mutateAsync({
+        id: opportunityId,
+        priority: newPriority
+      });
+
+      // 2. Record new audit log entry
+      const actorName = user?.name || 'Admin';
+      const actorRole = user?.role || 'Admin';
+
+      const newRecord = recordPriorityChange({
+        opportunityId,
+        opportunityName,
+        previousPriority,
+        newPriority,
+        user: actorName,
+        userRole: actorRole
+      });
+
+      // 3. Refresh audit logs
+      if (refetchAuditLogs) {
+        await refetchAuditLogs();
+      }
+
+      // 4. Show success notification
+      setNotification({
+        type: 'success',
+        message: `Priority updated for ${opportunityId}: ${previousPriority} → ${newPriority}`,
+        details: `Audit record saved by ${actorName}`
+      });
+    } catch (err) {
+      console.error('Failed to update priority:', err);
+      setNotification({
+        type: 'error',
+        message: 'Failed to update priority. Please try again.'
+      });
+    }
+  };
 
   return (
     <div className={styles.page}>
+      {/* Toast Notification */}
+      {notification && (
+        <div className={`${styles.toastNotification} ${notification.type === 'error' ? styles.toastError : styles.toastSuccess}`} role="alert">
+          <div className={styles.toastContent}>
+            <CheckCircle2 size={18} className={styles.toastIcon} />
+            <div>
+              <strong className={styles.toastMessage}>{notification.message}</strong>
+              {notification.details && <p className={styles.toastDetails}>{notification.details}</p>}
+            </div>
+          </div>
+          <button
+            type="button"
+            className={styles.toastCloseBtn}
+            onClick={() => setNotification(null)}
+            aria-label="Dismiss notification"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Page Header */}
       <div className={styles.headerSection}>
-        <h1 className={styles.title}>Audit trail</h1>
-        <p className={styles.subtitle}>A clear record of the decisions and changes that shape your pipeline.</p>
+        <div className={styles.headerFlex}>
+          <div>
+            <h1 className={styles.title}>Audit Trail</h1>
+            <p className={styles.subtitle}>Complete chronological history of opportunity priority decisions and changes.</p>
+          </div>
+        </div>
       </div>
 
+      {/* Filter Toolbar */}
       <AuditFilters
         users={users}
         actions={actions}
@@ -197,16 +325,31 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         setSearchVal={setSearchVal}
       />
 
+      {/* Audit Table */}
       <section className={styles.tableWrapper}>
-        {sortedRecords.length === 0 ? (
+        {tableRecords.length === 0 ? (
           <div className={styles.emptyState}>
             <p className={styles.emptyMessage}>No audit records found</p>
             <p className={styles.emptyHint}>Try adjusting your filters or search terms.</p>
           </div>
         ) : (
-          <AuditTable logs={sortedRecords} onRowClick={(log) => navigate(`/audit/details/${log.id}`)} />
+          <AuditTable
+            logs={tableRecords}
+            onRowClick={(log) => navigate(`/audit/details/${log.id}`)}
+            onEdit={handleOpenEdit}
+          />
         )}
       </section>
+
+      {/* Priority Edit Modal */}
+      <EditPriorityModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        opportunity={editingOpportunity}
+        currentPriority={editingOpportunity?.currentPriority}
+        currentUser={user?.name || user?.role || 'Admin'}
+        onSave={handleSavePriority}
+      />
     </div>
   );
 }

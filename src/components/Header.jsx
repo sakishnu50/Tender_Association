@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-import React from 'react';
-import { Search, Sun, Moon } from 'lucide-react';
-
-export default function Header({ searchVal, setSearchVal, activeTabTitle, activeTab, darkMode, toggleTheme }) {
-=======
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
 import './HeaderProfile.css';
 
-export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMode, toggleTheme }) {
+export default function Header({ searchVal, setSearchVal, activeTabTitle, activeTab, darkMode, toggleTheme }) {
   // Notification state
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -45,8 +39,6 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
->>>>>>> 90bb78c (Update audit trail functionality)
   return (
     <header className="top-header">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -89,9 +81,7 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
           )}
         </button>
 
-<<<<<<< HEAD
         <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} />
-=======
 
         <button ref={bellRef} className="btn btn-outline" style={{ padding: '0.4rem 0.6rem', position: 'relative' }} onClick={toggleNotifications} title="Notifications">
           <Bell size={18} color="var(--text-main)" />
@@ -145,7 +135,6 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
           </div>
           <ChevronDown size={14} color="var(--text-muted)" />
         </div>
->>>>>>> 90bb78c (Update audit trail functionality)
       </div>
     </header>
   );

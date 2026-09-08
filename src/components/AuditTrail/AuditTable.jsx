@@ -1,20 +1,19 @@
 // src/components/AuditTrail/AuditTable.jsx
 
 import React from 'react';
-import { Eye } from 'lucide-react';
+import { Pencil, Eye } from 'lucide-react';
 import styles from './AuditTrail.module.css';
 
-export default function AuditTable({ logs, onRowClick }) {
+export default function AuditTable({ logs, onRowClick, onEdit }) {
   const getPriorityBadgeClass = (priority) => {
     switch (priority) {
-      case 'HIGH':
+      case 'High':
         return styles.priorityHigh;
-      case 'MEDIUM':
-        return styles.priorityMedium;
-      case 'LOW':
+      case 'Low':
         return styles.priorityLow;
+      case 'Medium':
       default:
-        return '';
+        return styles.priorityMedium;
     }
   };
 
@@ -23,47 +22,101 @@ export default function AuditTable({ logs, onRowClick }) {
       <table className={styles.auditTable}>
         <thead>
           <tr>
-            <th className={styles.th}>TIMESTAMP</th>
-            <th className={styles.th}>USER</th>
-            <th className={styles.th}>ACTION</th>
+            <th className={styles.th}>OPPORTUNITY ID</th>
             <th className={styles.th}>OPPORTUNITY</th>
-            <th className={styles.th}>CHANGE</th>
-            <th className={styles.th}>ACTION</th>
+            <th className={styles.th}>USER</th>
+            <th className={styles.th}>TIMESTAMP</th>
+            <th className={styles.th}>DATE</th>
+            <th className={styles.th}>PRIORITY</th>
+            <th className={styles.th} style={{ textAlign: 'center' }}>EDIT</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((log, index) => (
             <tr
-              key={log.id || log.opportunityId || index}
+              key={log.id || `${log.opportunityId}-${index}`}
               className={styles.tr}
-              onClick={() => onRowClick(log)}
+              onClick={() => onRowClick && onRowClick(log)}
               tabIndex={0}
               onKeyDown={(event) => {
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault();
-                  onRowClick(log);
+                  onRowClick && onRowClick(log);
                 }
               }}
             >
-              <td className={styles.td}>{log.timestamp}</td>
-              <td className={styles.td}>{log.user}</td>
-              <td className={styles.td}>{log.action}</td>
-              <td className={styles.td}>{log.opportunity}</td>
+              {/* Opportunity ID */}
               <td className={styles.td}>
-                <span className={`${styles.priorityBadge} ${getPriorityBadgeClass(log.change)}`}>{log.change}</span>
+                <span className={styles.opportunityIdBadge}>
+                  {log.opportunityId || log.recordId || 'OP-001'}
+                </span>
               </td>
+
+              {/* Opportunity */}
               <td className={styles.td}>
-                <button
-                  className={styles.viewButton}
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onRowClick(log);
-                  }}
-                >
-                  <Eye size={12} />
-                  <span>View</span>
-                </button>
+                <div className={styles.opportunityNameWrapper}>
+                  <strong className={styles.opportunityTitle}>
+                    {log.opportunity || log.opportunityTitle || log.recordName || 'Untitled Opportunity'}
+                  </strong>
+                  {log.action && log.action !== 'Priority Changed' && (
+                    <span className={styles.actionSubtext}>{log.action}</span>
+                  )}
+                </div>
+              </td>
+
+              {/* User */}
+              <td className={styles.td}>
+                <div className={styles.userCell}>
+                  <span className={styles.userName}>{log.user || 'Admin'}</span>
+                  {log.userRole && <span className={styles.userRoleTag}>{log.userRole}</span>}
+                </div>
+              </td>
+
+              {/* Timestamp */}
+              <td className={styles.td}>
+                <span className={styles.timestampCell}>{log.timestamp}</span>
+              </td>
+
+              {/* Date */}
+              <td className={styles.td}>
+                <span className={styles.dateCell}>{log.date || '08-Sep-2026'}</span>
+              </td>
+
+              {/* Current Priority */}
+              <td className={styles.td}>
+                <span className={`${styles.priorityBadge} ${getPriorityBadgeClass(log.currentPriority)}`}>
+                  {log.currentPriority || 'Medium'}
+                </span>
+              </td>
+
+              {/* Edit Action */}
+              <td className={styles.td} style={{ textAlign: 'center' }}>
+                <div className={styles.actionsContainer} onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className={styles.editButton}
+                    type="button"
+                    title={`Edit priority for ${log.opportunityId}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit && onEdit(log);
+                    }}
+                  >
+                    <Pencil size={13} />
+                    <span>Edit</span>
+                  </button>
+
+                  <button
+                    className={styles.viewIconBtn}
+                    type="button"
+                    title="View details"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRowClick && onRowClick(log);
+                    }}
+                  >
+                    <Eye size={13} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

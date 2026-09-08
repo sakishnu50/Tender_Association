@@ -2,11 +2,15 @@
 
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { formatAuditDate, formatAuditTime } from '../../services/auditService';
 import styles from './AuditTrail.module.css';
 
-export default function AuditDetailsDrawer({ log, onClose, relatedLogs = [] }) {
+export default function AuditDetailsDrawer({ log, onClose }) {
+  if (!log) return null;
+
   const getPriorityBadgeClass = (priority) => {
-    switch (priority) {
+    const p = String(priority || '').trim().toUpperCase();
+    switch (p) {
       case 'HIGH':
         return styles.priorityHigh;
       case 'MEDIUM':
@@ -14,24 +18,80 @@ export default function AuditDetailsDrawer({ log, onClose, relatedLogs = [] }) {
       case 'LOW':
         return styles.priorityLow;
       default:
-        return '';
+        return styles.priorityMedium;
     }
   };
 
-  const getDescription = (record) => {
-    if (record.action === 'AI score generated') {
-      return `AI-generated score evaluated and classified as ${record.change?.toLowerCase() || 'medium'} priority.`;
+  const getPreviousPriority = (item) => {
+    if (!item) return '—';
+    if (item.previousPriority && item.previousPriority !== '—') return item.previousPriority;
+    if (item.previousValue && item.previousValue !== '—') return item.previousValue;
+    if (item.change && item.change.includes('→')) {
+      const parts = item.change.split('→');
+      return parts[0].trim();
     }
-    return `Opportunity detected and classified as a ${record.change?.toLowerCase() || 'medium'}-priority opportunity.`;
+    return '—';
   };
 
-  const timelineEntries = (relatedLogs.length ? relatedLogs : [log])
-    .slice()
-    .sort((a, b) => {
-      const left = a.timestamp || '';
-      const right = b.timestamp || '';
-      return left.localeCompare(right);
-    });
+  const getNewPriority = (item) => {
+    if (!item) return 'Medium';
+    if (item.newPriority) return item.newPriority;
+    if (item.newValue) return item.newValue;
+    if (item.change && item.change.includes('→')) {
+      const parts = item.change.split('→');
+      return parts[1].trim();
+    }
+    if (item.change) return item.change.trim();
+    if (item.priority) return item.priority.trim();
+    return 'Medium';
+  };
+
+  const getDescription = (item, prev, next) => {
+    if (!item) return 'No change details available.';
+    if (item.details) return item.details;
+    if (item.action === 'Priority Changed' || (item.change && item.change.includes('→'))) {
+      if (prev && prev !== '—' && next && next !== '—') {
+        return `Priority changed: ${prev} → ${next}`;
+      }
+      return `Priority changed: ${item.change || next}`;
+    }
+    if (item.action === 'AI score generated') {
+      return `AI-generated score evaluated and classified as ${String(next || 'medium').toLowerCase()} priority.`;
+    }
+    return `Opportunity detected and classified as a ${String(next || 'medium').toLowerCase()}-priority opportunity.`;
+  };
+
+  const getTimeString = (item) => {
+    if (!item) return '12:56 PM';
+    if (item.timestamp) {
+      if (item.timestamp.includes('·')) {
+        return item.timestamp.split('·')[1].trim();
+      }
+      return item.timestamp;
+    }
+    if (item.createdAt) {
+      return formatAuditTime(item.createdAt);
+    }
+    return '12:56 PM';
+  };
+
+  const getDateString = (item) => {
+    if (!item) return '08-Sep-2026';
+    if (item.date) return item.date;
+    if (item.timestamp && item.timestamp.includes('·')) {
+      return item.timestamp.split('·')[0].trim();
+    }
+    if (item.createdAt) {
+      return formatAuditDate(item.createdAt);
+    }
+    return '08-Sep-2026';
+  };
+
+  const prevPriority = getPreviousPriority(log);
+  const newPriority = getNewPriority(log);
+  const description = getDescription(log, prevPriority, newPriority);
+  const timeStr = getTimeString(log);
+  const dateStr = getDateString(log);
 
   return (
     <div className={styles.drawerOverlay} onClick={onClose}>
@@ -50,109 +110,108 @@ export default function AuditDetailsDrawer({ log, onClose, relatedLogs = [] }) {
         <div className={styles.fullscreenContent}>
           <div className={styles.pageTitleRow}>
             <h2>Audit Record Details</h2>
+            <p className={styles.detailSubtitle}>A detailed record of an activity and change recorded in the audit trail.</p>
           </div>
 
+          {/* Activity */}
           <section className={styles.detailCard}>
-            <div className={styles.sectionLabel}>Audit Record</div>
-
+            <div className={styles.sectionLabel}>Activity</div>
             <div className={styles.detailGrid}>
               <div className={styles.detailItem}>
-                <span className={styles.label}>Activity</span>
-                <strong>{log.action}</strong>
-              </div>
-
-              <div className={styles.detailItem}>
-                <span className={styles.label}>Timestamp</span>
-                <strong>{log.timestamp}</strong>
-              </div>
-
-              <div className={styles.detailItem}>
-                <span className={styles.label}>User</span>
-                <strong>{log.user}</strong>
-              </div>
-
-              <div className={styles.detailItem}>
-                <span className={styles.label}>Opportunity</span>
-                <strong>{log.opportunity}</strong>
-              </div>
-
-              <div className={styles.detailItem}>
-                <span className={styles.label}>Opportunity ID</span>
-                <strong>{log.opportunityId}</strong>
-              </div>
-
-              <div className={styles.detailItem}>
-                <span className={styles.label}>Change</span>
-                <strong>
-                  <span className={`${styles.priorityBadge} ${getPriorityBadgeClass(log.change)}`}>{log.change}</span>
-                </strong>
+                <strong>{log.action || 'Priority Changed'}</strong>
               </div>
             </div>
           </section>
 
+          {/* Opportunity */}
           <section className={styles.detailCard}>
-            <div className={styles.sectionLabel}>Change Details</div>
+            <div className={styles.sectionLabel}>Opportunity</div>
+            <div className={styles.detailGrid}>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>Name</span>
+                <strong>{log.opportunity || log.opportunityTitle || log.recordName || 'Untitled Opportunity'}</strong>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>ID</span>
+                <strong>{log.opportunityId || log.recordId || 'OPP-001'}</strong>
+              </div>
+            </div>
+          </section>
+
+          {/* Change */}
+          <section className={styles.detailCard}>
+            <div className={styles.sectionLabel}>Change</div>
             <div className={styles.changeGrid}>
               <div className={styles.changeItem}>
-                <span className={styles.label}>Previous Value</span>
-                <strong>—</strong>
+                <span className={styles.label}>Previous Priority</span>
+                {prevPriority && prevPriority !== '—' ? (
+                  <div>
+                    <span className={`${styles.priorityBadge} ${getPriorityBadgeClass(prevPriority)}`}>
+                      {prevPriority}
+                    </span>
+                  </div>
+                ) : (
+                  <strong>—</strong>
+                )}
               </div>
               <div className={styles.changeItem}>
-                <span className={styles.label}>New Value</span>
-                <strong>{log.change}</strong>
+                <span className={styles.label}>New Priority</span>
+                {newPriority && newPriority !== '—' ? (
+                  <div>
+                    <span className={`${styles.priorityBadge} ${getPriorityBadgeClass(newPriority)}`}>
+                      {newPriority}
+                    </span>
+                  </div>
+                ) : (
+                  <strong>—</strong>
+                )}
               </div>
               <div className={styles.changeItemWide}>
                 <span className={styles.label}>Description</span>
-                <strong>{getDescription(log)}</strong>
+                <strong>{description}</strong>
               </div>
             </div>
           </section>
 
+          {/* Performed By */}
           <section className={styles.detailCard}>
-            <div className={styles.sectionLabel}>Opportunity Information</div>
-            <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
-                <span className={styles.label}>Opportunity Name</span>
-                <strong>{log.opportunity}</strong>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.label}>Opportunity ID</span>
-                <strong>{log.opportunityId}</strong>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.label}>Action</span>
-                <strong>{log.action}</strong>
-              </div>
-              <div className={styles.infoItem}>
-                <span className={styles.label}>Priority</span>
-                <strong>
-                  <span className={`${styles.priorityBadge} ${getPriorityBadgeClass(log.change)}`}>{log.change}</span>
-                </strong>
-              </div>
-              <div className={styles.infoItem}>
+            <div className={styles.sectionLabel}>Performed By</div>
+            <div className={styles.detailGrid}>
+              <div className={styles.detailItem}>
                 <span className={styles.label}>User</span>
-                <strong>{log.user}</strong>
+                <strong>{log.user || log.userName || 'XYZ'}</strong>
               </div>
-              <div className={styles.infoItem}>
+              <div className={styles.detailItem}>
                 <span className={styles.label}>Timestamp</span>
-                <strong>{log.timestamp}</strong>
+                <strong>{timeStr}</strong>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>Date</span>
+                <strong>{dateStr}</strong>
               </div>
             </div>
           </section>
 
+          {/* Record Metadata */}
           <section className={styles.detailCard}>
-            <div className={styles.sectionLabel}>Activity Timeline</div>
-            <div className={styles.timelineList}>
-              {timelineEntries.map((entry, index) => (
-                <div className={styles.timelineEntry} key={`${entry.opportunityId}-${index}`}>
-                  <div className={styles.timelineDot} />
-                  <div className={styles.timelineContent}>
-                    <div className={styles.timelineStamp}>{entry.timestamp}</div>
-                    <div className={styles.timelineAction}>{entry.action}</div>
-                    <div className={styles.timelineMeta}>{entry.user} · {entry.opportunity}</div>
-                  </div>
-                </div>
-              ))}
+            <div className={styles.sectionLabel}>Record Metadata</div>
+            <div className={styles.detailGrid}>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>Record ID</span>
+                <strong>{log.id || 'AUD-1788852383462-lwsa'}</strong>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>Source</span>
+                <strong>{log.source || 'Audit Trail'}</strong>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>Status</span>
+                <strong>Read-only</strong>
+              </div>
+              <div className={styles.detailItem}>
+                <span className={styles.label}>Created</span>
+                <strong>{timeStr}</strong>
+              </div>
             </div>
           </section>
 

@@ -225,6 +225,22 @@ export const apiFacade = {
     return { success: true, data: fullOpp };
   },
 
+  updateOpportunityPriority: async (id, priority) => {
+    const opps = getStorage('iot_opportunities', mockOpportunities);
+    const normalizedPriority = String(priority).toUpperCase();
+    const updated = opps.map((opp) => {
+      if (opp.id === id) {
+        return {
+          ...opp,
+          priority: normalizedPriority
+        };
+      }
+      return opp;
+    });
+    setStorage('iot_opportunities', updated);
+    return { success: true, id, priority: normalizedPriority };
+  },
+
   saveSettings: async (settings) => {
     setStorage('iot_settings', settings);
     return { success: true, data: settings };
