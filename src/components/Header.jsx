@@ -91,7 +91,7 @@ export default function Header({
 
   return (
     <header className="top-header">
-      {/* 1. Expanded Search Bar (50-60% width) - Heading removed */}
+      {/* Expanded Search Bar (50-60% width) - Dashboard heading removed */}
       <div className="header-search">
         <Search size={17} color="var(--text-muted)" style={{ flexShrink: 0 }} />
         <input
@@ -103,7 +103,14 @@ export default function Header({
         {searchVal && (
           <button
             onClick={() => setSearchVal && setSearchVal('')}
-            style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            style={{
+              border: 'none',
+              background: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
+            }}
             title="Clear search"
           >
             <X size={15} />
@@ -111,7 +118,7 @@ export default function Header({
         )}
       </div>
 
-      {/* 2. Header Action Controls (Left to Right Order: Refresh -> Export CSV -> Download PDF -> Notifications Badge -> User Profile -> Theme Toggle) */}
+      {/* Header Action Controls */}
       <div className="header-actions">
         {/* Refresh Button */}
         <button
@@ -124,7 +131,7 @@ export default function Header({
           <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
         </button>
 
-        {/* Export CSV Button (Visually Prominent Blue) */}
+        {/* Export CSV Button */}
         <button
           className="btn-header-blue"
           onClick={handleExportCSVClick}
@@ -134,7 +141,7 @@ export default function Header({
           <span>Export CSV</span>
         </button>
 
-        {/* Download PDF Button (Visually Prominent Blue) */}
+        {/* Download PDF Button */}
         <button
           className="btn-header-blue-alt"
           onClick={handleDownloadPDFClick}
@@ -144,7 +151,7 @@ export default function Header({
           <span>Download PDF</span>
         </button>
 
-        {/* Notifications Bell Icon with Badge Count 3 */}
+        {/* Notifications Bell Icon with Badge */}
         <div style={{ position: 'relative' }}>
           <button
             className="icon-btn-header"
@@ -236,7 +243,7 @@ export default function Header({
           )}
         </div>
 
-        {/* User Profile Avatar / Icon Pill */}
+        {/* User Profile Avatar */}
         <div style={{ position: 'relative' }}>
           <div
             className="header-user-profile"
@@ -331,11 +338,18 @@ export default function Header({
           )}
         </div>
 
-        {/* Dark / Light Theme Toggle Icon Button on Far Right */}
+        {/* Dark / Light Theme Toggle */}
         <button
           className="icon-btn-header"
           onClick={toggleTheme}
-          title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          style={{
+            padding: '0.4rem 0.6rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '1.1rem',
+          }}
         >
           {darkMode ? (
             <Sun size={18} color="#F59E0B" />
@@ -344,7 +358,14 @@ export default function Header({
           )}
         </button>
 
-        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} />
+        <div
+          id="header-actions-portal"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+          }}
+        />
       </div>
     </header>
   );
