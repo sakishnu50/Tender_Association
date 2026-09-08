@@ -11,9 +11,6 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
   return (
     <header className="top-header">
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
-          {activeTabTitle || 'Dashboard'}
-        </h2>
         <div className="header-search">
           <Search size={16} color="var(--text-muted)" />
           <input
