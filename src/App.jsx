@@ -14,7 +14,8 @@ import ReportsView from './views/ReportsView';
 import SourcesView from './views/SourcesView';
 import OfficesView from './views/OfficesView';
 import UsersRolesView from './views/UsersRolesView';
-import AuditTrailView from './views/AuditTrailView';
+import AuditTrail from './components/AuditTrail/AuditTrail.jsx';
+import AuditRecordDetailsPage from './components/AuditTrail/AuditRecordDetailsPage.jsx';
 import SettingsView from './views/SettingsView';
 import LoginPageView from './views/LoginPageView';
 import Dashboard from './views/Dashboard';
@@ -94,6 +95,20 @@ export default function App() {
     login: 'Login Page'
   };
 
+  // Derived filtered opportunities for global actions
+  const filteredOpportunities = React.useMemo(() => {
+    if (!searchVal || !searchVal.trim()) return mockOpportunities;
+    const term = searchVal.trim().toLowerCase();
+    return mockOpportunities.filter((o) => {
+      const name = (o.name || o.title || '').toLowerCase();
+      const id = (o.id || '').toLowerCase();
+      const source = (o.source || '').toLowerCase();
+      const sector = (o.sector || '').toLowerCase();
+      const location = (o.location || o.country || '').toLowerCase();
+      return name.includes(term) || id.includes(term) || source.includes(term) || sector.includes(term) || location.includes(term);
+    });
+  }, [searchVal]);
+
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
@@ -105,8 +120,11 @@ export default function App() {
           searchVal={searchVal}
           setSearchVal={setSearchVal}
           activeTabTitle={titlesMap[activeTab]}
+          activeTab={activeTab}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
+          opportunities={mockOpportunities}
+          filteredOpportunities={filteredOpportunities}
         />
 
         {/* Declarative View Router */}
@@ -115,6 +133,8 @@ export default function App() {
             path="/"
             element={
               <DashboardView
+                searchVal={searchVal}
+                setSearchVal={setSearchVal}
                 onSelectOpportunity={handleSelectOpportunity}
                 onViewAll={() => {
                   setActiveTab('opportunities');
@@ -125,7 +145,12 @@ export default function App() {
           />
           <Route
             path="/opportunities"
-            element={<OpportunitiesListView onSelectOpportunity={handleSelectOpportunity} />}
+            element={
+              <OpportunitiesListView
+                searchVal={searchVal}
+                onSelectOpportunity={handleSelectOpportunity}
+              />
+            }
           />
           <Route
             path="/opportunities/details"
@@ -181,7 +206,8 @@ export default function App() {
           <Route path="/sources" element={<SourcesView />} />
           <Route path="/offices" element={<OfficesView />} />
           <Route path="/users" element={<UsersRolesView />} />
-          <Route path="/audit" element={<AuditTrailView />} />
+          <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
+          <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/settings" element={<SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />} />
           <Route
