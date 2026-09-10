@@ -167,15 +167,15 @@ export default function Header({
 
       {/* Header Action Controls */}
       <div className="header-actions">
-        {/* 2. Refresh Button: white background, rounded corners, subtle border, refresh icon + "Refresh" text */}
+        {/* 2. Refresh Button: icon-only */}
         <button
-          className="btn-header-refresh"
+          className="header-circle-btn"
           onClick={handleRefreshClick}
           title="Refresh Dashboard Data"
           disabled={isRefreshing}
+          aria-label="Refresh"
         >
-          <RefreshCw size={15} className={isRefreshing ? 'spin-icon' : ''} />
-          <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+          <RefreshCw size={17} className={isRefreshing ? 'spin-icon' : ''} />
         </button>
 
         {/* 3. Download Button: solid blue background, white text, rounded corners, download icon + "Download" + dropdown chevron */}

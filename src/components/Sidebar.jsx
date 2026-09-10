@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Briefcase,
-  Bell,
   Calendar,
   Users2,
   BarChart3,
@@ -24,7 +23,6 @@ const navSections = [
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
       { id: 'opportunities', label: 'Opportunities', icon: Briefcase, count: 150, path: '/opportunities' },
-      { id: 'alerts', label: 'Alerts', icon: Bell, count: 3, urgent: true, path: '/alerts' },
       { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' },
     ]
   },
