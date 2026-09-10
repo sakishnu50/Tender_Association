@@ -39,6 +39,8 @@ export default function Header({
 
   const inputRef = useRef(null);
   const downloadMenuRef = useRef(null);
+  const notificationMenuRef = useRef(null);
+  const profileMenuRef = useRef(null);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -49,6 +51,7 @@ export default function Header({
   const [downloadingLabel, setDownloadingLabel] = useState('');
 
   const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
+  const userInitial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'X';
 
   // Keyboard shortcut listener (Cmd+K / Ctrl+K focus, Escape clear)
   useEffect(() => {
@@ -70,6 +73,12 @@ export default function Header({
     const handleClickOutside = (event) => {
       if (downloadMenuRef.current && !downloadMenuRef.current.contains(event.target)) {
         setShowDownloadMenu(false);
+      }
+      if (notificationMenuRef.current && !notificationMenuRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -122,8 +131,8 @@ export default function Header({
 
   return (
     <header className="top-header">
-      {/* Real-Time Search Bar */}
-      <div className="header-search" style={{ position: 'relative' }}>
+      {/* 1. Real-Time Search Bar */}
+      <div className="header-search">
         <Search size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} />
         <input
           ref={inputRef}
@@ -142,47 +151,37 @@ export default function Header({
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              padding: '2px'
+              padding: '2px',
+              flexShrink: 0
             }}
             title="Clear search (Esc)"
           >
             <X size={14} />
           </button>
         ) : (
-          <span style={{
-            fontSize: '0.675rem',
-            fontWeight: '600',
-            color: 'var(--text-muted)',
-            backgroundColor: 'var(--bg-card)',
-            border: '1px solid var(--border-color)',
-            padding: '0.1rem 0.4rem',
-            borderRadius: '0.25rem',
-            boxShadow: 'var(--shadow-xs)',
-            pointerEvents: 'none'
-          }}>
+          <span className="header-search-badge">
             ⌘K
           </span>
         )}
       </div>
 
       {/* Header Action Controls */}
-      <div className="header-actions" style={{ gap: '0.65rem' }}>
-        {/* 1. Refresh Button */}
+      <div className="header-actions">
+        {/* 2. Refresh Button: white background, rounded corners, subtle border, refresh icon + "Refresh" text */}
         <button
-          className="btn-header-action"
+          className="btn-header-refresh"
           onClick={handleRefreshClick}
           title="Refresh Dashboard Data"
           disabled={isRefreshing}
-          style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
           <RefreshCw size={15} className={isRefreshing ? 'spin-icon' : ''} />
           <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
         </button>
 
-        {/* 2. Combined Single Download Button with Dropdown (Positioned after Refresh) */}
+        {/* 3. Download Button: solid blue background, white text, rounded corners, download icon + "Download" + dropdown chevron */}
         <div style={{ position: 'relative' }} ref={downloadMenuRef}>
           <button
-            className="btn-header-blue"
+            className="btn-header-download"
             onClick={() => {
               setShowDownloadMenu(!showDownloadMenu);
               setShowNotifications(false);
@@ -190,12 +189,6 @@ export default function Header({
             }}
             title="Download or Export Tenders Data"
             disabled={isDownloading}
-            style={{
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem'
-            }}
           >
             {isDownloading ? (
               <>
@@ -206,7 +199,7 @@ export default function Header({
               <>
                 <Download size={15} />
                 <span>Download</span>
-                <ChevronDown size={13} style={{ marginLeft: 1, opacity: 0.85 }} />
+                <ChevronDown size={14} style={{ marginLeft: 3, opacity: 0.9 }} />
               </>
             )}
           </button>
@@ -313,20 +306,19 @@ export default function Header({
           )}
         </div>
 
-        {/* 3. Notifications Bell Icon with Badge */}
-        <div style={{ position: 'relative' }}>
+        {/* 4. Notification Bell Icon: white circular/rounded button with border, bell icon, red circular badge with count */}
+        <div style={{ position: 'relative' }} ref={notificationMenuRef}>
           <button
-            className="icon-btn-header"
+            className="header-circle-btn"
             onClick={() => {
               setShowNotifications(!showNotifications);
               setShowProfileMenu(false);
               setShowDownloadMenu(false);
             }}
             title="Notifications (3 Urgent Alerts)"
-            style={{ position: 'relative', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
           >
-            <Bell size={17} color="var(--text-main)" />
-            <span className="notification-badge-count">3</span>
+            <Bell size={18} />
+            <span className="header-bell-badge">3</span>
           </button>
 
           {/* Notifications Dropdown */}
@@ -409,28 +401,17 @@ export default function Header({
           )}
         </div>
 
-        {/* 4. Dark / Light Theme Toggle (Positioned before User Profile) */}
+        {/* 5. Dark Mode Toggle: white circular/rounded button with a border, moon icon */}
         <button
-          className="icon-btn-header"
+          className="header-circle-btn"
           onClick={toggleTheme}
           title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          style={{
-            padding: '0.4rem 0.6rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
         >
-          {darkMode ? (
-            <Sun size={18} color="#F59E0B" />
-          ) : (
-            <Moon size={18} color="#6366F1" />
-          )}
+          <Moon size={18} />
         </button>
 
-        {/* 5. User Profile Avatar & Dropdown (On the far right) */}
-        <div style={{ position: 'relative' }}>
+        {/* 6. User Profile: circular blue avatar with user's initial, small green online dot on bottom-right, stacked name and role, dropdown chevron */}
+        <div style={{ position: 'relative' }} ref={profileMenuRef}>
           <div
             className="header-user-profile"
             onClick={() => {
@@ -438,29 +419,17 @@ export default function Header({
               setShowNotifications(false);
               setShowDownloadMenu(false);
             }}
-            title={`User Profile: ${user.name} (${user.role || 'Admin'})`}
-            style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+            title={`User Profile: ${user.name || 'Admin'} (${user.role || 'Admin'})`}
           >
-            <div style={{ position: 'relative' }}>
-              <div className="header-user-avatar">
-                {user.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'JD'}
-              </div>
-              <span style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#10B981',
-                border: '1.5px solid var(--bg-card)'
-              }} />
+            <div className="header-user-avatar">
+              {userInitial}
+              <span className="header-user-status-dot" />
             </div>
             <div className="header-user-info">
               <span className="header-user-name">{user.name || 'John Doe'}</span>
               <span className="header-user-role">{user.role || 'Admin'}</span>
             </div>
-            <ChevronDown size={14} color="var(--text-muted)" style={{ marginLeft: 2 }} />
+            <ChevronDown size={14} color="var(--text-muted)" style={{ marginLeft: 3 }} />
           </div>
 
           {/* User Profile Menu Dropdown */}
