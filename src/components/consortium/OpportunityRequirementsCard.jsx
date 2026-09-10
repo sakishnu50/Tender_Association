@@ -130,15 +130,18 @@ export default function OpportunityRequirementsCard({ requirements }) {
         </div>
 
         {/* 2. Missing Capabilities Section (Mukesh & Associates gap) */}
-        <div style={{
-          backgroundColor: 'rgba(254, 243, 199, 0.4)',
-          borderRadius: 'var(--radius-md)',
-          padding: '1rem',
-          border: '1px solid var(--warning)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem'
-        }}>
+        <div
+          className="missing-caps-card"
+          style={{
+            backgroundColor: 'rgba(254, 243, 199, 0.4)',
+            borderRadius: 'var(--radius-md)',
+            padding: '1rem',
+            border: '1px solid var(--warning)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem'
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <AlertTriangle size={16} color="var(--warning)" />
@@ -187,15 +190,16 @@ export default function OpportunityRequirementsCard({ requirements }) {
 
           <div style={{
             fontSize: '0.75rem',
-            color: 'var(--warning-text)',
             lineHeight: '1.4',
             display: 'flex',
             alignItems: 'center',
             gap: '0.4rem'
           }}>
-            <Sparkles size={14} style={{ flexShrink: 0 }} />
+            <Sparkles size={14} color="var(--warning)" style={{ flexShrink: 0 }} />
             <span>
-              <strong>AI Recommendation:</strong> Partner with listed consortium candidates below to bridge these missing capabilities and reach 100% tender compliance.
+              <strong style={{ color: 'var(--warning-text)' }}>AI Recommendation:</strong>
+              {' '}
+              <span style={{ color: 'var(--text-muted)' }}>Partner with listed consortium candidates below to bridge these missing capabilities and reach 100% tender compliance.</span>
             </span>
           </div>
         </div>
