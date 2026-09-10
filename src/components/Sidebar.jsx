@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Briefcase,
-  Bell,
   Calendar,
   Users2,
   BarChart3,
@@ -12,10 +11,11 @@ import {
   UserCheck,
   History,
   Settings,
-  LogIn,
+  LogOut,
   BadgeCheck,
   ShieldCheck
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const navSections = [
   {
@@ -23,7 +23,6 @@ const navSections = [
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
       { id: 'opportunities', label: 'Opportunities', icon: Briefcase, count: 150, path: '/opportunities' },
-      { id: 'alerts', label: 'Alerts', icon: Bell, count: 3, urgent: true, path: '/alerts' },
       { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' },
     ]
   },
@@ -43,7 +42,7 @@ const navSections = [
       { id: 'users', label: 'Users & Roles', icon: UserCheck, path: '/users' },
       { id: 'audit', label: 'Audit Trail', icon: History, path: '/audit' },
       { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
-      { id: 'login', label: 'Login Showcase', icon: LogIn, path: '/login' }
+      { id: 'login', label: 'Logout', icon: LogOut, path: '/login' }
     ]
   }
 ];
@@ -62,7 +61,14 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     }
   }, [location.pathname, activeTab, setActiveTab]);
 
+  const auth = useAuth();
+
   const handleNavClick = (item) => {
+    if (item.id === 'login' || item.path === '/login') {
+      if (auth?.logout) {
+        auth.logout();
+      }
+    }
     setActiveTab(item.id);
     navigate(item.path);
   };
@@ -98,21 +104,17 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       </div>
 
       {/* Navigation Sections */}
-      <nav className="sidebar-nav" style={{ padding: '1rem 0.65rem' }}>
+      <nav className="sidebar-nav" style={{ padding: '0.75rem 0.65rem' }}>
         {navSections.map((section, idx) => (
-          <div key={section.title} style={{ marginBottom: idx < navSections.length - 1 ? '1.15rem' : '0' }}>
-            <div style={{
-              fontSize: '0.65rem',
-              fontWeight: '700',
-              color: '#64748B',
-              letterSpacing: '0.08em',
-              padding: '0 0.6rem 0.4rem 0.6rem',
-              textTransform: 'uppercase'
-            }}>
-              {section.title}
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+          <div
+            key={idx}
+            style={{
+              marginBottom: idx < navSections.length - 1 ? '0.75rem' : '0',
+              paddingBottom: idx < navSections.length - 1 ? '0.75rem' : '0',
+              borderBottom: idx < navSections.length - 1 ? '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))' : 'none'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -163,7 +165,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         ))}
       </nav>
 
-      {/* Footer Branding */}
+      {/* Footer Status */}
       <div style={{
         padding: '0.85rem 1rem',
         borderTop: '1px solid var(--sidebar-border)',
@@ -171,9 +173,8 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         color: '#64748B',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'flex-end'
       }}>
-        <span>v2.4.0 Enterprise</span>
         <span style={{
           width: '7px',
           height: '7px',
