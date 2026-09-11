@@ -10,7 +10,7 @@ import { Eye } from 'lucide-react';
 export default function OpportunityTable({
   data = [],
   onSelectOpportunity,
-  pageSize = 5,
+  pageSize = 10,
   isLoading = false,
   isError = false
 }) {
