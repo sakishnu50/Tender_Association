@@ -14,9 +14,12 @@ import {
   Settings,
   LogOut,
   BadgeCheck,
-  ShieldCheck
+  ShieldCheck,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { exportService } from '../services/exportService';
+import { mockClientProfile } from '../data/clientProfileData';
 
 const navSections = [
   {
@@ -49,7 +52,7 @@ const navSections = [
   }
 ];
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -67,12 +70,28 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
   const handleNavClick = (item) => {
     if (item.id === 'login' || item.path === '/login') {
-      if (auth?.logout) {
-        auth.logout();
+      if (onRequestLogout) {
+        onRequestLogout();
+      } else {
+        if (auth?.logout) {
+          auth.logout();
+        }
+        setActiveTab(item.id);
+        navigate(item.path);
       }
+      return;
     }
     setActiveTab(item.id);
     navigate(item.path);
+  };
+
+  const handleDownloadProjectPDF = (e) => {
+    e?.stopPropagation();
+    // Use activeProject or fallback to the latest selected/first past project
+    const targetProject = activeProject || mockClientProfile.pastProjects[0];
+    if (targetProject) {
+      exportService.exportSingleProjectPDF(targetProject);
+    }
   };
 
   return (
@@ -167,16 +186,52 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         ))}
       </nav>
 
-      {/* Footer Status */}
+      {/* Footer: Bottom-Left Download Button & Status */}
       <div style={{
         padding: '0.85rem 1rem',
-        borderTop: '1px solid var(--sidebar-border)',
-        fontSize: '0.725rem',
-        color: '#64748B',
+        borderTop: '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-end'
+        justifyContent: 'space-between',
+        gap: '0.65rem'
       }}>
+        {/* Download Button at the bottom-left */}
+        <button
+          type="button"
+          onClick={handleDownloadProjectPDF}
+          title={activeProject ? `Download ${activeProject.name} PDF` : 'Download Selected Project Details (PDF)'}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            padding: '0.45rem 0.75rem',
+            borderRadius: '0.5rem',
+            border: '1px solid rgba(37, 99, 235, 0.4)',
+            backgroundColor: 'rgba(37, 99, 235, 0.15)',
+            color: '#60A5FA',
+            fontSize: '0.775rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.18s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.3)';
+            e.currentTarget.style.color = '#FFFFFF';
+            e.currentTarget.style.borderColor = '#3B82F6';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.15)';
+            e.currentTarget.style.color = '#60A5FA';
+            e.currentTarget.style.borderColor = 'rgba(37, 99, 235, 0.4)';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          <Download size={14} />
+          <span>Download</span>
+        </button>
+
+        {/* Operational Status Dot */}
         <span style={{
           width: '7px',
           height: '7px',
@@ -188,4 +243,3 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     </aside>
   );
 }
-

@@ -521,6 +521,103 @@ body {
   white-space: nowrap;
 }
 
+/* ── Screen Reader Utility ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Authentication Toggle Button Container & Styles ── */
+.header-auth-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 106px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.btn-auth-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 42px;
+  padding: 0 1.15rem;
+  border-radius: 0.625rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: authFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-xs);
+  width: 100%;
+}
+
+.btn-auth-toggle:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+}
+
+/* Logged Out / Login Button State */
+.btn-auth-login {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  border-color: #2563EB;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.btn-auth-login:hover {
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+  border-color: #1D4ED8;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-auth-login:active {
+  transform: translateY(0);
+}
+
+/* Logged In / Logout Button State */
+.btn-auth-logout {
+  background-color: var(--bg-card);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #EF4444;
+}
+
+.btn-auth-logout:hover {
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: #EF4444;
+  color: #DC2626;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-auth-logout:active {
+  transform: translateY(0);
+}
+
+@keyframes authFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Page Container */
 .page-container {
   padding: 1.5rem;
@@ -1211,4 +1308,66 @@ body {
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ─── Responsive Navbar Breakpoints ─── */
+@media (max-width: 1100px) {
+  .top-header {
+    padding: 0 1.25rem;
+    gap: 1rem;
+  }
+  .header-search {
+    width: 280px;
+  }
+  .header-user-role {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .top-header {
+    padding: 0.5rem 1rem;
+    gap: 0.75rem;
+  }
+  .header-search {
+    width: 200px;
+  }
+  .btn-header-refresh span,
+  .btn-header-download span {
+    display: none;
+  }
+  .btn-header-refresh,
+  .btn-header-download {
+    padding: 0 0.75rem;
+  }
+  .header-user-name {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 680px) {
+  .top-header {
+    height: auto;
+    min-height: 64px;
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+  .header-search {
+    order: 3;
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+  .header-user-info {
+    display: none;
+  }
+  .header-auth-container {
+    min-width: 90px;
+  }
+  .btn-auth-toggle {
+    padding: 0 0.85rem;
+    font-size: 0.8rem;
+  }
+}
+
 
