@@ -22,6 +22,23 @@ import { useAuth } from '../context/AuthContext';
 import { exportService } from '../services/exportService';
 import { mockOpportunities } from '../data/mockData';
 
+// Context-aware search config keyed by activeTab
+const PAGE_SEARCH_CONFIG = {
+  dashboard:     { placeholder: 'Search project name, tender ID, source, sector...', ariaLabel: 'Search opportunities by project, source, or sector' },
+  opportunities: { placeholder: 'Search project name, tender ID, source, sector...', ariaLabel: 'Search opportunities by project, source, or sector' },
+  opp_details:   { placeholder: 'Search project name, tender ID, source, sector...', ariaLabel: 'Search opportunities by project, source, or sector' },
+  calendar:      { placeholder: 'Search bid calendar by project or deadline...',      ariaLabel: 'Search bid calendar entries' },
+  consortium:    { placeholder: 'Search consortium partners...',                       ariaLabel: 'Search consortium partner organisations' },
+  client_profile:{ placeholder: 'Search clients, projects, or sectors...',            ariaLabel: 'Search client profiles and projects' },
+  reports:       { placeholder: 'Search reports and analytics...',                    ariaLabel: 'Search reports and analytics data' },
+  sources:       { placeholder: 'Search tender sources...',                           ariaLabel: 'Search monitored tender sources' },
+  offices:       { placeholder: 'Search offices by name or location...',              ariaLabel: 'Search offices' },
+  users:         { placeholder: 'Search users, roles, or permissions...',             ariaLabel: 'Search users and roles' },
+  audit:         { placeholder: 'Search audit logs by action, user, or date...',      ariaLabel: 'Search audit trail logs' },
+  settings:      { placeholder: 'Search settings...',                                 ariaLabel: 'Search settings' },
+  alerts:        { placeholder: 'Search alerts and notifications...',                 ariaLabel: 'Search alerts' },
+};
+
 export default function Header({
   searchVal,
   setSearchVal,
@@ -29,7 +46,6 @@ export default function Header({
   activeTab,
   darkMode,
   toggleTheme,
-  onRefresh,
   onExportCSV,
   onDownloadPDF,
   opportunities = mockOpportunities,
@@ -46,7 +62,6 @@ export default function Header({
   const notificationMenuRef = useRef(null);
   const profileMenuRef = useRef(null);
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
@@ -54,6 +69,9 @@ export default function Header({
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadingLabel, setDownloadingLabel] = useState('');
   const [ariaAnnouncement, setAriaAnnouncement] = useState('');
+
+  // Resolve search config for the active page
+  const searchConfig = PAGE_SEARCH_CONFIG[activeTab] || PAGE_SEARCH_CONFIG['dashboard'];
 
   const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
   const userInitial = isAuthenticated && user?.name ? user.name.trim().charAt(0).toUpperCase() : 'G';
@@ -112,15 +130,6 @@ export default function Header({
     setAriaAnnouncement('Navigating to login interface.');
   };
 
-  const handleRefreshClick = async () => {
-    setIsRefreshing(true);
-    if (onRefresh) {
-      await onRefresh();
-    } else {
-      await new Promise((res) => setTimeout(res, 700));
-    }
-    setIsRefreshing(false);
-  };
 
   const handleDownloadCSV = async () => {
     setShowDownloadMenu(false);
@@ -163,16 +172,16 @@ export default function Header({
         {ariaAnnouncement}
       </div>
 
-      {/* 1. Real-Time Search Bar */}
+      {/* 1. Context-Aware Real-Time Search Bar */}
       <div className="header-search" role="search">
         <Search size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} aria-hidden="true" />
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search project name, tender ID, source, sector..."
+          placeholder={searchConfig.placeholder}
           value={searchVal || ''}
           onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
-          aria-label="Search opportunities by project, source, or sector"
+          aria-label={searchConfig.ariaLabel}
         />
         {searchVal ? (
           <button
@@ -201,20 +210,7 @@ export default function Header({
 
       {/* Header Action Controls */}
       <div className="header-actions" role="toolbar" aria-label="Global header actions">
-        {/* 2. Refresh Button */}
-        <button
-          className="btn-header-refresh"
-          onClick={handleRefreshClick}
-          title="Refresh Dashboard Data"
-          aria-label={isRefreshing ? 'Refreshing data...' : 'Refresh dashboard data'}
-          disabled={isRefreshing}
-          type="button"
-        >
-          <RefreshCw size={15} className={isRefreshing ? 'spin-icon' : ''} aria-hidden="true" />
-          <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
-        </button>
-
-        {/* 3. Download Button & Dropdown */}
+        {/* 2. Download Button & Dropdown */}
         <div style={{ position: 'relative' }} ref={downloadMenuRef}>
           <button
             className="btn-header-download"

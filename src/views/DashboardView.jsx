@@ -21,7 +21,8 @@ import {
   RefreshCw,
   SlidersHorizontal,
   ChevronRight,
-  Calendar
+  Calendar,
+  X
 } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
@@ -328,8 +329,63 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
           </span>
         </div>
 
-        {/* Toolbar Quick Indicators */}
+        {/* Toolbar Quick Indicators + Search Bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Global Search Bar */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.6rem',
+            backgroundColor: 'var(--bg-subtle)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.625rem',
+            padding: '0 0.875rem',
+            height: '38px',
+            width: '340px',
+            maxWidth: '100%',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
+          }}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = '#2563EB';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)';
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = 'var(--border-color)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <Search size={15} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+            <input
+              type="text"
+              placeholder="Search project name, tender ID, source, sector..."
+              value={searchVal}
+              onChange={e => setSearchVal && setSearchVal(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                fontSize: '0.82rem',
+                color: 'var(--text-main)',
+                width: '100%',
+              }}
+            />
+            {searchVal ? (
+              <button
+                onClick={() => setSearchVal && setSearchVal('')}
+                title="Clear search"
+                style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px', flexShrink: 0 }}
+              >
+                <X size={13} />
+              </button>
+            ) : (
+              <span style={{
+                fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)',
+                backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)',
+                padding: '0.15rem 0.4rem', borderRadius: '0.3rem', flexShrink: 0, lineHeight: 1
+              }}>⌘K</span>
+            )}
+          </div>
+
           {lastRefreshedTime && (
             <span style={{
               fontSize: '0.725rem',

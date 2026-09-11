@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { mockOffices } from '../data/mockData';
 import { useOffices } from '../hooks/useApiQueries';
 
-export default function OfficesView() {
+export default function OfficesView({ searchVal = '' }) {
   const { data: fetchedOffices } = useOffices();
   const officesList = fetchedOffices || mockOffices;
+
+  const filteredOffices = useMemo(() => {
+    const term = (searchVal || '').trim().toLowerCase();
+    if (!term) return officesList;
+    return officesList.filter(o =>
+      (o.name || '').toLowerCase().includes(term)
+    );
+  }, [officesList, searchVal]);
 
   return (
     <div className="page-container">
       <div className="page-header">
         <h2 className="page-title">Offices Overview</h2>
-        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>Total Offices: <strong>11</strong></span>
+        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+          {searchVal
+            ? <>{filteredOffices.length} result{filteredOffices.length !== 1 ? 's' : ''} for "{searchVal}"</>
+            : <>Total Offices: <strong>{officesList.length}</strong></>
+          }
+        </span>
       </div>
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -26,7 +39,7 @@ export default function OfficesView() {
               </tr>
             </thead>
             <tbody>
-              {officesList.map((off, idx) => (
+              {filteredOffices.map((off, idx) => (
                 <tr key={idx}>
                   <td style={{ fontWeight: '700' }}>{off.name}</td>
                   <td style={{ fontWeight: '600' }}>{off.total}</td>
