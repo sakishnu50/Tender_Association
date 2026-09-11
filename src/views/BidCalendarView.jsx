@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar as CalendarIcon, Search, X, ChevronLeft, ChevronRight, XCircle, Filter } from 'lucide-react';
-import { mockCalendarEvents, mockOpportunities } from '../data/mockData';
-import { useCalendar } from '../hooks/useApiQueries';
+import { mockCalendarEvents } from '../data/mockData';
+import { useCalendar, useOpportunities } from '../hooks/useApiQueries';
 
 export default function BidCalendarView({ searchVal: propSearchVal, onSelectOpportunity }) {
   const { data: fetchedEvents } = useCalendar();
+  const { data: userOpps = [] } = useOpportunities();
   const calendarEvents = fetchedEvents || mockCalendarEvents;
+  const mockOpportunities = userOpps;
   
   const activeSearch = propSearchVal || '';
 

@@ -47,7 +47,7 @@ const navSections = [
   }
 ];
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -65,9 +65,16 @@ export default function Sidebar({ activeTab, setActiveTab }) {
 
   const handleNavClick = (item) => {
     if (item.id === 'login' || item.path === '/login') {
-      if (auth?.logout) {
-        auth.logout();
+      if (onRequestLogout) {
+        onRequestLogout();
+      } else {
+        if (auth?.logout) {
+          auth.logout();
+        }
+        setActiveTab(item.id);
+        navigate(item.path);
       }
+      return;
     }
     setActiveTab(item.id);
     navigate(item.path);
@@ -168,7 +175,7 @@ export default function Sidebar({ activeTab, setActiveTab }) {
       {/* Footer Status */}
       <div style={{
         padding: '0.85rem 1rem',
-        borderTop: '1px solid var(--sidebar-border)',
+        borderTop: '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))',
         fontSize: '0.725rem',
         color: '#64748B',
         display: 'flex',
@@ -186,4 +193,3 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     </aside>
   );
 }
-
