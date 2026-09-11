@@ -408,11 +408,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       </div>
 
       {/* 2. Enterprise Metric KPI Cards Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))',
-        gap: '24px',
-      }}>
+      <div className="kpi-cards-grid">
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           const isActive = activeKpiFilter === kpi.key;
@@ -422,68 +418,63 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
             <div
               key={kpi.key}
               onClick={() => handleStatCardClick(kpi)}
-              className="card"
+              className="kpi-stat-card"
               title={`Click to filter list by ${kpi.title}`}
               style={{
-                padding: '24px',
-                cursor: 'pointer',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                borderRadius: '0.85rem',
                 border: isActive ? `2px solid ${kpi.borderAccent}` : '1px solid var(--border-color)',
                 boxShadow: isActive ? 'var(--shadow-card-hover)' : 'var(--shadow-sm)',
-                position: 'relative',
-                overflow: 'hidden',
-                backgroundColor: 'var(--bg-card)',
-                transform: isActive ? 'translateY(-2px)' : 'none'
+                transform: isActive ? 'translateY(-2px)' : undefined
               }}
             >
               {/* Top Row: Title & Icon Box */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.85rem' }}>
                 <span style={{
-                  fontSize: '0.775rem',
+                  fontSize: '0.725rem',
                   fontWeight: '700',
                   color: 'var(--text-muted)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.04em'
+                  letterSpacing: '0.03em',
+                  lineHeight: '1.25'
                 }}>
                   {kpi.title}
                 </span>
 
                 <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '0.65rem',
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '0.6rem',
                   backgroundColor: kpi.bg,
                   color: kpi.color,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: `0 4px 10px ${kpi.bg}`,
+                  boxShadow: `0 3px 8px ${kpi.bg}`,
                   flexShrink: 0
                 }}>
-                  <Icon size={20} />
+                  <Icon size={18} />
                 </div>
               </div>
 
               {/* Middle Row: Numeric Value & Trending Pill */}
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-                <span style={{ fontSize: '2.1rem', fontWeight: '800', color: 'var(--text-main)', tracking: '-0.03em', lineHeight: '1' }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '1.85rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.03em', lineHeight: '1' }}>
                   {kpi.value}
                 </span>
 
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.25rem',
-                  fontSize: '0.725rem',
+                  gap: '0.2rem',
+                  fontSize: '0.7rem',
                   fontWeight: '700',
-                  padding: '0.2rem 0.55rem',
+                  padding: '0.15rem 0.45rem',
                   borderRadius: '9999px',
                   backgroundColor: kpi.isPositive ? 'var(--success-bg)' : 'var(--danger-bg)',
                   color: kpi.isPositive ? 'var(--success-text)' : 'var(--danger-text)',
-                  border: `1px solid ${kpi.isPositive ? 'var(--success-border)' : 'var(--danger-border)'}`
+                  border: `1px solid ${kpi.isPositive ? 'var(--success-border)' : 'var(--danger-border)'}`,
+                  whiteSpace: 'nowrap'
                 }}>
-                  <TrendIcon size={12} />
+                  <TrendIcon size={11} />
                   <span>{kpi.percentage}</span>
                 </div>
               </div>
@@ -493,24 +484,34 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingTop: '0.75rem',
+                gap: '0.35rem',
+                paddingTop: '0.65rem',
                 borderTop: '1px solid var(--border-color)',
-                marginTop: '0.25rem'
+                marginTop: 'auto'
               }}>
-                <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '500' }}>
+                <span style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  fontWeight: '500',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
                   {kpi.changeText}
                 </span>
 
                 <span style={{
-                  fontSize: '0.75rem',
+                  fontSize: '0.725rem',
                   color: kpi.color,
                   fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.2rem',
+                  gap: '0.15rem',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                   transition: 'transform 0.15s ease'
                 }}>
-                  View List <ChevronRight size={13} />
+                  View List <ChevronRight size={12} />
                 </span>
               </div>
 
