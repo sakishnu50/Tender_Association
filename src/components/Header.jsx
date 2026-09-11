@@ -42,10 +42,38 @@ export default function Header({
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
         setShowProfileMenu(false);
       }
+      if (notificationMenuRef.current && !notificationMenuRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Handle Logout button
+  const handleLogout = (e) => {
+    e?.stopPropagation();
+    setShowProfileMenu(false);
+    if (onRequestLogout) {
+      onRequestLogout();
+    } else {
+      if (auth?.logout) {
+        auth.logout();
+      }
+      navigate('/login');
+    }
+  };
+
+  // Handle Login button
+  const handleLogin = (e) => {
+    e?.stopPropagation();
+    setShowProfileMenu(false);
+    navigate('/login');
+    setAriaAnnouncement('Navigating to login interface.');
+  };
 
   const isOpportunitySection =
     activeTab === 'opportunities' ||
@@ -238,16 +266,12 @@ export default function Header({
       <div className="header-actions" style={{ gap: '0.65rem' }}>
         {/* Dark / Light Theme Toggle */}
         <button
-          className="icon-btn-header"
+          className="header-circle-btn"
           onClick={toggleTheme}
           title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           aria-label="Toggle Theme"
         >
-          {darkMode ? (
-            <Sun size={18} color="#F59E0B" />
-          ) : (
-            <Moon size={18} color="#6366F1" />
-          )}
+          {darkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
         </button>
 
         {/* Notifications Bell */}
@@ -310,6 +334,9 @@ export default function Header({
           {/* User Profile Menu Dropdown */}
           {showProfileMenu && (
             <div
+              className="header-dropdown-menu"
+              role="menu"
+              aria-label="User profile options"
               style={{
                 position: 'absolute',
                 top: 'calc(100% + 10px)',
@@ -332,15 +359,18 @@ export default function Header({
                   marginTop: '6px',
                   fontSize: '0.65rem',
                   fontWeight: '700',
-                  color: 'var(--primary)',
-                  backgroundColor: 'var(--primary-light)',
+                  color: isAuthenticated ? 'var(--primary)' : 'var(--text-muted)',
+                  backgroundColor: isAuthenticated ? 'var(--primary-light)' : 'var(--bg-subtle)',
                   padding: '0.1rem 0.45rem',
-                  borderRadius: '0.25rem'
+                  borderRadius: '0.25rem',
+                  border: '1px solid var(--border-color)'
                 }}>
                   {userRole}
                 </div>
               </div>
+
               <button
+                role="menuitem"
                 onClick={() => {
                   setShowProfileMenu(false);
                   navigate('/settings');
@@ -362,15 +392,14 @@ export default function Header({
                   transition: 'background 0.15s ease'
                 }}
               >
-                <Settings size={15} color="var(--text-muted)" /> Account Settings
+                <Settings size={15} color="var(--text-muted)" aria-hidden="true" /> Account Settings
               </button>
-              {auth?.logout && (
+
+              {/* In-Dropdown Action Toggle */}
+              {isAuthenticated ? (
                 <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    auth.logout();
-                    navigate('/login');
-                  }}
+                  role="menuitem"
+                  onClick={handleLogout}
                   style={{
                     width: '100%',
                     display: 'flex',
@@ -389,12 +418,37 @@ export default function Header({
                     transition: 'background 0.15s ease'
                   }}
                 >
-                  <LogOut size={15} /> Log Out
+                  <LogOut size={15} aria-hidden="true" /> Log Out
+                </button>
+              ) : (
+                <button
+                  role="menuitem"
+                  onClick={handleLogin}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.55rem',
+                    padding: '0.5rem 0.6rem',
+                    border: 'none',
+                    background: 'var(--primary-light)',
+                    color: 'var(--primary)',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    borderRadius: '0.4rem',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    marginTop: '0.2rem',
+                    transition: 'background 0.15s ease'
+                  }}
+                >
+                  <LogIn size={15} aria-hidden="true" /> Sign In
                 </button>
               )}
             </div>
           )}
         </div>
+
 
         <div
           id="header-actions-portal"

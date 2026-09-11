@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Briefcase,
-  Bell,
   Calendar,
   Users2,
   BarChart3,
@@ -12,10 +11,11 @@ import {
   UserCheck,
   History,
   Settings,
-  LogIn,
+  LogOut,
   BadgeCheck,
   ShieldCheck
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const navSections = [
   {
@@ -23,7 +23,6 @@ const navSections = [
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
       { id: 'opportunities', label: 'Opportunities', icon: Briefcase, count: 150, path: '/opportunities' },
-      { id: 'alerts', label: 'Alerts', icon: Bell, count: 3, urgent: true, path: '/alerts' },
       { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' },
     ]
   },
@@ -43,12 +42,12 @@ const navSections = [
       { id: 'users', label: 'Users & Roles', icon: UserCheck, path: '/users' },
       { id: 'audit', label: 'Audit Trail', icon: History, path: '/audit' },
       { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
-      { id: 'login', label: 'Login Showcase', icon: LogIn, path: '/login' }
+      { id: 'login', label: 'Logout', icon: LogOut, path: '/login' }
     ]
   }
 ];
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -62,7 +61,21 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     }
   }, [location.pathname, activeTab, setActiveTab]);
 
+  const auth = useAuth();
+
   const handleNavClick = (item) => {
+    if (item.id === 'login' || item.path === '/login') {
+      if (onRequestLogout) {
+        onRequestLogout();
+      } else {
+        if (auth?.logout) {
+          auth.logout();
+        }
+        setActiveTab(item.id);
+        navigate(item.path);
+      }
+      return;
+    }
     setActiveTab(item.id);
     navigate(item.path);
   };
@@ -159,17 +172,16 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         ))}
       </nav>
 
-      {/* Footer Branding */}
+      {/* Footer Status */}
       <div style={{
         padding: '0.85rem 1rem',
-        borderTop: '1px solid var(--sidebar-border)',
+        borderTop: '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))',
         fontSize: '0.725rem',
         color: '#64748B',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'flex-end'
       }}>
-        <span>v2.4.0 Enterprise</span>
         <span style={{
           width: '7px',
           height: '7px',
@@ -181,4 +193,3 @@ export default function Sidebar({ activeTab, setActiveTab }) {
     </aside>
   );
 }
-

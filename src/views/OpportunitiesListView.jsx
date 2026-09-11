@@ -10,7 +10,7 @@ import AddOpportunityModal from '../components/ui/AddOpportunityModal';
 export default function OpportunitiesListView({ onSelectOpportunity, searchVal = '' }) {
   const { data: fetchedOpps, isLoading, isError } = useOpportunities();
   const createMutation = useCreateOpportunity();
-  const opportunitiesList = fetchedOpps || mockOpportunities;
+  const opportunitiesList = fetchedOpps || [];
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);

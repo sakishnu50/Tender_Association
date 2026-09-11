@@ -3,31 +3,48 @@ import { db } from '../db.js';
 
 const router = express.Router();
 
+// Helper to extract authenticated userId from request
+function getUserId(req) {
+  return (
+    req.headers['x-user-id'] ||
+    req.query.userId ||
+    (req.body && req.body.userId) ||
+    null
+  );
+}
+
 // Authentication endpoint
 router.post('/auth/login', (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password required' });
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
   }
 
-  // Enterprise JWT token generation simulation
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiWFlaIiwicm9sZSI6IkFkbWluIn0.signature';
+  const cleanEmail = email.trim().toLowerCase();
+  const rawName = cleanEmail.split('@')[0];
+  const formattedName = rawName.replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const token = `jwt-token-${Buffer.from(cleanEmail).toString('base64')}-${Date.now()}`;
+
   return res.json({
     message: 'Login successful',
     token,
     user: {
-      name: 'XYZ',
-      email: email || 'xyz10@gmail.com',
+      id: cleanEmail,
+      userId: cleanEmail,
+      name: formattedName || 'User',
+      email: cleanEmail,
       role: 'Admin',
       office: 'Chennai'
     }
   });
 });
 
-// Opportunities endpoints
+// Opportunities endpoints with strict userId filtering
 router.get('/opportunities', (req, res) => {
   const { source, sector, location, status } = req.query;
-  let items = db.getOpportunities();
+  const userId = getUserId(req);
+
+  let items = db.getOpportunities(userId);
 
   if (source) items = items.filter(i => i.source === source);
   if (sector) items = items.filter(i => i.sector === sector);
@@ -37,18 +54,30 @@ router.get('/opportunities', (req, res) => {
   res.json({ success: true, count: items.length, data: items });
 });
 
+router.post('/opportunities', (req, res) => {
+  const userId = getUserId(req) || 'anonymous';
+  const newOpp = {
+    ...req.body,
+    userId: req.body.userId || userId
+  };
+  const created = db.createOpportunity(newOpp);
+  res.json({ success: true, data: created });
+});
+
 router.get('/opportunities/:id', (req, res) => {
-  const opp = db.getOpportunityById(req.params.id);
+  const userId = getUserId(req);
+  const opp = db.getOpportunityById(req.params.id, userId);
   if (!opp) return res.status(404).json({ error: 'Opportunity not found' });
   res.json({ success: true, data: opp });
 });
 
 router.post('/opportunities/:id/pursue', (req, res) => {
   const { owner, priority } = req.body;
-  const opp = db.updateOpportunityStatus(req.params.id, 'Pursued');
+  const userId = getUserId(req);
+  const opp = db.updateOpportunityStatus(req.params.id, 'Pursued', userId);
 
   db.addAuditLog({
-    user: owner || 'Ravi Kumar',
+    user: owner || userId || 'User',
     action: 'Pursued Opportunity',
     details: `${opp ? opp.name : req.params.id} (${priority || 'High'})`
   });
@@ -58,10 +87,11 @@ router.post('/opportunities/:id/pursue', (req, res) => {
 
 router.post('/opportunities/:id/decline', (req, res) => {
   const { reason } = req.body;
-  const opp = db.updateOpportunityStatus(req.params.id, 'Declined');
+  const userId = getUserId(req);
+  const opp = db.updateOpportunityStatus(req.params.id, 'Declined', userId);
 
   db.addAuditLog({
-    user: 'Ravi Kumar',
+    user: userId || 'User',
     action: 'Declined Opportunity',
     details: `${opp ? opp.name : req.params.id} (${reason || 'Budget Constraints'})`
   });

@@ -32,7 +32,7 @@ import KpiDetailModal from '../components/dashboard/KpiDetailModal';
 export default function DashboardView({ onSelectOpportunity, onViewAll, searchVal = '', setSearchVal }) {
   const queryClient = useQueryClient();
   const { data: fetchedOpps, refetch } = useOpportunities();
-  const opportunities = fetchedOpps || mockOpportunities;
+  const opportunities = fetchedOpps || [];
 
   // Decision mutations
   const pursueMutation = usePursueOpportunity();
