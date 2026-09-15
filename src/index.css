@@ -355,9 +355,15 @@ body {
 }
 
 .nav-badge.urgent {
-  background-color: var(--danger);
-  color: #FFFFFF;
-  box-shadow: 0 0 8px rgba(220, 38, 38, 0.4);
+  background-color: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+
+[data-theme="dark"] .nav-badge.urgent {
+  background-color: rgba(37, 99, 235, 0.22);
+  color: #93C5FD;
+  border: 1px solid rgba(96, 165, 250, 0.3);
 }
 
 /* Sidebar Bottom Area (Pinned very close to bottom edge) */
