@@ -203,7 +203,7 @@ export default function Header({
 
       {/* Header Action Controls */}
       <div className="header-actions" role="toolbar" aria-label="Global header actions">
-        {/* Refresh Button - icon only, immediately to the LEFT of the notification bell */}
+        {/* Refresh Button - immediately to the LEFT of the notification bell */}
         <button
           className="header-refresh-btn"
           onClick={handleRefreshClick}

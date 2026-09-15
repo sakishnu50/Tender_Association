@@ -1,42 +1,38 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
-  Briefcase,
+  Layers,
   Calendar,
   Users2,
-  BarChart3,
-  Globe2,
-  Building2,
   UserCheck,
+  FileBarChart,
+  Globe,
+  Building2,
   History,
   Settings,
+  ShieldCheck,
   LogOut,
-  BadgeCheck,
-  ShieldCheck
+  User
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 const navSections = [
   {
-    title: 'OVERVIEW',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-      { id: 'opportunities', label: 'Opportunities', icon: Briefcase, count: 150, path: '/opportunities' },
-      { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' },
+      { id: 'opportunities', label: 'Opportunities', icon: Layers, path: '/opportunities', count: 150, urgent: true },
+      { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' }
     ]
   },
   {
-    title: 'INTELLIGENCE',
     items: [
       { id: 'consortium', label: 'Consortium', icon: Users2, path: '/consortium' },
-      { id: 'client_profile', label: 'Client Profile', icon: BadgeCheck, path: '/client-profile' },
-      { id: 'reports', label: 'Reports & Analytics', icon: BarChart3, path: '/reports' },
-      { id: 'sources', label: 'Tender Sources', icon: Globe2, path: '/sources' },
+      { id: 'client_profile', label: 'Client Profile', icon: UserCheck, path: '/client-profile' },
+      { id: 'reports', label: 'Reports & Analytics', icon: FileBarChart, path: '/reports' },
+      { id: 'sources', label: 'Tender Sources', icon: Globe, path: '/sources' }
     ]
   },
   {
-    title: 'ADMINISTRATION',
     items: [
       { id: 'offices', label: 'Offices', icon: Building2, path: '/offices' },
       { id: 'users', label: 'Users & Roles', icon: UserCheck, path: '/users' },
@@ -48,35 +44,22 @@ const navSections = [
 
 export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject }) {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const allNavItems = navSections.flatMap(section => section.items);
-
-  useEffect(() => {
-    const currentPath = location.pathname;
-    const matchedItem = allNavItems.find(item => item.path === currentPath || (item.path !== '/' && currentPath.startsWith(item.path)));
-    if (matchedItem && matchedItem.id !== activeTab) {
-      setActiveTab(matchedItem.id);
-    }
-  }, [location.pathname, activeTab, setActiveTab]);
-
-  const auth = useAuth();
 
   const handleNavClick = (item) => {
-    if (item.id === 'login' || item.path === '/login') {
-      if (onRequestLogout) {
-        onRequestLogout();
-      } else {
-        if (auth?.logout) {
-          auth.logout();
-        }
-        setActiveTab(item.id);
-        navigate(item.path);
-      }
-      return;
+    if (setActiveTab) {
+      setActiveTab(item.id);
     }
-    setActiveTab(item.id);
-    navigate(item.path);
+    if (item.path) {
+      navigate(item.path);
+    }
+  };
+
+  const handleLogoutClick = () => {
+    if (onRequestLogout) {
+      onRequestLogout();
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
@@ -86,14 +69,14 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         <div style={{
           width: '36px',
           height: '36px',
-          borderRadius: '10px',
-          background: 'linear-gradient(135deg, #2563EB 0%, #0284C7 100%)',
+          borderRadius: '0.625rem',
+          background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: '#FFFFFF',
           fontWeight: '800',
-          fontSize: '0.9rem',
+          fontSize: '0.95rem',
           boxShadow: '0 4px 12px rgba(37, 99, 235, 0.35)',
           flexShrink: 0
         }}>
@@ -120,6 +103,7 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
               {section.items.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
+
                 return (
                   <button
                     key={item.id}
@@ -145,12 +129,12 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         ))}
       </nav>
 
-      {/* Bottom Logout Navigation Area (Pinned at absolute bottom) */}
+      {/* Bottom Logout Navigation Area */}
       <div className="sidebar-bottom-actions">
         <button
           className="sidebar-logout-btn"
-          onClick={() => handleNavClick({ id: 'login', path: '/login' })}
-          title="Sign out of session"
+          onClick={handleLogoutClick}
+          title="Sign out of your session"
           type="button"
         >
           <div className="nav-item-content">

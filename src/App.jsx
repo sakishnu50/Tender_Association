@@ -170,6 +170,7 @@ export default function App() {
 
       {/* Main Workspace Area */}
       <div className="main-content">
+        {/* Global Header — search bar, download, notifications, theme, profile */}
         <Header
           searchVal={searchVal}
           setSearchVal={setSearchVal}
@@ -256,7 +257,7 @@ export default function App() {
             }
           />
           <Route path="/calendar" element={<BidCalendarView searchVal={searchVal} onSelectOpportunity={handleSelectOpportunity} />} />
-          <Route path="/consortium" element={<ConsortiumView />} />
+          <Route path="/consortium" element={<ConsortiumView searchVal={searchVal} />} />
           <Route
             path="/client-profile"
             element={
@@ -267,9 +268,9 @@ export default function App() {
             }
           />
           <Route path="/reports" element={<ReportsView />} />
-          <Route path="/sources" element={<SourcesView />} />
-          <Route path="/offices" element={<OfficesView />} />
-          <Route path="/users" element={<UsersRolesView />} />
+          <Route path="/sources" element={<SourcesView searchVal={searchVal} />} />
+          <Route path="/offices" element={<OfficesView searchVal={searchVal} />} />
+          <Route path="/users" element={<UsersRolesView searchVal={searchVal} />} />
           <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
           <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
           <Route path="/dashboard" element={<Dashboard />} />

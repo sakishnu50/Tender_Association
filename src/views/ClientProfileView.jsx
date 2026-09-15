@@ -344,6 +344,7 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
           </table>
         </div>
 
+
         {/* ── Page Navigation Footer ────────────────────────────────────────── */}
         <div
           style={{
@@ -406,378 +407,381 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
             </button>
           </div>
         </div>
-      </div>
 
-      {/* ── Project Details Modal ────────────────────────────────────────── */}
-      {selectedProject && (
+      </div >
+
+    {/* ── Project Details Modal ────────────────────────────────────────── */ }
+  {
+    selectedProject && (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '1.25rem',
+          animation: 'fadeIn 0.2s ease-out'
+        }}
+        onClick={() => setSelectedProject(null)}
+      >
         <div
           style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(5px)',
-            WebkitBackdropFilter: 'blur(5px)',
+            width: '100%',
+            maxWidth: '860px',
+            maxHeight: '90vh',
+            backgroundColor: 'var(--bg-card, #FFFFFF)',
+            borderRadius: '1rem',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-color, #E2E8F0)',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            padding: '1.25rem',
-            animation: 'fadeIn 0.2s ease-out'
+            flexDirection: 'column',
+            overflow: 'hidden',
+            animation: 'slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
           }}
-          onClick={() => setSelectedProject(null)}
+          onClick={(e) => e.stopPropagation()}
         >
+          {/* Modal Header */}
           <div
             style={{
-              width: '100%',
-              maxWidth: '860px',
-              maxHeight: '90vh',
-              backgroundColor: 'var(--bg-card, #FFFFFF)',
-              borderRadius: '1rem',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--border-color, #E2E8F0)',
+              padding: '1.25rem 1.75rem',
+              borderBottom: '1px solid var(--border-color, #E2E8F0)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+              gap: '1rem',
+              backgroundColor: 'var(--bg-subtle, #F8FAFC)'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '0.2rem 0.65rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    backgroundColor: selectedProject.status === 'Completed' ? '#DCFCE7' : '#FEF3C7',
+                    color: selectedProject.status === 'Completed' ? '#166534' : '#92400E'
+                  }}
+                >
+                  {selectedProject.status === 'Completed' ? (
+                    <CheckCircle2 size={13} style={{ marginRight: '4px' }} />
+                  ) : (
+                    <Clock size={13} style={{ marginRight: '4px' }} />
+                  )}
+                  {selectedProject.status}
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '0.2rem 0.65rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    color: 'var(--primary, #2563EB)'
+                  }}
+                >
+                  <Briefcase size={12} style={{ marginRight: '4px' }} />
+                  {selectedProject.sector}
+                </span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    padding: '0.2rem 0.65rem',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    backgroundColor: 'var(--bg-card, #FFFFFF)',
+                    border: '1px solid var(--border-color, #E2E8F0)',
+                    color: 'var(--text-secondary, #475569)'
+                  }}
+                >
+                  <Globe2 size={12} style={{ marginRight: '4px' }} />
+                  {selectedProject.country}
+                </span>
+              </div>
+              <h2
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '800',
+                  color: 'var(--text-main, #0F172A)',
+                  margin: 0,
+                  lineHeight: '1.3'
+                }}
+              >
+                {selectedProject.name}
+              </h2>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedProject(null)}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-muted, #64748B)',
+                  cursor: 'pointer',
+                  padding: '0.4rem',
+                  borderRadius: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'background-color 0.15s ease'
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.06)')}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                title="Close modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </div>
+
+          {/* Modal Body (Scrollable) */}
+          <div
+            style={{
+              padding: '1.5rem 1.75rem',
+              overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden',
-              animation: 'slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+              gap: '1.35rem'
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
+            {/* Quick Key Facts Matrix */}
             <div
               style={{
-                padding: '1.25rem 1.75rem',
-                borderBottom: '1px solid var(--border-color, #E2E8F0)',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                gap: '1rem',
-                backgroundColor: 'var(--bg-subtle, #F8FAFC)'
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '0.85rem',
+                padding: '1rem',
+                borderRadius: '0.75rem',
+                backgroundColor: 'var(--bg-subtle, #F8FAFC)',
+                border: '1px solid var(--border-color, #E2E8F0)'
               }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '0.2rem 0.65rem',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      fontWeight: '700',
-                      backgroundColor: selectedProject.status === 'Completed' ? '#DCFCE7' : '#FEF3C7',
-                      color: selectedProject.status === 'Completed' ? '#166534' : '#92400E'
-                    }}
-                  >
-                    {selectedProject.status === 'Completed' ? (
-                      <CheckCircle2 size={13} style={{ marginRight: '4px' }} />
-                    ) : (
-                      <Clock size={13} style={{ marginRight: '4px' }} />
-                    )}
-                    {selectedProject.status}
-                  </span>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '0.2rem 0.65rem',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
-                      backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                      color: 'var(--primary, #2563EB)'
-                    }}
-                  >
-                    <Briefcase size={12} style={{ marginRight: '4px' }} />
-                    {selectedProject.sector}
-                  </span>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      padding: '0.2rem 0.65rem',
-                      borderRadius: '9999px',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
-                      backgroundColor: 'var(--bg-card, #FFFFFF)',
-                      border: '1px solid var(--border-color, #E2E8F0)',
-                      color: 'var(--text-secondary, #475569)'
-                    }}
-                  >
-                    <Globe2 size={12} style={{ marginRight: '4px' }} />
-                    {selectedProject.country}
-                  </span>
-                </div>
-                <h2
-                  style={{
-                    fontSize: '1.25rem',
-                    fontWeight: '800',
-                    color: 'var(--text-main, #0F172A)',
-                    margin: 0,
-                    lineHeight: '1.3'
-                  }}
-                >
-                  {selectedProject.name}
-                </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  Contract Value
+                </span>
+                <strong style={{ fontSize: '1.15rem', color: 'var(--primary, #1D4ED8)', fontWeight: '800' }}>
+                  {selectedProject.value}
+                </strong>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(null)}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--text-muted, #64748B)',
-                    cursor: 'pointer',
-                    padding: '0.4rem',
-                    borderRadius: '0.5rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'background-color 0.15s ease'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.06)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                  title="Close modal"
-                >
-                  <X size={20} />
-                </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  Client / Agency
+                </span>
+                <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main, #0F172A)' }}>
+                  {selectedProject.client}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  Execution Timeline
+                </span>
+                <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main, #0F172A)' }}>
+                  {selectedProject.duration || `${selectedProject.year} (Completed)`}
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                  Location / Corridors
+                </span>
+                <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main, #0F172A)' }}>
+                  {selectedProject.location || `${selectedProject.country}`}
+                </span>
               </div>
             </div>
 
-            {/* Modal Body (Scrollable) */}
-            <div
-              style={{
-                padding: '1.5rem 1.75rem',
-                overflowY: 'auto',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1.35rem'
-              }}
-            >
-              {/* Quick Key Facts Matrix */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                  gap: '0.85rem',
-                  padding: '1rem',
-                  borderRadius: '0.75rem',
-                  backgroundColor: 'var(--bg-subtle, #F8FAFC)',
-                  border: '1px solid var(--border-color, #E2E8F0)'
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                    Contract Value
-                  </span>
-                  <strong style={{ fontSize: '1.15rem', color: 'var(--primary, #1D4ED8)', fontWeight: '800' }}>
-                    {selectedProject.value}
-                  </strong>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                    Client / Agency
-                  </span>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main, #0F172A)' }}>
-                    {selectedProject.client}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                    Execution Timeline
-                  </span>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main, #0F172A)' }}>
-                    {selectedProject.duration || `${selectedProject.year} (Completed)`}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                    Location / Corridors
-                  </span>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-main, #0F172A)' }}>
-                    {selectedProject.location || `${selectedProject.country}`}
-                  </span>
-                </div>
+            {/* 1. Project Overview */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
+                <Building2 size={16} color="var(--primary, #2563EB)" />
+                Project Overview & Background
               </div>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary, #334155)', lineHeight: '1.65', margin: 0 }}>
+                {selectedProject.overview}
+              </p>
+            </div>
 
-              {/* 1. Project Overview */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
-                  <Building2 size={16} color="var(--primary, #2563EB)" />
-                  Project Overview & Background
-                </div>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary, #334155)', lineHeight: '1.65', margin: 0 }}>
-                  {selectedProject.overview}
-                </p>
+            {/* 2. Project Scope */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
+                <Layers size={16} color="var(--primary, #2563EB)" />
+                Scope of Work & Engineering Details
               </div>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary, #334155)', lineHeight: '1.65', margin: 0 }}>
+                {selectedProject.scope}
+              </p>
+            </div>
 
-              {/* 2. Project Scope */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
-                  <Layers size={16} color="var(--primary, #2563EB)" />
-                  Scope of Work & Engineering Details
-                </div>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary, #334155)', lineHeight: '1.65', margin: 0 }}>
-                  {selectedProject.scope}
-                </p>
-              </div>
-
-              {/* 3. Strategic Objectives & Key Activities (2 Columns) */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
-                {/* Objectives */}
-                <div
-                  style={{
-                    padding: '1.1rem',
-                    borderRadius: '0.75rem',
-                    backgroundColor: 'var(--bg-subtle, #F8FAFC)',
-                    border: '1px solid var(--border-color, #E2E8F0)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.65rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
-                    <Target size={15} color="var(--primary, #2563EB)" />
-                    Key Project Objectives
-                  </div>
-                  <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.825rem', color: 'var(--text-secondary, #334155)' }}>
-                    {selectedProject.objectives?.map((obj, i) => (
-                      <li key={i} style={{ lineHeight: '1.5' }}>{obj}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Key Activities */}
-                <div
-                  style={{
-                    padding: '1.1rem',
-                    borderRadius: '0.75rem',
-                    backgroundColor: 'var(--bg-subtle, #F8FAFC)',
-                    border: '1px solid var(--border-color, #E2E8F0)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.65rem'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
-                    <Activity size={15} color="#10B981" />
-                    Key Activities & Execution Phases
-                  </div>
-                  <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.825rem', color: 'var(--text-secondary, #334155)' }}>
-                    {selectedProject.keyActivities?.map((act, i) => (
-                      <li key={i} style={{ lineHeight: '1.5' }}>{act}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* 4. Outcomes & Measurable Impact */}
+            {/* 3. Strategic Objectives & Key Activities (2 Columns) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+              {/* Objectives */}
               <div
                 style={{
                   padding: '1.1rem',
                   borderRadius: '0.75rem',
-                  backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                  backgroundColor: 'var(--bg-subtle, #F8FAFC)',
+                  border: '1px solid var(--border-color, #E2E8F0)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.65rem'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: '800', color: '#065F46' }}>
-                  <Award size={16} color="#059669" />
-                  Key Outcomes & Delivered Impact
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
+                  <Target size={15} color="var(--primary, #2563EB)" />
+                  Key Project Objectives
                 </div>
-                <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.825rem', color: '#047857' }}>
-                  {selectedProject.outcomes?.map((outc, i) => (
-                    <li key={i} style={{ lineHeight: '1.5', fontWeight: '600' }}>{outc}</li>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.825rem', color: 'var(--text-secondary, #334155)' }}>
+                  {selectedProject.objectives?.map((obj, i) => (
+                    <li key={i} style={{ lineHeight: '1.5' }}>{obj}</li>
                   ))}
                 </ul>
               </div>
 
-              {/* 5. Team, Reference & Standards */}
+              {/* Key Activities */}
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                  gap: '0.85rem',
-                  fontSize: '0.8rem',
-                  color: 'var(--text-muted, #64748B)',
-                  paddingTop: '0.5rem',
-                  borderTop: '1px solid var(--border-color, #E2E8F0)'
+                  padding: '1.1rem',
+                  borderRadius: '0.75rem',
+                  backgroundColor: 'var(--bg-subtle, #F8FAFC)',
+                  border: '1px solid var(--border-color, #E2E8F0)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.65rem'
                 }}
               >
-                {selectedProject.projectLead && (
-                  <div>
-                    <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Project Lead:</strong>
-                    <span>{selectedProject.projectLead}</span>
-                  </div>
-                )}
-                {selectedProject.teamSize && (
-                  <div>
-                    <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Team Deployment:</strong>
-                    <span>{selectedProject.teamSize}</span>
-                  </div>
-                )}
-                {selectedProject.contractRef && (
-                  <div>
-                    <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Contract Reference:</strong>
-                    <span>{selectedProject.contractRef}</span>
-                  </div>
-                )}
-                {selectedProject.standards && (
-                  <div>
-                    <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Standards Followed:</strong>
-                    <span>{selectedProject.standards}</span>
-                  </div>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-main, #0F172A)' }}>
+                  <Activity size={15} color="#10B981" />
+                  Key Activities & Execution Phases
+                </div>
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.825rem', color: 'var(--text-secondary, #334155)' }}>
+                  {selectedProject.keyActivities?.map((act, i) => (
+                    <li key={i} style={{ lineHeight: '1.5' }}>{act}</li>
+                  ))}
+                </ul>
               </div>
             </div>
 
-            {/* Modal Footer */}
+            {/* 4. Outcomes & Measurable Impact */}
             <div
               style={{
-                padding: '1rem 1.75rem',
-                borderTop: '1px solid var(--border-color, #E2E8F0)',
+                padding: '1.1rem',
+                borderRadius: '0.75rem',
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
                 display: 'flex',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                gap: '0.75rem',
-                backgroundColor: 'var(--bg-subtle, #F8FAFC)'
+                flexDirection: 'column',
+                gap: '0.65rem'
               }}
             >
-              <button
-                type="button"
-                className="btn btn-outline"
-                onClick={() => exportService.exportSingleProjectPDF(selectedProject)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.55rem 1.15rem',
-                  fontSize: '0.85rem',
-                  fontWeight: '700',
-                  color: 'var(--primary, #2563EB)',
-                  borderColor: 'var(--primary, #2563EB)'
-                }}
-              >
-                <Download size={15} />
-                <span>Download Project PDF</span>
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => setSelectedProject(null)}
-                style={{ padding: '0.55rem 1.35rem', fontSize: '0.85rem', fontWeight: '700' }}
-              >
-                Close Details
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: '800', color: '#065F46' }}>
+                <Award size={16} color="#059669" />
+                Key Outcomes & Delivered Impact
+              </div>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.825rem', color: '#047857' }}>
+                {selectedProject.outcomes?.map((outc, i) => (
+                  <li key={i} style={{ lineHeight: '1.5', fontWeight: '600' }}>{outc}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 5. Team, Reference & Standards */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '0.85rem',
+                fontSize: '0.8rem',
+                color: 'var(--text-muted, #64748B)',
+                paddingTop: '0.5rem',
+                borderTop: '1px solid var(--border-color, #E2E8F0)'
+              }}
+            >
+              {selectedProject.projectLead && (
+                <div>
+                  <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Project Lead:</strong>
+                  <span>{selectedProject.projectLead}</span>
+                </div>
+              )}
+              {selectedProject.teamSize && (
+                <div>
+                  <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Team Deployment:</strong>
+                  <span>{selectedProject.teamSize}</span>
+                </div>
+              )}
+              {selectedProject.contractRef && (
+                <div>
+                  <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Contract Reference:</strong>
+                  <span>{selectedProject.contractRef}</span>
+                </div>
+              )}
+              {selectedProject.standards && (
+                <div>
+                  <strong style={{ color: 'var(--text-main, #334155)', display: 'block' }}>Standards Followed:</strong>
+                  <span>{selectedProject.standards}</span>
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Modal Footer */}
+          <div
+            style={{
+              padding: '1rem 1.75rem',
+              borderTop: '1px solid var(--border-color, #E2E8F0)',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              alignItems: 'center',
+              gap: '0.75rem',
+              backgroundColor: 'var(--bg-subtle, #F8FAFC)'
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={() => exportService.exportSingleProjectPDF(selectedProject)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.55rem 1.15rem',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                color: 'var(--primary, #2563EB)',
+                borderColor: 'var(--primary, #2563EB)'
+              }}
+            >
+              <Download size={15} />
+              <span>Download Project PDF</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setSelectedProject(null)}
+              style={{ padding: '0.55rem 1.35rem', fontSize: '0.85rem', fontWeight: '700' }}
+            >
+              Close Details
+            </button>
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+    )
+  }
+    </div >
   );
 }

@@ -21,7 +21,8 @@ import {
   RefreshCw,
   SlidersHorizontal,
   ChevronRight,
-  Calendar
+  Calendar,
+  X
 } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
@@ -289,7 +290,6 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
 
   return (
     <div className="page-container" style={{ padding: '32px', gap: '32px' }}>
-
       {/* Time Period Filter Bar (Positioned above Metric Cards Grid) */}
       <div style={{
         display: 'flex',
