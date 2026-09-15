@@ -22,6 +22,7 @@ import Dashboard from './views/Dashboard';
 import ClientProfileView from './views/ClientProfileView';
 import LogoutModal from './components/LogoutModal';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './context/AuthContext';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
 import { mockClientProfile } from './data/clientProfileData';
@@ -30,6 +31,7 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
+  const queryClient = useQueryClient();
 
   const [tabState, setTabState] = useState('dashboard');
   const [searchVal, setSearchVal] = useState('');
@@ -42,9 +44,16 @@ export default function App() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // User-isolated opportunities from React Query
-  const { data: userOpportunities = [] } = useOpportunities();
+  const { data: userOpportunities = [], refetch: refetchOpportunities } = useOpportunities();
   const pursueMutation = usePursueOpportunity();
   const declineMutation = useDeclineOpportunity();
+
+  const handleGlobalRefresh = async () => {
+    await queryClient.invalidateQueries();
+    if (refetchOpportunities) {
+      await refetchOpportunities();
+    }
+  };
 
   // Derive activeTab from current route pathname
   const activeTab = React.useMemo(() => {
@@ -171,6 +180,7 @@ export default function App() {
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
+          onRefresh={handleGlobalRefresh}
         />
 
         {/* Declarative View Router */}

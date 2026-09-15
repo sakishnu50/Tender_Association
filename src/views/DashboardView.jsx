@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
-import DashboardAnalytics from '../components/dashboard/DashboardAnalytics';
 import DashboardQuickViewModal from '../components/dashboard/DashboardQuickViewModal';
 import KpiDetailModal from '../components/dashboard/KpiDetailModal';
 
@@ -290,64 +289,6 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
 
   return (
     <div className="page-container" style={{ padding: '32px', gap: '32px' }}>
-      {/* 1. Welcome & Hero Toolbar (Title, AI Engine Active & Filters) */}
-      <div style={{
-        backgroundColor: 'var(--bg-card)',
-        borderRadius: '1rem',
-        padding: '24px 28px',
-        border: '1px solid var(--border-color)',
-        boxShadow: 'var(--shadow-sm)',
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '1.25rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          <div>
-            <h1 style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em', margin: 0 }}>
-              Enterprise Intelligence Dashboard
-            </h1>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0 }}>
-              Real-time tender tracking, AI matching scores & pipeline analytics
-            </p>
-          </div>
-          <span style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.3rem',
-            fontSize: '0.725rem',
-            fontWeight: '700',
-            padding: '0.25rem 0.75rem',
-            borderRadius: '9999px',
-            backgroundColor: 'var(--primary-light)',
-            color: 'var(--primary)',
-            border: '1px solid var(--primary-border)'
-          }}>
-            <Sparkles size={13} /> AI Engine Active
-          </span>
-        </div>
-
-        {/* Toolbar Quick Indicators */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          {lastRefreshedTime && (
-            <span style={{
-              fontSize: '0.725rem',
-              fontWeight: '600',
-              color: 'var(--success-text)',
-              backgroundColor: 'var(--success-bg)',
-              border: '1px solid var(--success-border)',
-              padding: '0.25rem 0.6rem',
-              borderRadius: '0.4rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem'
-            }}>
-              ✓ Refreshed {lastRefreshedTime}
-            </span>
-          )}
-        </div>
-      </div>
 
       {/* Time Period Filter Bar (Positioned above Metric Cards Grid) */}
       <div style={{
@@ -635,8 +576,6 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
         </div>
       </div>
 
-      {/* 4. Interactive Recharts Visual Analytics (wired to timeRange) */}
-      <DashboardAnalytics timeRange={timeRange} />
 
       {/* 5. Opportunities Workspace (Table / Card Explorer) */}
       <div className="card" style={{ padding: '28px', marginBottom: '32px' }}>
