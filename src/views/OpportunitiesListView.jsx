@@ -218,238 +218,277 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
 
   return (
     <div className="page-container" style={{ padding: '1rem 1.5rem', gap: '0.875rem', width: '100%', boxSizing: 'border-box' }}>
-      {/* Top Search & Actions Row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', width: '100%' }}>
-        {/* Wide Search Bar */}
-        <div style={{ position: 'relative', flex: 1 }}>
-          <Search
-            size={15}
-            color="var(--text-muted)"
-            style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }}
-          />
-          <input
-            type="text"
-            placeholder="Search opportunities by project name..."
-            value={searchTerm}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            style={{
-              width: '100%',
-              height: '36px',
-              padding: '0 0.85rem 0 2.4rem',
-              borderRadius: 'var(--radius-md, 6px)',
-              border: '1px solid var(--border-color)',
-              backgroundColor: 'var(--bg-card)',
-              color: 'var(--text-main)',
-              fontSize: '0.875rem',
-              outline: 'none',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+      {/* Single Control Row: Heading on Left, Search + Filter + Add Button on Right */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          gap: '1rem',
+          flexWrap: 'wrap'
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            margin: 0,
+            color: 'var(--text-main)',
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          Opportunities
+        </h1>
 
-        {/* Filter Button & Floating Dropdown Container */}
-        <div ref={filterDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
-          {/* Filter Icon Button */}
+        {/* Grouped Right Controls: Search + Filter + Add Button */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            flexShrink: 0
+          }}
+        >
+          {/* Search Bar */}
+          <div style={{ position: 'relative', width: '260px', maxWidth: '100%' }}>
+            <Search
+              size={15}
+              color="var(--text-muted)"
+              style={{
+                position: 'absolute',
+                left: '0.75rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none'
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search opportunities..."
+              value={searchTerm}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              style={{
+                width: '100%',
+                height: '36px',
+                padding: '0 0.75rem 0 2.2rem',
+                borderRadius: 'var(--radius-md, 6px)',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          {/* Filter Button & Floating Dropdown Container */}
+          <div ref={filterDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
+            {/* Filter Icon Button */}
+            <button
+              type="button"
+              className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
+              style={{
+                height: '36px',
+                width: activeFilterCount > 0 ? 'auto' : '36px',
+                minWidth: '36px',
+                padding: activeFilterCount > 0 ? '0 0.5rem' : '0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                borderRadius: 'var(--radius-md, 6px)',
+                flexShrink: 0
+              }}
+              onClick={() => setShowFilters((prev) => !prev)}
+              title="Filter options"
+              aria-label="Filter options"
+              aria-expanded={showFilters}
+            >
+              <Filter size={15} />
+              {activeFilterCount > 0 && (
+                <span style={{ fontSize: '0.75rem', fontWeight: '700', lineHeight: 1 }}>
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
+
+            {/* Floating Dropdown Filter Panel */}
+            {showFilters && (
+              <div
+                className="card"
+                style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  right: 0,
+                  zIndex: 1000,
+                  width: '280px',
+                  padding: '0.625rem 0.75rem',
+                  borderRadius: 'var(--radius-md, 8px)',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-card)',
+                  boxShadow: 'var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.2))',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.2rem'
+                }}
+              >
+                {filterCategories.map((cat, idx) => {
+                  const isExpanded = expandedFilter === cat.id;
+                  const isSelected = Boolean(cat.selected);
+
+                  return (
+                    <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                      {/* Filter Item Row */}
+                      <div
+                        onClick={() => setExpandedFilter(isExpanded ? null : cat.id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0.45rem 0.5rem',
+                          borderRadius: 'var(--radius-sm, 6px)',
+                          cursor: 'pointer',
+                          fontWeight: isSelected ? '600' : '500',
+                          fontSize: '0.875rem',
+                          color: isSelected ? 'var(--primary)' : 'var(--text-main)',
+                          backgroundColor: isExpanded
+                            ? 'var(--bg-subtle)'
+                            : 'transparent',
+                          userSelect: 'none',
+                          transition: 'background-color 0.15s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span>{cat.label}</span>
+                          {isSelected && (
+                            <span
+                              style={{
+                                fontSize: '0.75rem',
+                                color: 'var(--primary)',
+                                fontWeight: '600'
+                              }}
+                            >
+                              ({cat.selected})
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Reset/Refresh icon inside first row as per reference sketch */}
+                        {idx === 0 ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              resetFilters();
+                            }}
+                            title="Reset all filters"
+                            aria-label="Reset all filters"
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '0.2rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: activeFilterCount > 0 ? 'var(--primary)' : 'var(--text-muted)',
+                              borderRadius: '4px'
+                            }}
+                          >
+                            <RotateCcw size={14} />
+                          </button>
+                        ) : null}
+                      </div>
+
+                      {/* Expandable Filter Options Box directly below filter item */}
+                      {isExpanded && (
+                        <div
+                          style={{
+                            margin: '0.25rem 0 0.4rem 0',
+                            padding: '0.25rem',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: 'var(--radius-sm, 6px)',
+                            backgroundColor: 'var(--bg-subtle)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '0.15rem',
+                            maxHeight: '170px',
+                            overflowY: 'auto'
+                          }}
+                        >
+                          {cat.options.map((opt) => {
+                            const optSelected =
+                              cat.selected &&
+                              (cat.selected.toLowerCase() === opt.toLowerCase() ||
+                               (cat.id === 'location' && opt.toLowerCase().includes(cat.selected.toLowerCase())));
+
+                            return (
+                              <div
+                                key={opt}
+                                onClick={() => handleFilterSelect(cat.id, opt)}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.45rem',
+                                  padding: '0.35rem 0.5rem',
+                                  borderRadius: '4px',
+                                  cursor: 'pointer',
+                                  fontSize: '0.8125rem',
+                                  color: optSelected ? 'var(--primary)' : 'var(--text-main)',
+                                  backgroundColor: optSelected
+                                    ? 'var(--primary-light, rgba(29, 78, 216, 0.08))'
+                                    : 'transparent',
+                                  fontWeight: optSelected ? '600' : '400',
+                                  transition: 'background-color 0.15s ease'
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    width: '14px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  {optSelected ? <Check size={13} color="var(--primary)" /> : null}
+                                </span>
+                                <span>{opt}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Compact / Square + Add Button */}
           <button
             type="button"
-            className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
+            className="btn btn-primary"
             style={{
               height: '36px',
-              padding: activeFilterCount > 0 ? '0 0.65rem' : '0',
-              width: activeFilterCount > 0 ? 'auto' : '36px',
+              width: '36px',
+              padding: 0,
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.35rem',
               borderRadius: 'var(--radius-md, 6px)',
               flexShrink: 0
             }}
-            onClick={() => setShowFilters((prev) => !prev)}
-            title="Filter options"
-            aria-label="Filter options"
-            aria-expanded={showFilters}
+            onClick={() => setIsAddModalOpen(true)}
+            title="Add Opportunity"
+            aria-label="Add Opportunity"
           >
-            <Filter size={15} />
-            {activeFilterCount > 0 && (
-              <span style={{ fontSize: '0.75rem', fontWeight: '700', lineHeight: 1 }}>
-                {activeFilterCount}
-              </span>
-            )}
+            <Plus size={18} />
           </button>
-
-          {/* Floating Dropdown Filter Panel */}
-          {showFilters && (
-            <div
-              className="card"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 6px)',
-                right: 0,
-                zIndex: 1000,
-                width: '280px',
-                padding: '0.625rem 0.75rem',
-                borderRadius: 'var(--radius-md, 8px)',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-card)',
-                boxShadow: 'var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.2))',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.2rem'
-              }}
-            >
-              {filterCategories.map((cat, idx) => {
-                const isExpanded = expandedFilter === cat.id;
-                const isSelected = Boolean(cat.selected);
-
-                return (
-                  <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                    {/* Filter Item Row */}
-                    <div
-                      onClick={() => setExpandedFilter(isExpanded ? null : cat.id)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0.45rem 0.5rem',
-                        borderRadius: 'var(--radius-sm, 6px)',
-                        cursor: 'pointer',
-                        fontWeight: isSelected ? '600' : '500',
-                        fontSize: '0.875rem',
-                        color: isSelected ? 'var(--primary)' : 'var(--text-main)',
-                        backgroundColor: isExpanded
-                          ? 'var(--bg-subtle)'
-                          : 'transparent',
-                        userSelect: 'none',
-                        transition: 'background-color 0.15s ease'
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <span>{cat.label}</span>
-                        {isSelected && (
-                          <span
-                            style={{
-                              fontSize: '0.75rem',
-                              color: 'var(--primary)',
-                              fontWeight: '600'
-                            }}
-                          >
-                            ({cat.selected})
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Reset/Refresh icon inside first row as per reference sketch */}
-                      {idx === 0 ? (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            resetFilters();
-                          }}
-                          title="Reset all filters"
-                          aria-label="Reset all filters"
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '0.2rem',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: activeFilterCount > 0 ? 'var(--primary)' : 'var(--text-muted)',
-                            borderRadius: '4px'
-                          }}
-                        >
-                          <RotateCcw size={14} />
-                        </button>
-                      ) : null}
-                    </div>
-
-                    {/* Expandable Filter Options Box directly below filter item */}
-                    {isExpanded && (
-                      <div
-                        style={{
-                          margin: '0.25rem 0 0.4rem 0',
-                          padding: '0.25rem',
-                          border: '1px solid var(--border-color)',
-                          borderRadius: 'var(--radius-sm, 6px)',
-                          backgroundColor: 'var(--bg-subtle)',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '0.15rem',
-                          maxHeight: '170px',
-                          overflowY: 'auto'
-                        }}
-                      >
-                        {cat.options.map((opt) => {
-                          const optSelected =
-                            cat.selected &&
-                            (cat.selected.toLowerCase() === opt.toLowerCase() ||
-                             (cat.id === 'location' && opt.toLowerCase().includes(cat.selected.toLowerCase())));
-
-                          return (
-                            <div
-                              key={opt}
-                              onClick={() => handleFilterSelect(cat.id, opt)}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.45rem',
-                                padding: '0.35rem 0.5rem',
-                                borderRadius: '4px',
-                                cursor: 'pointer',
-                                fontSize: '0.8125rem',
-                                color: optSelected ? 'var(--primary)' : 'var(--text-main)',
-                                backgroundColor: optSelected
-                                  ? 'var(--primary-light, rgba(29, 78, 216, 0.08))'
-                                  : 'transparent',
-                                fontWeight: optSelected ? '600' : '400',
-                                transition: 'background-color 0.15s ease'
-                              }}
-                            >
-                              <span
-                                style={{
-                                  width: '14px',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
-                              >
-                                {optSelected ? <Check size={13} color="var(--primary)" /> : null}
-                              </span>
-                              <span>{opt}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
-
-        {/* Compact Add Opportunity Button */}
-        <button
-          type="button"
-          className="btn btn-primary"
-          style={{
-            height: '36px',
-            padding: '0 0.85rem',
-            fontSize: '0.8125rem',
-            gap: '0.35rem',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 'var(--radius-md, 6px)',
-            flexShrink: 0,
-            whiteSpace: 'nowrap'
-          }}
-          onClick={() => setIsAddModalOpen(true)}
-        >
-          <Plus size={15} /> Add Opportunity
-        </button>
       </div>
 
       {/* TanStack Opportunities Data Table */}

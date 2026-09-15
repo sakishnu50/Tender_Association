@@ -248,11 +248,7 @@ function FiltersPopup({ onClose, anchorRef,
 }
 
 /* ══════════════════════════════════════════ */
-<<<<<<< HEAD
-export default function ConsortiumView() {
-=======
 export default function ConsortiumView({ searchVal = '' }) {
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
   const { data: fetchedConsortium } = useConsortium();
   const { data: fetchedRequirements } = useOpportunityRequirements();
   const updateStatusMutation = useUpdateConsortiumStatus();
@@ -266,14 +262,10 @@ export default function ConsortiumView({ searchVal = '' }) {
   const [matchScoreFilter,setMatchScoreFilter]= useState('');
   const [locationFilter,  setLocationFilter]  = useState('');
   const [statusFilter,    setStatusFilter]    = useState('');
-<<<<<<< HEAD
-=======
-
   // Sync global header search into local search query
   React.useEffect(() => {
     setSearchQuery(searchVal || '');
   }, [searchVal]);
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isProfileOpen,   setIsProfileOpen]   = useState(false);

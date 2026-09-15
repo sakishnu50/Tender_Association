@@ -22,26 +22,6 @@ import { useAuth } from '../context/AuthContext';
 import { exportService } from '../services/exportService';
 import { mockOpportunities } from '../data/mockData';
 
-<<<<<<< HEAD
-=======
-// Context-aware search config keyed by activeTab
-const PAGE_SEARCH_CONFIG = {
-  dashboard:     { placeholder: 'Search project name, tender ID, source, sector...', ariaLabel: 'Search opportunities by project, source, or sector' },
-  opportunities: { placeholder: 'Search project name, tender ID, source, sector...', ariaLabel: 'Search opportunities by project, source, or sector' },
-  opp_details:   { placeholder: 'Search project name, tender ID, source, sector...', ariaLabel: 'Search opportunities by project, source, or sector' },
-  calendar:      { placeholder: 'Search bid calendar by project or deadline...',      ariaLabel: 'Search bid calendar entries' },
-  consortium:    { placeholder: 'Search consortium partners...',                       ariaLabel: 'Search consortium partner organisations' },
-  client_profile:{ placeholder: 'Search clients, projects, or sectors...',            ariaLabel: 'Search client profiles and projects' },
-  reports:       { placeholder: 'Search reports and analytics...',                    ariaLabel: 'Search reports and analytics data' },
-  sources:       { placeholder: 'Search tender sources...',                           ariaLabel: 'Search monitored tender sources' },
-  offices:       { placeholder: 'Search offices by name or location...',              ariaLabel: 'Search offices' },
-  users:         { placeholder: 'Search users, roles, or permissions...',             ariaLabel: 'Search users and roles' },
-  audit:         { placeholder: 'Search audit logs by action, user, or date...',      ariaLabel: 'Search audit trail logs' },
-  settings:      { placeholder: 'Search settings...',                                 ariaLabel: 'Search settings' },
-  alerts:        { placeholder: 'Search alerts and notifications...',                 ariaLabel: 'Search alerts' },
-};
-
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 export default function Header({
   searchVal,
   setSearchVal,
@@ -49,10 +29,7 @@ export default function Header({
   activeTab,
   darkMode,
   toggleTheme,
-<<<<<<< HEAD
   onRefresh,
-=======
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
   onExportCSV,
   onDownloadPDF,
   opportunities = mockOpportunities,
@@ -62,23 +39,16 @@ export default function Header({
   const navigate = useNavigate();
   const auth = useAuth();
   const isAuthenticated = Boolean(auth?.isAuthenticated);
-<<<<<<< HEAD
   const user = auth?.user || { name: 'Usera', role: 'Admin', email: 'usera@tenderhub.org' };
   const displayName = user?.name && user.name !== 'S Sakishnu' ? user.name : 'Usera';
   const displayRole = user?.role && user.role !== 'Super Admin' ? user.role : 'Admin';
-=======
-  const user = auth?.user || { name: 'S Sakishnu', role: 'Super Admin', email: 'sakishnu33@gmail.com' };
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 
   const inputRef = useRef(null);
   const downloadMenuRef = useRef(null);
   const notificationMenuRef = useRef(null);
   const profileMenuRef = useRef(null);
 
-<<<<<<< HEAD
   const [isRefreshing, setIsRefreshing] = useState(false);
-=======
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
@@ -87,16 +57,8 @@ export default function Header({
   const [downloadingLabel, setDownloadingLabel] = useState('');
   const [ariaAnnouncement, setAriaAnnouncement] = useState('');
 
-<<<<<<< HEAD
   const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
   const userInitial = displayName.charAt(0).toUpperCase() || 'U';
-=======
-  // Resolve search config for the active page
-  const searchConfig = PAGE_SEARCH_CONFIG[activeTab] || PAGE_SEARCH_CONFIG['dashboard'];
-
-  const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
-  const userInitial = isAuthenticated && user?.name ? user.name.trim().charAt(0).toUpperCase() : 'G';
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 
   // Keyboard shortcut listener (Cmd+K / Ctrl+K focus, Escape clear)
   useEffect(() => {
@@ -152,7 +114,6 @@ export default function Header({
     setAriaAnnouncement('Navigating to login interface.');
   };
 
-<<<<<<< HEAD
   const handleRefreshClick = async () => {
     setIsRefreshing(true);
     if (onRefresh) {
@@ -162,8 +123,6 @@ export default function Header({
     }
     setIsRefreshing(false);
   };
-=======
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 
   const handleDownloadCSV = async () => {
     setShowDownloadMenu(false);
@@ -206,7 +165,6 @@ export default function Header({
         {ariaAnnouncement}
       </div>
 
-<<<<<<< HEAD
       {/* 1. Real-Time Search Bar */}
       <div className="header-search" role="search">
         <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
@@ -217,33 +175,14 @@ export default function Header({
           value={searchVal || ''}
           onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
           aria-label="Search projects, tenders, sector, location"
-=======
-      {/* 1. Context-Aware Real-Time Search Bar */}
-      <div className="header-search" role="search">
-        <Search size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} aria-hidden="true" />
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder={searchConfig.placeholder}
-          value={searchVal || ''}
-          onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
-          aria-label={searchConfig.ariaLabel}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
         />
         {searchVal ? (
           <button
             onClick={() => setSearchVal && setSearchVal('')}
-<<<<<<< HEAD
             className="header-search-clear-btn"
             style={{
               border: 'none',
               background: 'none',
-=======
-            style={{
-              border: 'none',
-              background: 'none',
-              color: 'var(--text-muted)',
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -264,8 +203,7 @@ export default function Header({
 
       {/* Header Action Controls */}
       <div className="header-actions" role="toolbar" aria-label="Global header actions">
-<<<<<<< HEAD
-        {/* Refresh Button - icon only, immediately to the LEFT of the notification bell */}
+        {/* Refresh Button - immediately to the LEFT of the notification bell */}
         <button
           className="header-refresh-btn"
           onClick={handleRefreshClick}
@@ -390,282 +328,19 @@ export default function Header({
         </button>
 
         {/* 4. User Profile Section */}
-=======
-        {/* 2. Download Button & Dropdown */}
-        <div style={{ position: 'relative' }} ref={downloadMenuRef}>
-          <button
-            className="btn-header-download"
-            onClick={() => {
-              setShowDownloadMenu(!showDownloadMenu);
-              setShowNotifications(false);
-              setShowProfileMenu(false);
-            }}
-            title="Download or Export Tenders Data"
-            aria-label="Export or download tenders data"
-            aria-haspopup="true"
-            aria-expanded={showDownloadMenu}
-            disabled={isDownloading}
-            type="button"
-          >
-            {isDownloading ? (
-              <>
-                <RefreshCw size={15} className="spin-icon" aria-hidden="true" />
-                <span>{downloadingLabel || 'Downloading...'}</span>
-              </>
-            ) : (
-              <>
-                <Download size={15} aria-hidden="true" />
-                <span>Download</span>
-                <ChevronDown size={14} style={{ marginLeft: 3, opacity: 0.9 }} aria-hidden="true" />
-              </>
-            )}
-          </button>
-
-          {showDownloadMenu && (
-            <div
-              className="header-dropdown-menu"
-              role="menu"
-              aria-label="Download formats"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                right: 0,
-                width: '230px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.75rem',
-                boxShadow: 'var(--shadow-xl)',
-                zIndex: 110,
-                padding: '0.5rem',
-                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-            >
-              <div style={{ padding: '0.35rem 0.6rem', fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Export Options
-              </div>
-
-              {/* Option 1: Download CSV */}
-              <button
-                role="menuitem"
-                onClick={handleDownloadCSV}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.55rem 0.65rem',
-                  border: 'none',
-                  background: 'transparent',
-                  color: 'var(--text-main)',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                  color: '#10B981',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <Table size={15} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>Download CSV</div>
-                  <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>Spreadsheet data (.csv)</div>
-                </div>
-              </button>
-
-              {/* Option 2: Download PDF */}
-              <button
-                role="menuitem"
-                onClick={handleDownloadPDF}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.55rem 0.65rem',
-                  border: 'none',
-                  background: 'transparent',
-                  color: 'var(--text-main)',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  marginTop: '0.2rem',
-                  transition: 'background 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(37, 99, 235, 0.12)',
-                  color: '#2563EB',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <FileText size={15} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>Download PDF</div>
-                  <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>Intelligence report (.pdf)</div>
-                </div>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* 4. Notification Bell Icon */}
-        <div style={{ position: 'relative' }} ref={notificationMenuRef}>
-          <button
-            className="header-circle-btn"
-            onClick={() => {
-              setShowNotifications(!showNotifications);
-              setShowProfileMenu(false);
-              setShowDownloadMenu(false);
-            }}
-            title="Notifications (3 Urgent Alerts)"
-            aria-label="Notifications, 3 urgent alerts available"
-            aria-haspopup="true"
-            aria-expanded={showNotifications}
-            type="button"
-          >
-            <Bell size={18} aria-hidden="true" />
-            <span className="header-bell-badge" aria-hidden="true">3</span>
-          </button>
-
-          {/* Notifications Dropdown */}
-          {showNotifications && (
-            <div
-              className="header-dropdown-menu"
-              role="dialog"
-              aria-label="Urgent notifications"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 10px)',
-                right: 0,
-                width: '330px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.85rem',
-                boxShadow: 'var(--shadow-xl)',
-                zIndex: 100,
-                padding: '0.85rem',
-                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.65rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.65rem' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)' }}>Notifications</span>
-                <span style={{ fontSize: '0.7rem', fontWeight: '700', backgroundColor: 'var(--danger-bg)', color: 'var(--danger-text)', padding: '0.15rem 0.5rem', borderRadius: '9999px', border: '1px solid var(--danger-border)' }}>
-                  3 Urgent
-                </span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-                {sampleNotifications.map((n) => (
-                  <div
-                    key={n.id}
-                    onClick={() => {
-                      setShowNotifications(false);
-                      navigate('/alerts');
-                    }}
-                    style={{
-                      padding: '0.6rem 0.75rem',
-                      borderRadius: '0.6rem',
-                      backgroundColor: 'var(--bg-subtle)',
-                      border: '1px solid var(--border-color)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '0.6rem',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    <AlertTriangle size={15} color={n.urgent ? 'var(--danger)' : 'var(--warning)'} style={{ marginTop: 2, flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.25' }}>{n.title}</div>
-                      <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{n.time}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => {
-                  setShowNotifications(false);
-                  navigate('/alerts');
-                }}
-                style={{
-                  width: '100%',
-                  marginTop: '0.75rem',
-                  padding: '0.45rem',
-                  border: 'none',
-                  background: 'var(--primary-light)',
-                  color: 'var(--primary)',
-                  fontWeight: '700',
-                  fontSize: '0.775rem',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.35rem',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                View All Alerts <ExternalLink size={13} />
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* 5. Dark Mode Toggle */}
-        <button
-          className="header-circle-btn"
-          onClick={toggleTheme}
-          title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
-          type="button"
-        >
-          {darkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
-        </button>
-
-        {/* 6. User Profile Card / Status Indicator */}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
         <div style={{ position: 'relative' }} ref={profileMenuRef}>
           <div
             className={`header-user-profile ${isAuthenticated ? 'authenticated' : 'unauthenticated'}`}
             onClick={() => {
               setShowProfileMenu(!showProfileMenu);
               setShowNotifications(false);
-<<<<<<< HEAD
             }}
             title={isAuthenticated ? `Active User: ${displayName} (${displayRole})` : 'Guest Session (Click for Options)'}
-=======
-              setShowDownloadMenu(false);
-            }}
-            title={isAuthenticated ? `Active User: ${user.name || 'Admin'} (${user.role || 'Super Admin'})` : 'Guest Session (Click for Options)'}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
             role="button"
             tabIndex={0}
             aria-haspopup="true"
             aria-expanded={showProfileMenu}
-<<<<<<< HEAD
             aria-label={`User menu for ${displayName}`}
-=======
-            aria-label={isAuthenticated ? `User menu for ${user.name || 'Admin'}` : 'Guest user menu'}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -673,7 +348,6 @@ export default function Header({
               }
             }}
           >
-<<<<<<< HEAD
             <div className="header-user-avatar">
               {userInitial}
             </div>
@@ -686,32 +360,6 @@ export default function Header({
               </span>
             </div>
             <ChevronDown size={14} className="header-user-chevron" style={{ marginLeft: 2 }} aria-hidden="true" />
-=======
-            <div
-              className="header-user-avatar"
-              style={{
-                backgroundColor: isAuthenticated ? 'var(--primary)' : 'var(--text-muted)'
-              }}
-            >
-              {isAuthenticated ? userInitial : <User size={16} />}
-              <span
-                className="header-user-status-dot"
-                style={{
-                  backgroundColor: isAuthenticated ? '#10B981' : '#94A3B8'
-                }}
-                aria-hidden="true"
-              />
-            </div>
-            <div className="header-user-info">
-              <span className="header-user-name">
-                {isAuthenticated ? (user.name || 'S Sakishnu') : 'Guest User'}
-              </span>
-              <span className="header-user-role">
-                {isAuthenticated ? (user.role || 'Super Admin') : 'Not Signed In'}
-              </span>
-            </div>
-            <ChevronDown size={14} color="var(--text-muted)" style={{ marginLeft: 2 }} aria-hidden="true" />
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
           </div>
 
           {/* User Profile Menu Dropdown */}
@@ -722,11 +370,7 @@ export default function Header({
               aria-label="User profile options"
               style={{
                 position: 'absolute',
-<<<<<<< HEAD
                 top: 'calc(100% + 8px)',
-=======
-                top: 'calc(100% + 10px)',
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                 right: 0,
                 width: '230px',
                 backgroundColor: 'var(--bg-card)',
@@ -740,39 +384,23 @@ export default function Header({
             >
               <div style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
                 <div style={{ fontSize: '0.825rem', fontWeight: '700', color: 'var(--text-main)' }}>
-<<<<<<< HEAD
                   {displayName}
                 </div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                   {user?.email || 'usera@tenderhub.org'}
-=======
-                  {isAuthenticated ? (user.name || 'S Sakishnu') : 'Guest Session'}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                  {isAuthenticated ? (user.email || 'sakishnu@tenderhub.org') : 'Sign in to access administration'}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                 </div>
                 <div style={{
                   display: 'inline-block',
                   marginTop: '6px',
                   fontSize: '0.65rem',
                   fontWeight: '700',
-<<<<<<< HEAD
                   color: 'var(--primary)',
                   backgroundColor: 'var(--primary-light)',
-=======
-                  color: isAuthenticated ? 'var(--primary)' : 'var(--text-muted)',
-                  backgroundColor: isAuthenticated ? 'var(--primary-light)' : 'var(--bg-subtle)',
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                   padding: '0.1rem 0.45rem',
                   borderRadius: '0.25rem',
                   border: '1px solid var(--border-color)'
                 }}>
-<<<<<<< HEAD
                   {displayRole}
-=======
-                  {isAuthenticated ? (user.role || 'Super Admin') : 'Guest Mode'}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                 </div>
               </div>
 
@@ -802,10 +430,6 @@ export default function Header({
                 <Settings size={15} color="var(--text-muted)" aria-hidden="true" /> Account Settings
               </button>
 
-<<<<<<< HEAD
-=======
-              {/* In-Dropdown Action Toggle */}
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
               {isAuthenticated ? (
                 <button
                   role="menuitem"
@@ -858,19 +482,6 @@ export default function Header({
             </div>
           )}
         </div>
-<<<<<<< HEAD
-=======
-
-
-        <div
-          id="header-actions-portal"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-          }}
-        />
->>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       </div>
     </header>
   );
