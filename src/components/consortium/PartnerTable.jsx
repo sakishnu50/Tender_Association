@@ -1,5 +1,5 @@
 import React from 'react';
-import { SlidersHorizontal, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 function scoreColor(score) {
   if (score >= 90) return 'var(--success)';
@@ -12,6 +12,7 @@ export default function PartnerTable({
   filteredList,
   consortiumList,
   onViewProfile,
+  filterSlot,
 }) {
   const thStyle = {
     padding: '0.75rem 1rem',
@@ -39,11 +40,11 @@ export default function PartnerTable({
 
       {/* Row count strip */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '7px 12px 7px 16px',
         fontSize: '0.76rem', color: 'var(--text-muted)',
         borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--bg-subtle)',
       }}>
-        <SlidersHorizontal size={12} />
         <span>
           Showing{' '}
           <strong style={{ color: 'var(--text-main)' }}>{filteredList.length}</strong>
@@ -51,6 +52,7 @@ export default function PartnerTable({
           <strong style={{ color: 'var(--text-main)' }}>{consortiumList.length}</strong>
           {' '}consortium partners
         </span>
+        {filterSlot}
       </div>
 
       {/* Table — 4 columns: PARTNER | MATCH | EXPERTISE | ACTION */}

@@ -11,241 +11,113 @@ import PartnerProfileModal from '../components/consortium/PartnerProfileModal';
 
 import {
   Layers, AlertTriangle, CheckCircle2, Sparkles,
-  Building, MapPin, Calendar, X, SlidersHorizontal
+  Building, MapPin, Calendar, Filter, RotateCcw
 } from 'lucide-react';
 
-/* ── Capabilities Popup ── */
-function CapabilitiesPopup({ type, requirements, onClose }) {
+/* ── Inline Capabilities Panel ── */
+function CapabilitiesPanel({ requirements }) {
   if (!requirements) return null;
-  const isRequired = type === 'required';
   return (
-    <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, zIndex: 1100,
-      backgroundColor: 'rgba(0,0,0,0.25)',
-      display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end',
-      padding: '68px 24px 0',
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+      gap: '1rem',
+      marginBottom: '1rem',
     }}>
-      <div onClick={e => e.stopPropagation()} style={{
-        width: '360px', maxHeight: 'calc(100vh - 90px)', overflowY: 'auto',
-        backgroundColor: 'var(--bg-card)',
-        borderRadius: 'var(--radius-lg)',
-        border: isRequired ? '1px solid var(--border-color)' : '1px solid var(--warning)',
-        boxShadow: 'var(--shadow-lg)',
-        padding: '1.125rem',
-        display: 'flex', flexDirection: 'column', gap: '0.875rem',
+      {/* Required Capabilities */}
+      <div style={{
+        backgroundColor: 'var(--bg-subtle)',
+        borderRadius: 'var(--radius-md)',
+        padding: '1rem',
+        border: '1px solid var(--border-color)',
+        display: 'flex', flexDirection: 'column', gap: '0.75rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            {isRequired
-              ? <Layers size={15} color="var(--primary)" />
-              : <AlertTriangle size={15} color="var(--warning)" />}
-            <span style={{
-              fontSize: '0.82rem', fontWeight: '700',
-              color: isRequired ? 'var(--text-main)' : 'var(--warning-text)',
-              textTransform: 'uppercase', letterSpacing: '0.03em'
-            }}>
-              {isRequired ? 'Required Capabilities' : `Missing Capabilities (${requirements.targetCompany})`}
+            <Layers size={15} color="var(--primary)" />
+            <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+              Required Capabilities
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{
-              fontSize: '0.65rem', fontWeight: '700', padding: '1px 7px', borderRadius: '9999px',
-              backgroundColor: isRequired ? 'var(--primary-light)' : 'var(--warning-bg)',
-              color: isRequired ? 'var(--primary)' : 'var(--warning-text)',
-              border: isRequired ? 'none' : '1px solid var(--warning)',
-            }}>
-              {isRequired
-                ? `${requirements.requiredCapabilities?.length || 0} Mandated`
-                : 'Action Needed'}
-            </span>
-            <button onClick={onClose} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', padding: '2px' }}>
-              <X size={15} />
-            </button>
-          </div>
+          <span style={{
+            fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px',
+            backgroundColor: 'var(--primary-light)', color: 'var(--primary)',
+          }}>
+            {requirements.requiredCapabilities?.length || 0} Mandated
+          </span>
         </div>
-
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-          {isRequired
-            ? requirements.requiredCapabilities?.map((cap, idx) => (
-                <div key={idx} title={cap.description} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                  padding: '0.3rem 0.6rem', borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-color)',
-                  fontSize: '0.78rem', fontWeight: '600', color: 'var(--text-main)',
-                }}>
-                  <CheckCircle2 size={12} color="var(--success)" style={{ flexShrink: 0 }} />
-                  {cap.name}
-                </div>
-              ))
-            : requirements.missingCapabilities?.map((gap, idx) => (
-                <div key={idx} title={gap.reason} style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-                  padding: '0.3rem 0.65rem', borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--warning-bg)', border: '1px solid rgba(217,119,6,0.35)',
-                  fontSize: '0.78rem', fontWeight: '700', color: 'var(--warning-text)',
-                }}>
-                  <AlertTriangle size={12} color="var(--warning)" style={{ flexShrink: 0 }} />
-                  {gap.name}
-                </div>
-              ))
-          }
+          {requirements.requiredCapabilities?.map((cap, idx) => (
+            <div key={idx} title={cap.description} style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+              padding: '0.3rem 0.65rem', borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)',
+              fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-main)',
+            }}>
+              <CheckCircle2 size={13} color="var(--success)" style={{ flexShrink: 0 }} />
+              {cap.name}
+            </div>
+          ))}
         </div>
+        <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', lineHeight: '1.5', display: 'flex', gap: '0.4rem' }}>
+          <Layers size={12} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <span>Mandatory technical and operational benchmarks required by{' '}
+            <strong style={{ color: 'var(--text-main)' }}>{requirements.fundingAgency}</strong> for consortium qualification.
+          </span>
+        </div>
+      </div>
 
-        <div style={{
-          fontSize: '0.73rem', lineHeight: '1.5', display: 'flex', gap: '0.4rem',
-          borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem',
-        }}>
-          {isRequired
-            ? <><Layers size={12} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span style={{ color: 'var(--text-muted)' }}>
-                  Mandatory technical and operational benchmarks required by{' '}
-                  <strong style={{ color: 'var(--text-main)' }}>{requirements.fundingAgency}</strong> for consortium qualification.
-                </span></>
-            : <><Sparkles size={12} color="var(--warning)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span>
-                  <strong style={{ color: 'var(--warning-text)' }}>AI Recommendation:</strong>{' '}
-                  <span style={{ color: 'var(--text-muted)' }}>Partner with listed consortium candidates below to bridge these missing capabilities and reach 100% tender compliance.</span>
-                </span></>
-          }
+      {/* Missing Capabilities */}
+      <div style={{
+        backgroundColor: 'rgba(254,243,199,0.18)',
+        borderRadius: 'var(--radius-md)',
+        padding: '1rem',
+        border: '1px solid var(--warning)',
+        display: 'flex', flexDirection: 'column', gap: '0.75rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <AlertTriangle size={15} color="var(--warning)" />
+            <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--warning-text)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+              Missing Capabilities ({requirements.targetCompany})
+            </span>
+          </div>
+          <span style={{
+            fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px',
+            backgroundColor: 'var(--warning-bg)', color: 'var(--warning-text)',
+            border: '1px solid var(--warning)',
+          }}>
+            Action Needed
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+          {requirements.missingCapabilities?.map((gap, idx) => (
+            <div key={idx} title={gap.reason} style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+              padding: '0.3rem 0.65rem', borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--warning-bg)', border: '1px solid rgba(217,119,6,0.35)',
+              fontSize: '0.8rem', fontWeight: '700', color: 'var(--warning-text)',
+            }}>
+              <AlertTriangle size={13} color="var(--warning)" style={{ flexShrink: 0 }} />
+              {gap.name}
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: '0.73rem', lineHeight: '1.5', display: 'flex', gap: '0.4rem' }}>
+          <Sparkles size={12} color="var(--warning)" style={{ flexShrink: 0, marginTop: '2px' }} />
+          <span>
+            <strong style={{ color: 'var(--warning-text)' }}>AI Recommendation:</strong>{' '}
+            <span style={{ color: 'var(--text-muted)' }}>Partner with listed consortium candidates below to bridge these missing capabilities and reach 100% tender compliance.</span>
+          </span>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Filters Dropdown Popup ── */
-function FiltersPopup({ onClose, anchorRef,
-  searchQuery, setSearchQuery,
-  expertiseFilter, setExpertiseFilter,
-  experienceFilter, setExperienceFilter,
-  matchScoreFilter, setMatchScoreFilter,
-  locationFilter, setLocationFilter,
-  statusFilter, setStatusFilter,
-  onResetFilters, hasActiveFilters,
-}) {
-  const popupRef = useRef(null);
 
-  useEffect(() => {
-    function handleClick(e) {
-      if (popupRef.current && !popupRef.current.contains(e.target) &&
-          anchorRef.current && !anchorRef.current.contains(e.target)) {
-        onClose();
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [onClose, anchorRef]);
 
-  const selectStyle = {
-    padding: '0.35rem 0.5rem', borderRadius: 'var(--radius-md)',
-    border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)',
-    color: 'var(--text-main)', fontSize: '0.79rem', outline: 'none', cursor: 'pointer', width: '100%',
-  };
-  const labelStyle = {
-    fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)',
-    textTransform: 'uppercase', marginBottom: '3px', display: 'block', letterSpacing: '0.05em',
-  };
 
-  return (
-    <div ref={popupRef} style={{
-      position: 'absolute', top: '100%', right: 0, marginTop: '6px',
-      width: '240px', backgroundColor: 'var(--bg-card)',
-      borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-color)',
-      boxShadow: 'var(--shadow-lg)', padding: '14px',
-      display: 'flex', flexDirection: 'column', gap: '10px',
-      zIndex: 900,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Filters</span>
-        <button onClick={onClose} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', padding: '2px' }}>
-          <X size={13} />
-        </button>
-      </div>
-
-      {/* Search */}
-      <div>
-        <label style={labelStyle}>Search Partner</label>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '5px',
-          backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-color)',
-          padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-md)',
-        }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          <input type="text" placeholder="Search…" value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.78rem', width: '100%', color: 'var(--text-main)' }} />
-          {searchQuery && (
-            <button onClick={() => setSearchQuery('')}
-              style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontWeight: '700', fontSize: '0.72rem', lineHeight: 1, padding: 0 }}>✕</button>
-          )}
-        </div>
-      </div>
-
-      <div><label style={labelStyle}>Expertise</label>
-        <select value={expertiseFilter} onChange={e => setExpertiseFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Expertise</option>
-          <option value="Transport Infrastructure">Transport Infrastructure</option>
-          <option value="Environmental Consultancy">Environmental Consultancy</option>
-          <option value="Road Construction">Road Construction</option>
-          <option value="Geotechnical & Surveying">Geotechnical &amp; Surveying</option>
-          <option value="Intelligent Toll Systems">Intelligent Toll Systems</option>
-          <option value="Civil Construction">Civil Construction</option>
-        </select>
-      </div>
-
-      <div><label style={labelStyle}>Experience</label>
-        <select value={experienceFilter} onChange={e => setExperienceFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Experience</option>
-          <option value="5">5+ Years</option>
-          <option value="10">10+ Years</option>
-          <option value="15">15+ Years</option>
-        </select>
-      </div>
-
-      <div><label style={labelStyle}>Match Score</label>
-        <select value={matchScoreFilter} onChange={e => setMatchScoreFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Scores</option>
-          <option value="90">90%+ High</option>
-          <option value="80">80%+ Good</option>
-          <option value="70">70%+ Moderate</option>
-        </select>
-      </div>
-
-      <div><label style={labelStyle}>Location</label>
-        <select value={locationFilter} onChange={e => setLocationFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Locations</option>
-          <option value="Karnataka">Karnataka</option>
-          <option value="Maharashtra">Maharashtra</option>
-          <option value="Tamil Nadu">Tamil Nadu</option>
-          <option value="Gujarat">Gujarat</option>
-        </select>
-      </div>
-
-      <div><label style={labelStyle}>Status</label>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={selectStyle}>
-          <option value="">All Statuses</option>
-          <option value="recommended">Recommended</option>
-          <option value="shortlisted">Shortlisted</option>
-          <option value="contacted">Contacted</option>
-          <option value="none">Not Actioned</option>
-        </select>
-      </div>
-
-      <button onClick={onResetFilters} disabled={!hasActiveFilters}
-        style={{
-          padding: '0.35rem', fontSize: '0.75rem', fontWeight: '600',
-          border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-          backgroundColor: 'transparent', color: 'var(--text-muted)',
-          cursor: hasActiveFilters ? 'pointer' : 'not-allowed',
-          opacity: hasActiveFilters ? 1 : 0.38, width: '100%',
-        }}>
-        ↺ Reset Filters
-      </button>
-    </div>
-  );
-}
 
 /* ══════════════════════════════════════════ */
 export default function ConsortiumView() {
@@ -266,8 +138,18 @@ export default function ConsortiumView() {
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [isProfileOpen,   setIsProfileOpen]   = useState(false);
 
-  const [activePopup,     setActivePopup]     = useState(null); // 'required'|'missing'|'filters'|null
-  const filterBtnRef = useRef(null);
+  const [showFilters,     setShowFilters]     = useState(false);
+  const filterDropdownRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(e.target)) {
+        setShowFilters(false);
+      }
+    }
+    if (showFilters) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showFilters]);
 
   const filteredList = consortiumList.filter(partner => {
     if (searchQuery.trim()) {
@@ -321,8 +203,247 @@ export default function ConsortiumView() {
     if (selectedPartner?.id === id) setSelectedPartner(prev => prev ? { ...prev, status } : prev);
   };
 
-  const togglePopup = key => setActivePopup(p => p === key ? null : key);
+  const activeFilterCount = [
+    searchQuery, expertiseFilter, experienceFilter,
+    matchScoreFilter, locationFilter, statusFilter,
+  ].filter(Boolean).length;
 
+  // Flat filter panel — all filters visible at once, panel stays open on selection
+  const filterSlot = (
+    <div ref={filterDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
+      {/* Filter icon toggle button */}
+      <button
+        type="button"
+        className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
+        style={{
+          height: '26px',
+          padding: activeFilterCount > 0 ? '0 0.5rem' : '0',
+          width: activeFilterCount > 0 ? 'auto' : '26px',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          gap: '0.3rem', borderRadius: 'var(--radius-md)', flexShrink: 0,
+          fontSize: '0.72rem', fontWeight: '700',
+        }}
+        onMouseDown={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); setShowFilters(p => !p); }}
+        title="Filter consortium partners"
+        aria-label="Filter consortium partners"
+        aria-expanded={showFilters}
+      >
+        <Filter size={13} />
+        {activeFilterCount > 0 && (
+          <span style={{ fontSize: '0.68rem', fontWeight: '700', lineHeight: 1 }}>{activeFilterCount}</span>
+        )}
+      </button>
+
+      {/* Flat filter panel — stopPropagation on mousedown keeps it open during interaction */}
+      {showFilters && (
+        <div
+          className="card"
+          onMouseDown={e => e.stopPropagation()}
+          style={{
+            position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 1000,
+            width: '240px',
+            borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--bg-card)',
+            boxShadow: 'var(--shadow-lg, 0 10px 25px -5px rgba(0,0,0,0.2))',
+            display: 'flex', flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Panel header with reset */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0.55rem 0.75rem 0.45rem',
+            borderBottom: '1px solid var(--border-color)',
+          }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Filters
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {activeFilterCount > 0 && (
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); handleResetFilters(); }}
+                  title="Reset all filters"
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
+                    display: 'inline-flex', alignItems: 'center', gap: '3px',
+                    color: 'var(--primary)', borderRadius: '4px',
+                    fontSize: '0.68rem', fontWeight: '600',
+                  }}
+                >
+                  <RotateCcw size={11} /> Reset
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Scrollable filter body */}
+          <div style={{ padding: '0.5rem 0.75rem 0.625rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', overflowY: 'auto', maxHeight: '360px' }}>
+
+            {/* Search */}
+            <div>
+              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Search Partner
+              </label>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '5px',
+                backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-color)',
+                padding: '0.3rem 0.5rem', borderRadius: 'var(--radius-md)',
+              }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
+                  fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search partners…"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.79rem', width: '100%', color: 'var(--text-main)' }}
+                />
+                {searchQuery && (
+                  <button onClick={e => { e.stopPropagation(); setSearchQuery(''); }}
+                    style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontWeight: '700', fontSize: '0.72rem', lineHeight: 1, padding: 0 }}>✕</button>
+                )}
+              </div>
+            </div>
+
+            {/* Expertise */}
+            <div>
+              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Expertise
+              </label>
+              <select
+                value={expertiseFilter}
+                onChange={e => setExpertiseFilter(e.target.value)}
+                style={{
+                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
+                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+                  backgroundColor: expertiseFilter ? 'var(--primary-light)' : 'var(--bg-card)',
+                  color: expertiseFilter ? 'var(--primary)' : 'var(--text-main)',
+                  outline: 'none', cursor: 'pointer', fontWeight: expertiseFilter ? '600' : '400',
+                }}
+              >
+                <option value="">All Expertise</option>
+                <option value="Transport Infrastructure">Transport Infrastructure</option>
+                <option value="Environmental Consultancy">Environmental Consultancy</option>
+                <option value="Road Construction">Road Construction</option>
+                <option value="Geotechnical & Surveying">Geotechnical &amp; Surveying</option>
+                <option value="Intelligent Toll Systems">Intelligent Toll Systems</option>
+                <option value="Civil Construction">Civil Construction</option>
+                <option value="Bridge Engineering">Bridge Engineering</option>
+                <option value="Urban Planning & DPR">Urban Planning &amp; DPR</option>
+                <option value="Utility & Power Infrastructure">Utility &amp; Power Infrastructure</option>
+                <option value="Drone Surveying & Remote Sensing">Drone Surveying &amp; Remote Sensing</option>
+              </select>
+            </div>
+
+            {/* Experience */}
+            <div>
+              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Experience
+              </label>
+              <select
+                value={experienceFilter}
+                onChange={e => setExperienceFilter(e.target.value)}
+                style={{
+                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
+                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+                  backgroundColor: experienceFilter ? 'var(--primary-light)' : 'var(--bg-card)',
+                  color: experienceFilter ? 'var(--primary)' : 'var(--text-main)',
+                  outline: 'none', cursor: 'pointer', fontWeight: experienceFilter ? '600' : '400',
+                }}
+              >
+                <option value="">All Experience</option>
+                <option value="5">5+ Years</option>
+                <option value="10">10+ Years</option>
+                <option value="15">15+ Years</option>
+              </select>
+            </div>
+
+            {/* Match Score */}
+            <div>
+              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Match Score
+              </label>
+              <select
+                value={matchScoreFilter}
+                onChange={e => setMatchScoreFilter(e.target.value)}
+                style={{
+                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
+                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+                  backgroundColor: matchScoreFilter ? 'var(--primary-light)' : 'var(--bg-card)',
+                  color: matchScoreFilter ? 'var(--primary)' : 'var(--text-main)',
+                  outline: 'none', cursor: 'pointer', fontWeight: matchScoreFilter ? '600' : '400',
+                }}
+              >
+                <option value="">All Scores</option>
+                <option value="90">90%+ High</option>
+                <option value="80">80%+ Good</option>
+                <option value="70">70%+ Moderate</option>
+              </select>
+            </div>
+
+            {/* Location */}
+            <div>
+              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Location
+              </label>
+              <select
+                value={locationFilter}
+                onChange={e => setLocationFilter(e.target.value)}
+                style={{
+                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
+                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+                  backgroundColor: locationFilter ? 'var(--primary-light)' : 'var(--bg-card)',
+                  color: locationFilter ? 'var(--primary)' : 'var(--text-main)',
+                  outline: 'none', cursor: 'pointer', fontWeight: locationFilter ? '600' : '400',
+                }}
+              >
+                <option value="">All Locations</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Maharashtra">Maharashtra</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Telangana">Telangana</option>
+              </select>
+            </div>
+
+            {/* Status */}
+            <div>
+              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
+                Status
+              </label>
+              <select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+                style={{
+                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
+                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+                  backgroundColor: statusFilter ? 'var(--primary-light)' : 'var(--bg-card)',
+                  color: statusFilter ? 'var(--primary)' : 'var(--text-main)',
+                  outline: 'none', cursor: 'pointer', fontWeight: statusFilter ? '600' : '400',
+                }}
+              >
+                <option value="">All Statuses</option>
+                <option value="accepted">Accepted</option>
+                <option value="invited">Invited</option>
+                <option value="recommended">Recommended</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="contacted">Contacted</option>
+                <option value="none">Not Actioned</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── JSX return ──
   return (
     <div className="page-container">
 
@@ -357,104 +478,20 @@ export default function ConsortiumView() {
               </span>
             </div>
           </div>
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', position: 'relative' }}>
-
-            {/* Required Capabilities */}
-            <button onClick={() => togglePopup('required')} title="Required Capabilities"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '5px',
-                padding: '0.35rem 0.7rem', fontSize: '0.77rem', fontWeight: '600',
-                border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-                backgroundColor: activePopup === 'required' ? 'var(--primary-light)' : 'var(--bg-card)',
-                color: activePopup === 'required' ? 'var(--primary)' : 'var(--text-muted)',
-                cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-              }}>
-              <Layers size={13} />
-              Required Capabilities
-              <span style={{
-                fontSize: '0.62rem', fontWeight: '700', padding: '1px 5px', borderRadius: '9999px',
-                backgroundColor: 'var(--primary-light)', color: 'var(--primary)',
-              }}>{requirements?.requiredCapabilities?.length || 0}</span>
-            </button>
-
-            {/* Missing Capabilities */}
-            <button onClick={() => togglePopup('missing')} title="Missing Capabilities"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '5px',
-                padding: '0.35rem 0.7rem', fontSize: '0.77rem', fontWeight: '600',
-                border: `1px solid ${activePopup === 'missing' ? 'var(--warning)' : 'var(--border-color)'}`,
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: activePopup === 'missing' ? 'var(--warning-bg)' : 'var(--bg-card)',
-                color: activePopup === 'missing' ? 'var(--warning-text)' : 'var(--text-muted)',
-                cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-              }}>
-              <AlertTriangle size={13} />
-              Missing Capabilities
-              <span style={{
-                fontSize: '0.62rem', fontWeight: '700', padding: '1px 5px', borderRadius: '9999px',
-                backgroundColor: 'var(--warning-bg)', color: 'var(--warning-text)',
-                border: '1px solid var(--warning)',
-              }}>{requirements?.missingCapabilities?.length || 0}</span>
-            </button>
-
-            {/* Filter Button */}
-            <button ref={filterBtnRef} onClick={() => togglePopup('filters')} title="Filters"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '5px',
-                padding: '0.35rem 0.7rem', fontSize: '0.77rem', fontWeight: '600',
-                border: `1px solid ${activePopup === 'filters' || hasActiveFilters ? 'var(--primary)' : 'var(--border-color)'}`,
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: activePopup === 'filters' || hasActiveFilters ? 'var(--primary-light)' : 'var(--bg-card)',
-                color: activePopup === 'filters' || hasActiveFilters ? 'var(--primary)' : 'var(--text-muted)',
-                cursor: 'pointer', transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-              }}>
-              <SlidersHorizontal size={13} />
-              Filters
-              {hasActiveFilters && (
-                <span style={{
-                  fontSize: '0.62rem', fontWeight: '700', padding: '1px 5px', borderRadius: '9999px',
-                  backgroundColor: 'var(--primary)', color: '#fff',
-                }}>ON</span>
-              )}
-            </button>
-
-            {/* Filters Dropdown */}
-            {activePopup === 'filters' && (
-              <FiltersPopup
-                anchorRef={filterBtnRef}
-                onClose={() => setActivePopup(null)}
-                searchQuery={searchQuery}     setSearchQuery={setSearchQuery}
-                expertiseFilter={expertiseFilter}   setExpertiseFilter={setExpertiseFilter}
-                experienceFilter={experienceFilter}  setExperienceFilter={setExperienceFilter}
-                matchScoreFilter={matchScoreFilter}  setMatchScoreFilter={setMatchScoreFilter}
-                locationFilter={locationFilter}    setLocationFilter={setLocationFilter}
-                statusFilter={statusFilter}       setStatusFilter={setStatusFilter}
-                onResetFilters={handleResetFilters}
-                hasActiveFilters={hasActiveFilters}
-              />
-            )}
-          </div>
         </div>
       </div>
 
-      {/* ── Full-width Partner Table ── */}
+      {/* ── Capabilities Panel (always visible) ── */}
+      <CapabilitiesPanel requirements={requirements} />
+
+      {/* ── Full-width Partner Table (filter icon embedded in strip) ── */}
       <PartnerTable
         filteredList={filteredList}
         consortiumList={consortiumList}
         onViewProfile={handleViewProfile}
         onUpdateStatus={handleUpdateStatus}
+        filterSlot={filterSlot}
       />
-
-      {/* ── Capabilities Popups ── */}
-      {(activePopup === 'required' || activePopup === 'missing') && (
-        <CapabilitiesPopup
-          type={activePopup}
-          requirements={requirements}
-          onClose={() => setActivePopup(null)}
-        />
-      )}
 
       {/* ── Partner Profile Modal ── */}
       <PartnerProfileModal
