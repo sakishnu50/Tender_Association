@@ -11,8 +11,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  Legend
+  Tooltip
 } from 'recharts';
 import { TrendingUp, BarChart2, PieChart as PieIcon, Building2 } from 'lucide-react';
 
@@ -52,20 +51,25 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div style={{
-        backgroundColor: 'var(--sidebar-bg)',
+        backgroundColor: '#0F172A',
         color: '#FFFFFF',
-        padding: '0.6rem 0.85rem',
-        borderRadius: '0.5rem',
-        fontSize: '0.75rem',
-        boxShadow: '0 10px 15px -3px rgba(0,0,0,0.3)',
-        border: '1px solid rgba(255,255,255,0.1)'
+        padding: '0.65rem 0.95rem',
+        borderRadius: '0.6rem',
+        fontSize: '0.775rem',
+        boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.4)',
+        border: '1px solid #1E293B',
+        zIndex: 1000
       }}>
-        <p style={{ fontWeight: '700', marginBottom: '0.35rem', color: '#93C5FD' }}>{label || payload[0].name}</p>
+        <p style={{ fontWeight: '700', marginBottom: '0.4rem', color: '#60A5FA', borderBottom: '1px solid #1E293B', paddingBottom: '0.2rem' }}>
+          {label || payload[0].name}
+        </p>
         {payload.map((entry, index) => (
-          <div key={`item-${index}`} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: entry.fill || entry.color }} />
-            <span style={{ color: '#E2E8F0' }}>{entry.name}:</span>
-            <span style={{ fontWeight: '700', color: '#FFFFFF' }}>{entry.value}</span>
+          <div key={`item-${index}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem', marginTop: '0.25rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#94A3B8' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: entry.fill || entry.color }} />
+              {entry.name}:
+            </span>
+            <span style={{ fontWeight: '700', color: '#F8FAFC' }}>{entry.value}</span>
           </div>
         ))}
       </div>
@@ -75,10 +79,10 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function DashboardAnalytics({ timeRange = 'month' }) {
-  // Default activeTab to 'all' so ALL charts (Pipeline, AI Score Donut, Source Pie) are displayed together on dashboard
+  // Default activeTab to 'all' so ALL charts are displayed together on dashboard
   const [activeTab, setActiveTab] = useState('all');
 
-  // Compute scaled chart data dynamically based on selected timeRange filter ('week', 'month', 'quarter', 'all')
+  // Compute scaled chart data dynamically based on selected timeRange filter
   const { trendData, aiScoreData, sourceData, officeData, totalOppCount } = useMemo(() => {
     let multiplier = 1;
     let trendSliced = baseMonthlyTrendData;
@@ -122,51 +126,65 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
   }, [timeRange]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '24px', marginBottom: '32px' }}>
-      {/* Analytics Navigation Bar */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '16px', marginBottom: '32px' }}>
+      {/* Analytics Navigation Header Bar */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '0.75rem',
+        gap: '0.85rem',
         borderBottom: '1px solid var(--border-color)',
-        paddingBottom: '0.75rem'
+        paddingBottom: '0.85rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-main)' }}>
-            Interactive Performance Analytics
-          </span>
-          <span style={{
-            fontSize: '0.7rem',
-            padding: '0.15rem 0.5rem',
-            borderRadius: '9999px',
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '0.5rem',
             backgroundColor: 'var(--primary-light)',
             color: 'var(--primary)',
-            fontWeight: '600',
-            textTransform: 'capitalize'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            Filter: {timeRange === 'all' ? 'All Time' : `This ${timeRange}`}
-          </span>
+            <BarChart2 size={18} />
+          </div>
+          <div>
+            <span style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+              Performance Analytics & Visualizations
+            </span>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Interactive insights aggregated for {timeRange === 'all' ? 'All Time' : `This ${timeRange.charAt(0).toUpperCase() + timeRange.slice(1)}`}
+            </div>
+          </div>
         </div>
 
         {/* Tab Buttons */}
-        <div style={{ display: 'flex', gap: '0.4rem', backgroundColor: 'var(--bg-subtle)', padding: '0.25rem', borderRadius: '0.5rem', border: '1px solid var(--border-color)' }}>
+        <div style={{
+          display: 'flex',
+          gap: '0.3rem',
+          backgroundColor: 'var(--bg-subtle)',
+          padding: '0.3rem',
+          borderRadius: '0.6rem',
+          border: '1px solid var(--border-color)'
+        }}>
           <button
             onClick={() => setActiveTab('all')}
             style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              borderRadius: '0.375rem',
+              padding: '0.4rem 0.85rem',
+              fontSize: '0.775rem',
+              fontWeight: '700',
+              borderRadius: '0.4rem',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              backgroundColor: activeTab === 'all' ? 'var(--primary)' : 'transparent',
-              color: activeTab === 'all' ? '#FFFFFF' : 'var(--text-muted)',
-              transition: 'all 0.15s'
+              backgroundColor: activeTab === 'all' ? 'var(--bg-card)' : 'transparent',
+              color: activeTab === 'all' ? 'var(--primary)' : 'var(--text-muted)',
+              boxShadow: activeTab === 'all' ? 'var(--shadow-xs)' : 'none',
+              transition: 'all 0.15s ease'
             }}
           >
             All Charts
@@ -175,93 +193,112 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
           <button
             onClick={() => setActiveTab('pipeline')}
             style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              borderRadius: '0.375rem',
+              padding: '0.4rem 0.85rem',
+              fontSize: '0.775rem',
+              fontWeight: '700',
+              borderRadius: '0.4rem',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              backgroundColor: activeTab === 'pipeline' ? 'var(--primary)' : 'transparent',
-              color: activeTab === 'pipeline' ? '#FFFFFF' : 'var(--text-muted)',
-              transition: 'all 0.15s'
+              backgroundColor: activeTab === 'pipeline' ? 'var(--bg-card)' : 'transparent',
+              color: activeTab === 'pipeline' ? 'var(--primary)' : 'var(--text-muted)',
+              boxShadow: activeTab === 'pipeline' ? 'var(--shadow-xs)' : 'none',
+              transition: 'all 0.15s ease'
             }}
           >
-            <TrendingUp size={14} /> Growth Pipeline
+            <TrendingUp size={14} /> Pipeline Trend
           </button>
 
           <button
             onClick={() => setActiveTab('aiScores')}
             style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              borderRadius: '0.375rem',
+              padding: '0.4rem 0.85rem',
+              fontSize: '0.775rem',
+              fontWeight: '700',
+              borderRadius: '0.4rem',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              backgroundColor: activeTab === 'aiScores' ? 'var(--primary)' : 'transparent',
-              color: activeTab === 'aiScores' ? '#FFFFFF' : 'var(--text-muted)',
-              transition: 'all 0.15s'
+              backgroundColor: activeTab === 'aiScores' ? 'var(--bg-card)' : 'transparent',
+              color: activeTab === 'aiScores' ? 'var(--primary)' : 'var(--text-muted)',
+              boxShadow: activeTab === 'aiScores' ? 'var(--shadow-xs)' : 'none',
+              transition: 'all 0.15s ease'
             }}
           >
-            <BarChart2 size={14} /> AI Score Match
+            <BarChart2 size={14} /> AI Scores
           </button>
 
           <button
             onClick={() => setActiveTab('sources')}
             style={{
-              padding: '0.35rem 0.75rem',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              borderRadius: '0.375rem',
+              padding: '0.4rem 0.85rem',
+              fontSize: '0.775rem',
+              fontWeight: '700',
+              borderRadius: '0.4rem',
               border: 'none',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              backgroundColor: activeTab === 'sources' ? 'var(--primary)' : 'transparent',
-              color: activeTab === 'sources' ? '#FFFFFF' : 'var(--text-muted)',
-              transition: 'all 0.15s'
+              backgroundColor: activeTab === 'sources' ? 'var(--bg-card)' : 'transparent',
+              color: activeTab === 'sources' ? 'var(--primary)' : 'var(--text-muted)',
+              boxShadow: activeTab === 'sources' ? 'var(--shadow-xs)' : 'none',
+              transition: 'all 0.15s ease'
             }}
           >
-            <PieIcon size={14} /> Sources & Offices
+            <PieIcon size={14} /> Sources
           </button>
         </div>
       </div>
 
       {/* Analytics Grid: 3-column Responsive Layout */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
         
         {/* Chart 1: Opportunities Trend */}
         {(activeTab === 'pipeline' || activeTab === 'all') && (
-          <div className="card" style={{ gridColumn: activeTab === 'pipeline' ? '1 / -1' : 'span 1' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <div className="card" style={{
+            gridColumn: activeTab === 'pipeline' ? '1 / -1' : 'span 1',
+            borderRadius: '0.85rem',
+            border: '1px solid var(--border-color)',
+            padding: '24px',
+            boxShadow: 'var(--shadow-sm)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                  Opportunities Trend
+                <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
+                  Opportunities Growth Pipeline
                 </h4>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Volume trajectory ({timeRange === 'all' ? 'All Time' : `This ${timeRange}`})
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, marginTop: '2px' }}>
+                  Identified vs Pursued trajectory
                 </p>
               </div>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>2028</span>
+              <span style={{
+                fontSize: '0.7rem',
+                fontWeight: '700',
+                backgroundColor: 'var(--primary-light)',
+                color: 'var(--primary)',
+                padding: '0.15rem 0.55rem',
+                borderRadius: '9999px',
+                border: '1px solid var(--primary-border)'
+              }}>
+                Monthly Velocity
+              </span>
             </div>
 
-            <div style={{ width: '100%', height: 180 }}>
+            <div style={{ width: '100%', height: 210 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="totalGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0284C7" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#0284C7" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#2563EB" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
                     </linearGradient>
                     <linearGradient id="pursuedGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
+                      <stop offset="5%" stopColor="#10B981" stopOpacity={0.35} />
                       <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
@@ -269,7 +306,7 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
                   <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Area type="monotone" dataKey="total" stroke="#0284C7" strokeWidth={3} fillOpacity={1} fill="url(#totalGrad)" name="Total Identified" />
+                  <Area type="monotone" dataKey="total" stroke="#2563EB" strokeWidth={3} fillOpacity={1} fill="url(#totalGrad)" name="Total Identified" />
                   <Area type="monotone" dataKey="pursued" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#pursuedGrad)" name="Pursued Tenders" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -277,34 +314,34 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
           </div>
         )}
 
-        {/* Chart 2: AI Score Distribution Donut Chart (Restored) */}
+        {/* Chart 2: AI Score Distribution Donut Chart */}
         {(activeTab === 'aiScores' || activeTab === 'all') && (
-          <div className="card">
-            <div style={{ marginBottom: '0.5rem' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                AI Score Distribution
+          <div className="card" style={{ borderRadius: '0.85rem', border: '1px solid var(--border-color)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
+                AI Compatibility Breakdown
               </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Compatibility index breakdown
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, marginTop: '2px' }}>
+                Distribution of match scores across opportunity pool
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '170px', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '190px', gap: '1.25rem' }}>
               {/* Donut Chart Container with Center Text */}
-              <div style={{ width: '120px', height: '120px', position: 'relative' }}>
+              <div style={{ width: '130px', height: '130px', position: 'relative', flexShrink: 0 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={aiScoreData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={38}
-                      outerRadius={56}
-                      paddingAngle={3}
+                      innerRadius={40}
+                      outerRadius={60}
+                      paddingAngle={4}
                       dataKey="count"
                     >
                       {aiScoreData.map((entry, index) => (
-                        <Cell key={`ai-cell-${index}`} fill={entry.color} />
+                        <Cell key={`ai-cell-${index}`} fill={entry.color} cornerRadius={4} />
                       ))}
                     </Pie>
                     <Tooltip
@@ -329,18 +366,18 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
                   justifyContent: 'center',
                   pointerEvents: 'none'
                 }}>
-                  <span style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: '1' }}>
+                  <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: '1' }}>
                     {totalOppCount}
                   </span>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Total</span>
+                  <span style={{ fontSize: '0.675rem', fontWeight: '600', color: 'var(--text-muted)', marginTop: '2px' }}>Total Tenders</span>
                 </div>
               </div>
 
               {/* Side Legend */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.75rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.775rem' }}>
                 {aiScoreData.map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: item.color }} />
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: item.color, flexShrink: 0 }} />
                     <span style={{ color: 'var(--text-main)' }}>
                       <strong>{item.range}</strong> ({item.percentage}%)
                     </span>
@@ -351,21 +388,21 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
           </div>
         )}
 
-        {/* Chart 3: Source Distribution Pie Chart (Restored) */}
+        {/* Chart 3: Source Distribution Pie Chart */}
         {(activeTab === 'sources' || activeTab === 'all') && (
-          <div className="card">
-            <div style={{ marginBottom: '0.5rem' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                Source Distribution
+          <div className="card" style={{ borderRadius: '0.85rem', border: '1px solid var(--border-color)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
+                Tender Source Distribution
               </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Origin agency proportions
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, marginTop: '2px' }}>
+                Multilateral agency & institutional origin
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '170px', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '190px', gap: '1.25rem' }}>
               {/* Pie Chart */}
-              <div style={{ width: '120px', height: '120px' }}>
+              <div style={{ width: '130px', height: '130px', flexShrink: 0 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -373,12 +410,12 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
                       cx="50%"
                       cy="50%"
                       innerRadius={0}
-                      outerRadius={56}
-                      paddingAngle={2}
+                      outerRadius={60}
+                      paddingAngle={3}
                       dataKey="value"
                     >
                       {sourceData.map((entry, index) => (
-                        <Cell key={`src-cell-${index}`} fill={entry.color} />
+                        <Cell key={`src-cell-${index}`} fill={entry.color} cornerRadius={3} />
                       ))}
                     </Pie>
                     <Tooltip
@@ -392,12 +429,12 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
               </div>
 
               {/* Side Legend */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.75rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.775rem' }}>
                 {sourceData.map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: item.color }} />
-                    <span style={{ color: 'var(--text-main)' }}>
-                      {item.name}
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '3px', backgroundColor: item.color, flexShrink: 0 }} />
+                    <span style={{ color: 'var(--text-main)', fontWeight: '500' }}>
+                      {item.name} ({item.value})
                     </span>
                   </div>
                 ))}
@@ -406,26 +443,26 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
           </div>
         )}
 
-        {/* Chart 4: Regional Office Volume Bar Chart (when Sources tab active) */}
+        {/* Chart 4: Regional Office Volume Bar Chart */}
         {activeTab === 'sources' && (
-          <div className="card">
-            <div style={{ marginBottom: '0.5rem' }}>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Building2 size={16} color="var(--primary)" /> Regional Office Volume
+          <div className="card" style={{ borderRadius: '0.85rem', border: '1px solid var(--border-color)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Building2 size={16} color="var(--primary)" /> Regional Office Allocation
               </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Tenders allocated per local office
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, marginTop: '2px' }}>
+                Active tenders assigned per regional office
               </p>
             </div>
 
-            <div style={{ width: '100%', height: 170 }}>
+            <div style={{ width: '100%', height: 190 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={officeData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
                   <XAxis dataKey="office" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} />
                   <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="tenders" fill="#0284C7" radius={[4, 4, 0, 0]} name="Assigned Tenders" />
+                  <Bar dataKey="tenders" fill="#2563EB" radius={[6, 6, 0, 0]} name="Assigned Tenders" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -436,3 +473,4 @@ export default function DashboardAnalytics({ timeRange = 'month' }) {
     </div>
   );
 }
+

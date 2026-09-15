@@ -14,28 +14,46 @@ import ReportsView from './views/ReportsView';
 import SourcesView from './views/SourcesView';
 import OfficesView from './views/OfficesView';
 import UsersRolesView from './views/UsersRolesView';
-import AuditTrailView from './views/AuditTrailView';
+import AuditTrail from './components/AuditTrail/AuditTrail.jsx';
+import AuditRecordDetailsPage from './components/AuditTrail/AuditRecordDetailsPage.jsx';
 import SettingsView from './views/SettingsView';
 import LoginPageView from './views/LoginPageView';
 import Dashboard from './views/Dashboard';
 import ClientProfileView from './views/ClientProfileView';
+import LogoutModal from './components/LogoutModal';
 
-import { mockOpportunities } from './data/mockData';
-import { usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from './context/AuthContext';
+import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
+import { mockClientProfile } from './data/clientProfileData';
 
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, logout } = useAuth();
+  const queryClient = useQueryClient();
+
   const [tabState, setTabState] = useState('dashboard');
   const [searchVal, setSearchVal] = useState('');
   const [selectedOpp, setSelectedOpp] = useState(null);
+  const [activeProject, setActiveProject] = useState(mockClientProfile.pastProjects[0]);
   const [darkMode, setDarkMode] = useState(false);
 
   const [isPursueOpen, setIsPursueOpen] = useState(false);
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
+  // User-isolated opportunities from React Query
+  const { data: userOpportunities = [], refetch: refetchOpportunities } = useOpportunities();
   const pursueMutation = usePursueOpportunity();
   const declineMutation = useDeclineOpportunity();
+
+  const handleGlobalRefresh = async () => {
+    await queryClient.invalidateQueries();
+    if (refetchOpportunities) {
+      await refetchOpportunities();
+    }
+  };
 
   // Derive activeTab from current route pathname
   const activeTab = React.useMemo(() => {
@@ -47,6 +65,7 @@ export default function App() {
     if (path === '/alerts') return 'alerts';
     if (path === '/calendar') return 'calendar';
     if (path === '/consortium') return 'consortium';
+    if (path === '/client-profile') return 'client_profile';
     if (path === '/reports') return 'reports';
     if (path === '/sources') return 'sources';
     if (path === '/offices') return 'offices';
@@ -71,10 +90,12 @@ export default function App() {
   };
 
   const handleSelectOpportunity = (opp) => {
-    const selected = opp || mockOpportunities[0];
+    const selected = opp || userOpportunities[0] || null;
     setSelectedOpp(selected);
     setActiveTab('opp_details');
-    navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id } });
+    if (selected) {
+      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id } });
+    }
   };
 
   const titlesMap = {
@@ -94,10 +115,58 @@ export default function App() {
     login: 'Login Page'
   };
 
+  // User-isolated filtered opportunities for global actions
+  const filteredOpportunities = React.useMemo(() => {
+    if (!userOpportunities || userOpportunities.length === 0) return [];
+    if (!searchVal || !searchVal.trim()) return userOpportunities;
+    const term = searchVal.trim().toLowerCase();
+    return userOpportunities.filter((o) => {
+      const name = (o.name || o.title || '').toLowerCase();
+      const id = (o.id || '').toLowerCase();
+      const source = (o.source || '').toLowerCase();
+      const sector = (o.sector || '').toLowerCase();
+      const location = (o.location || o.country || '').toLowerCase();
+      return name.includes(term) || id.includes(term) || source.includes(term) || sector.includes(term) || location.includes(term);
+    });
+  }, [userOpportunities, searchVal]);
+
+  // Requirement 3 & 5: If not authenticated, render LoginPageView or redirect to /login
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <LoginPageView
+              onLoginSuccess={() => {
+                setActiveTab('dashboard');
+                navigate('/');
+              }}
+            />
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  const handleConfirmLogout = () => {
+    setIsLogoutModalOpen(false);
+    if (logout) {
+      logout();
+    }
+    navigate('/login');
+  };
+
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onRequestLogout={() => setIsLogoutModalOpen(true)}
+        activeProject={activeProject}
+      />
 
       {/* Main Workspace Area */}
       <div className="main-content">
@@ -108,6 +177,10 @@ export default function App() {
           activeTab={activeTab}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
+          opportunities={userOpportunities}
+          filteredOpportunities={filteredOpportunities}
+          onRequestLogout={() => setIsLogoutModalOpen(true)}
+          onRefresh={handleGlobalRefresh}
         />
 
         {/* Declarative View Router */}
@@ -116,6 +189,8 @@ export default function App() {
             path="/"
             element={
               <DashboardView
+                searchVal={searchVal}
+                setSearchVal={setSearchVal}
                 onSelectOpportunity={handleSelectOpportunity}
                 onViewAll={() => {
                   setActiveTab('opportunities');
@@ -126,13 +201,18 @@ export default function App() {
           />
           <Route
             path="/opportunities"
-            element={<OpportunitiesListView onSelectOpportunity={handleSelectOpportunity} />}
+            element={
+              <OpportunitiesListView
+                searchVal={searchVal}
+                onSelectOpportunity={handleSelectOpportunity}
+              />
+            }
           />
           <Route
             path="/opportunities/details"
             element={
               <OpportunityDetailsView
-                opportunity={selectedOpp || mockOpportunities[0]}
+                opportunity={selectedOpp || userOpportunities[0]}
                 onBack={() => {
                   setActiveTab('opportunities');
                   navigate('/opportunities');
@@ -169,7 +249,7 @@ export default function App() {
             element={
               <AlertsView
                 onSelectProject={(alert) => {
-                  const opp = mockOpportunities.find((o) => o.name === alert?.project) || mockOpportunities[0];
+                  const opp = userOpportunities.find((o) => o.name === alert?.project) || userOpportunities[0];
                   handleSelectOpportunity(opp);
                 }}
               />
@@ -177,25 +257,25 @@ export default function App() {
           />
           <Route path="/calendar" element={<BidCalendarView searchVal={searchVal} onSelectOpportunity={handleSelectOpportunity} />} />
           <Route path="/consortium" element={<ConsortiumView />} />
-          <Route path="/client-profile" element={<ClientProfileView />} />
+          <Route
+            path="/client-profile"
+            element={
+              <ClientProfileView
+                activeProject={activeProject}
+                setActiveProject={setActiveProject}
+              />
+            }
+          />
           <Route path="/reports" element={<ReportsView />} />
           <Route path="/sources" element={<SourcesView />} />
           <Route path="/offices" element={<OfficesView />} />
           <Route path="/users" element={<UsersRolesView />} />
-          <Route path="/audit" element={<AuditTrailView />} />
+          <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
+          <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/settings" element={<SettingsView darkMode={darkMode} toggleTheme={toggleTheme} />} />
-          <Route
-            path="/login"
-            element={
-              <LoginPageView
-                onLoginSuccess={() => {
-                  setActiveTab('dashboard');
-                  navigate('/');
-                }}
-              />
-            }
-          />
+          {/* Requirement 3: If already authenticated and navigating to /login, redirect to / */}
+          <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
@@ -205,7 +285,7 @@ export default function App() {
         isOpen={isPursueOpen}
         onClose={() => setIsPursueOpen(false)}
         onConfirm={async () => {
-          const currentId = selectedOpp ? selectedOpp.id : 'OPP-001';
+          const currentId = selectedOpp ? selectedOpp.id : (userOpportunities[0]?.id || 'OPP-001');
           await pursueMutation.mutateAsync({ id: currentId, details: { priority: 'High' } });
           alert('Opportunity marked as PURSUED!');
           setIsPursueOpen(false);
@@ -216,11 +296,18 @@ export default function App() {
         isOpen={isDeclineOpen}
         onClose={() => setIsDeclineOpen(false)}
         onConfirm={async () => {
-          const currentId = selectedOpp ? selectedOpp.id : 'OPP-001';
+          const currentId = selectedOpp ? selectedOpp.id : (userOpportunities[0]?.id || 'OPP-001');
           await declineMutation.mutateAsync({ id: currentId, details: { reason: 'Budget Constraints' } });
           alert('Opportunity DECLINED.');
           setIsDeclineOpen(false);
         }}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={handleConfirmLogout}
       />
     </div>
   );
