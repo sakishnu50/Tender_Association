@@ -132,12 +132,6 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
     return logs.filter((log) => {
       if (selectedUser !== 'All Users' && log.user !== selectedUser) return false;
       if (selectedAction !== 'All Actions' && log.action !== selectedAction) return false;
-
-      if (selectedPriority !== 'All Priorities') {
-        const logPriority = String(log.priority || log.newPriority || log.currentPriority || '').toLowerCase();
-        if (logPriority !== selectedPriority.toLowerCase()) return false;
-      }
-
       if (selectedDate !== 'All dates') {
         const matchDate = log.date === selectedDate || (log.timestamp && log.timestamp.includes(selectedDate));
         if (!matchDate) return false;
@@ -152,7 +146,7 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
 
       return true;
     });
-  }, [logs, searchVal, selectedUser, selectedAction, selectedPriority, selectedDate]);
+  }, [logs, searchVal, selectedUser, selectedAction, selectedDate]);
 
   // Reset to first page whenever filters/search/sort change
   useEffect(() => {
@@ -186,30 +180,38 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
     }
   }, [filteredRecords, sortBy]);
 
-  const tableRecords = useMemo(() => sortedRecords.map((log) => {
-    const opportunity = opportunitiesList.find(
-      (item) => item.id === log.opportunityId || item.name === log.opportunity
+  // Apply priority filter AFTER currentPriority is resolved (exact, case-insensitive match)
+  const tableRecords = useMemo(() => {
+    const rows = sortedRecords.map((log) => {
+      const opportunity = opportunitiesList.find(
+        (item) => item.id === log.opportunityId || item.name === log.opportunity
+      );
+      const normalizedPriority = normalizePriorityCase(
+        opportunity?.priority || log.priority || log.newPriority || 'Medium'
+      );
+      let resolvedAiScore = log.aiScore ?? log.score ?? opportunity?.aiScore ?? opportunity?.overallScore;
+      if (resolvedAiScore === undefined || resolvedAiScore === null) {
+        if (log.opportunityId === 'MA-26-0102') resolvedAiScore = 9.1;
+        else if (log.opportunityId === 'OPP-003') resolvedAiScore = 6.8;
+        else if (log.opportunityId === 'OPP-001') resolvedAiScore = 8.5;
+        else if (log.opportunityId === 'OPP-002') resolvedAiScore = 7.8;
+        else if (log.opportunityId === 'OPP-004') resolvedAiScore = 5.2;
+        else resolvedAiScore = 7.5;
+      }
+      return {
+        ...log,
+        aiScore: resolvedAiScore,
+        currentPriority: ['High', 'Medium', 'Low'].includes(normalizedPriority)
+          ? normalizedPriority
+          : 'Medium'
+      };
+    });
+
+    if (selectedPriority === 'All Priorities') return rows;
+    return rows.filter(
+      (row) => row.currentPriority.toLowerCase() === selectedPriority.toLowerCase()
     );
-    const normalizedPriority = normalizePriorityCase(
-      opportunity?.priority || log.priority || log.newPriority || 'Medium'
-    );
-    let resolvedAiScore = log.aiScore ?? log.score ?? opportunity?.aiScore ?? opportunity?.overallScore;
-    if (resolvedAiScore === undefined || resolvedAiScore === null) {
-      if (log.opportunityId === 'MA-26-0102') resolvedAiScore = 9.1;
-      else if (log.opportunityId === 'OPP-003') resolvedAiScore = 6.8;
-      else if (log.opportunityId === 'OPP-001') resolvedAiScore = 8.5;
-      else if (log.opportunityId === 'OPP-002') resolvedAiScore = 7.8;
-      else if (log.opportunityId === 'OPP-004') resolvedAiScore = 5.2;
-      else resolvedAiScore = 7.5;
-    }
-    return {
-      ...log,
-      aiScore: resolvedAiScore,
-      currentPriority: ['High', 'Medium', 'Low'].includes(normalizedPriority)
-        ? normalizedPriority
-        : 'Medium'
-    };
-  }), [sortedRecords, opportunitiesList]);
+  }, [sortedRecords, opportunitiesList, selectedPriority]);
 
   const totalRecords = tableRecords.length;
   const totalPages = Math.max(1, Math.ceil(totalRecords / ROWS_PER_PAGE));
