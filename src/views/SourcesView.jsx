@@ -1,20 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Globe, CheckCircle2 } from 'lucide-react';
 import { mockSources } from '../data/mockData';
 import { useSources } from '../hooks/useApiQueries';
 
-export default function SourcesView() {
+export default function SourcesView({ searchVal = '' }) {
   const { data: fetchedSources } = useSources();
   const sourcesList = fetchedSources || mockSources;
+
+  const filteredSources = useMemo(() => {
+    const term = (searchVal || '').trim().toLowerCase();
+    if (!term) return sourcesList;
+    return sourcesList.filter(s =>
+      (s.name || '').toLowerCase().includes(term) ||
+      (s.status || '').toLowerCase().includes(term)
+    );
+  }, [sourcesList, searchVal]);
 
   return (
     <div className="page-container">
       <div className="page-header">
         <h2 className="page-title">Monitored Sources</h2>
+        {searchVal && (
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {filteredSources.length} result{filteredSources.length !== 1 ? 's' : ''} for "{searchVal}"
+          </span>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-        {sourcesList.map((source, idx) => (
+        {filteredSources.map((source, idx) => (
           <div key={idx} className="card" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
               width: '48px',

@@ -10,7 +10,6 @@ import {
   mockAuditTrail
 } from '../data/mockData';
 
-// Frontend-Only Local Storage Persistence Engine
 function getStorage(key, fallback) {
   try {
     const data = localStorage.getItem(key);
@@ -28,55 +27,124 @@ function setStorage(key, value) {
   }
 }
 
-// Initialize Frontend Storage Cache
-// Bump DATA_VERSION whenever mockData changes to force a cache refresh
-const DATA_VERSION = 'v2';
-if (localStorage.getItem('iot_data_version') !== DATA_VERSION) {
-  localStorage.removeItem('iot_opportunities');
-  localStorage.removeItem('iot_consortium');
-  localStorage.removeItem('iot_audit_trail');
-  localStorage.setItem('iot_data_version', DATA_VERSION);
-}
-if (!localStorage.getItem('iot_opportunities')) setStorage('iot_opportunities', mockOpportunities);
-if (!localStorage.getItem('iot_consortium')) setStorage('iot_consortium', mockConsortium);
-if (!localStorage.getItem('iot_audit_trail')) setStorage('iot_audit_trail', mockAuditTrail);
-if (!localStorage.getItem('iot_settings')) {
-  setStorage('iot_settings', {
-    highPriority: true,
-    deadlineAlerts: true,
-    dailyReports: true,
-    weeklyReports: false,
-    threshold: '8.0'
-  });
+// Master opportunities collection with userId isolation & persistence
+function getAllOpportunities() {
+  const existing = getStorage('iot_all_opportunities', null);
+  if (existing && Array.isArray(existing)) {
+    return existing;
+  }
+  // Initialize baseline seed opportunities for demo accounts
+  const seedDemo = mockOpportunities.map((opp) => ({
+    ...opp,
+    userId: opp.userId || 'xyz10@gmail.com'
+  }));
+  setStorage('iot_all_opportunities', seedDemo);
+  return seedDemo;
 }
 
-// 100% Self-Contained Client-Side API Facade
+function saveAllOpportunities(opportunities) {
+  setStorage('iot_all_opportunities', opportunities);
+}
+
+// Generates initial seed opportunities for a new user account upon first login
+function seedNewUserOpportunities(userId) {
+  const userPrefix = userId.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6) || 'USR';
+  return mockOpportunities.slice(0, 5).map((opp, idx) => ({
+    ...opp,
+    id: `OPP-${userPrefix}-${String(idx + 1).padStart(3, '0')}`,
+    userId: userId,
+    status: opp.status || 'New'
+  }));
+}
+
+// User-Isolated, Persistent Client-Side API Facade
 export const apiFacade = {
-  fetchOpportunities: async () => getStorage('iot_opportunities', mockOpportunities),
-  fetchAlerts: async () => mockAlerts,
-  fetchCalendar: async () => mockCalendarEvents,
-  fetchConsortium: async () => getStorage('iot_consortium', mockConsortium),
+  fetchOpportunities: async (userId) => {
+    if (!userId) return [];
+    const normalizedUserId = String(userId).trim().toLowerCase();
+    const all = getAllOpportunities();
+
+    const userExisting = all.filter((item) => {
+      const owner = (item.userId || item.owner || '').trim().toLowerCase();
+      return owner === normalizedUserId;
+    });
+
+    // If this user already has saved opportunities, load and return them
+    if (userExisting.length > 0) {
+      return userExisting;
+    }
+
+    // If first-time login for this user, seed their initial opportunities and persist them permanently
+    const initialUserOpps = seedNewUserOpportunities(normalizedUserId);
+    const updated = [...initialUserOpps, ...all];
+    saveAllOpportunities(updated);
+    return initialUserOpps;
+  },
+
+  fetchOpportunityById: async (id, userId) => {
+    if (!id) return null;
+    const all = getAllOpportunities();
+    if (userId) {
+      const normalizedUserId = String(userId).trim().toLowerCase();
+      return (
+        all.find(
+          (o) => o.id === id && (o.userId || '').trim().toLowerCase() === normalizedUserId
+        ) || null
+      );
+    }
+    return all.find((o) => o.id === id) || null;
+  },
+
+  fetchAlerts: async (userId) => {
+    if (!userId) return [];
+    const key = `iot_alerts_${String(userId).trim().toLowerCase()}`;
+    return getStorage(key, mockAlerts);
+  },
+
+  fetchCalendar: async (userId) => {
+    if (!userId) return [];
+    const key = `iot_calendar_${String(userId).trim().toLowerCase()}`;
+    return getStorage(key, mockCalendarEvents);
+  },
+
+  fetchConsortium: async (userId) => {
+    const key = userId ? `iot_consortium_${String(userId).trim().toLowerCase()}` : 'iot_consortium';
+    return getStorage(key, mockConsortium);
+  },
+
   fetchOpportunityRequirements: async () => mockOpportunityRequirements,
   fetchSources: async () => mockSources,
   fetchOffices: async () => mockOffices,
   fetchUsers: async () => mockUsers,
-  fetchAuditTrail: async () => (await import('../services/auditService')).getAuditLogs(),
-  fetchSettings: async () => getStorage('iot_settings', {
-    highPriority: true,
-    deadlineAlerts: true,
-    dailyReports: true,
-    weeklyReports: false,
-    threshold: '8.0'
-  }),
 
-  updateConsortiumStatus: async (id, status) => {
-    const list = getStorage('iot_consortium', mockConsortium);
-    const updated = list.map(item => item.id === id ? { ...item, status } : item);
-    setStorage('iot_consortium', updated);
+  fetchAuditTrail: async (userId) => {
+    const key = userId ? `iot_audit_trail_${String(userId).trim().toLowerCase()}` : 'iot_audit_trail';
+    const logs = getStorage(key, mockAuditTrail);
+    return logs;
+  },
 
-    const partner = list.find(item => item.id === id);
+  fetchSettings: async (userId) => {
+    const key = userId ? `iot_settings_${String(userId).trim().toLowerCase()}` : 'iot_settings';
+    return getStorage(key, {
+      highPriority: true,
+      deadlineAlerts: true,
+      dailyReports: true,
+      weeklyReports: false,
+      threshold: '8.0'
+    });
+  },
+
+  updateConsortiumStatus: async (id, status, userId) => {
+    const key = userId ? `iot_consortium_${String(userId).trim().toLowerCase()}` : 'iot_consortium';
+    const list = getStorage(key, mockConsortium);
+    const updated = list.map((item) => (item.id === id ? { ...item, status } : item));
+    setStorage(key, updated);
+
+    const partner = list.find((item) => item.id === id);
     const partnerName = partner ? partner.name : id;
-    const logs = getStorage('iot_audit_trail', mockAuditTrail);
+
+    const auditKey = userId ? `iot_audit_trail_${String(userId).trim().toLowerCase()}` : 'iot_audit_trail';
+    const logs = getStorage(auditKey, mockAuditTrail);
 
     let actionLabel = 'Updated Partner Status';
     if (status === 'recommended') actionLabel = 'Recommended Partner';
@@ -84,97 +152,116 @@ export const apiFacade = {
     else if (status === 'contacted') actionLabel = 'Contacted Partner';
 
     const newLog = {
-      user: 'Ravi Kumar',
+      user: userId || 'User',
       action: actionLabel,
       details: `${partnerName} (${status.toUpperCase()})`,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    setStorage('iot_audit_trail', [newLog, ...logs]);
+    setStorage(auditKey, [newLog, ...logs]);
 
     return { success: true, data: updated, updatedId: id, status };
   },
 
-  pursueOpportunity: async (id, details) => {
+  pursueOpportunity: async (id, details, userId) => {
     const { logAuditEvent } = await import('../services/auditService');
-    const opps = getStorage('iot_opportunities', mockOpportunities);
-    const targetOpp = opps.find(o => o.id === id);
-    
-    // Update opportunity status
-    const updatedOpps = opps.map(o => o.id === id ? { ...o, status: 'Pursued' } : o);
-    setStorage('iot_opportunities', updatedOpps);
+    const normalizedUserId = userId ? String(userId).trim().toLowerCase() : '';
+    const all = getAllOpportunities();
+    const targetOpp = all.find((o) => o.id === id);
 
-    // Log audit event
-    logAuditEvent({
-      user: 'Ravi Kumar',
-      userName: 'Ravi Kumar',
-      userRole: 'Manager',
-      action: 'Decision Updated',
-      opportunityId: id,
-      recordId: id,
-      recordName: targetOpp ? targetOpp.name : id,
-      opportunityTitle: targetOpp ? targetOpp.name : id,
-      office: 'Chennai Office',
-      details: 'Management decision - PURSUE',
-      previousValue: 'Pending',
-      newValue: 'Pursue',
-      priority: targetOpp?.priority || 'MEDIUM',
-      source: 'Decision Module',
+    const updatedOpps = all.map((o) => {
+      if (o.id === id) {
+        return { ...o, status: 'Pursued' };
+      }
+      return o;
     });
+    saveAllOpportunities(updatedOpps);
+
+    if (normalizedUserId) {
+      logAuditEvent({
+        user: normalizedUserId,
+        userName: normalizedUserId,
+        userRole: 'Manager',
+        action: 'Decision Updated',
+        opportunityId: id,
+        recordId: id,
+        recordName: targetOpp ? targetOpp.name : id,
+        opportunityTitle: targetOpp ? targetOpp.name : id,
+        office: targetOpp?.office || 'Chennai Office',
+        details: 'Management decision - PURSUE',
+        previousValue: targetOpp?.status || 'Pending',
+        newValue: 'Pursue',
+        priority: targetOpp?.priority || 'MEDIUM',
+        source: 'Decision Module'
+      });
+    }
 
     return { success: true, message: 'Opportunity marked as PURSUED!' };
   },
 
-  declineOpportunity: async (id, details) => {
+  declineOpportunity: async (id, details, userId) => {
     const { logAuditEvent } = await import('../services/auditService');
-    const opps = getStorage('iot_opportunities', mockOpportunities);
-    const targetOpp = opps.find(o => o.id === id);
-    
-    // Update opportunity status
-    const updatedOpps = opps.map(o => o.id === id ? { ...o, status: 'Declined' } : o);
-    setStorage('iot_opportunities', updatedOpps);
+    const normalizedUserId = userId ? String(userId).trim().toLowerCase() : '';
+    const all = getAllOpportunities();
+    const targetOpp = all.find((o) => o.id === id);
 
-    // Log audit event
-    logAuditEvent({
-      user: 'Ravi Kumar',
-      userName: 'Ravi Kumar',
-      userRole: 'Manager',
-      action: 'Decision Updated',
-      opportunityId: id,
-      recordId: id,
-      recordName: targetOpp ? targetOpp.name : id,
-      opportunityTitle: targetOpp ? targetOpp.name : id,
-      office: 'Chennai Office',
-      details: 'Management decision - DECLINE',
-      previousValue: 'Pending',
-      newValue: 'Decline',
-      priority: targetOpp?.priority || 'MEDIUM',
-      source: 'Decision Module',
+    const updatedOpps = all.map((o) => {
+      if (o.id === id) {
+        return { ...o, status: 'Declined' };
+      }
+      return o;
     });
+    saveAllOpportunities(updatedOpps);
+
+    if (normalizedUserId) {
+      logAuditEvent({
+        user: normalizedUserId,
+        userName: normalizedUserId,
+        userRole: 'Manager',
+        action: 'Decision Updated',
+        opportunityId: id,
+        recordId: id,
+        recordName: targetOpp ? targetOpp.name : id,
+        opportunityTitle: targetOpp ? targetOpp.name : id,
+        office: targetOpp?.office || 'Chennai Office',
+        details: 'Management decision - DECLINE',
+        previousValue: targetOpp?.status || 'Pending',
+        newValue: 'Decline',
+        priority: targetOpp?.priority || 'MEDIUM',
+        source: 'Decision Module'
+      });
+    }
 
     return { success: true, message: 'Opportunity DECLINED.' };
   },
 
-  createOpportunity: async (opportunity) => {
-    const opps = getStorage('iot_opportunities', mockOpportunities);
-    const updatedOpps = [opportunity, ...opps];
-    setStorage('iot_opportunities', updatedOpps);
+  createOpportunity: async (opportunity, userId) => {
+    const cleanUserId = (opportunity.userId || userId || '').trim().toLowerCase();
+    const newOpportunity = {
+      ...opportunity,
+      userId: cleanUserId
+    };
 
-    const logs = getStorage('iot_audit_trail', mockAuditTrail);
+    const all = getAllOpportunities();
+    const updatedOpps = [newOpportunity, ...all];
+    saveAllOpportunities(updatedOpps);
+
+    const auditKey = cleanUserId ? `iot_audit_trail_${cleanUserId}` : 'iot_audit_trail';
+    const logs = getStorage(auditKey, mockAuditTrail);
     const newLog = {
-      user: 'Ravi Kumar',
+      user: cleanUserId || 'User',
       action: 'Created Opportunity',
-      details: opportunity.name || opportunity.id,
+      details: newOpportunity.name || newOpportunity.title || newOpportunity.id,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    setStorage('iot_audit_trail', [newLog, ...logs]);
+    setStorage(auditKey, [newLog, ...logs]);
 
-    return { success: true, data: opportunity };
+    return { success: true, data: newOpportunity };
   },
 
-  updateOpportunityPriority: async (id, priority) => {
-    const opps = getStorage('iot_opportunities', mockOpportunities);
+  updateOpportunityPriority: async (id, priority, userId) => {
+    const all = getAllOpportunities();
     const normalizedPriority = String(priority).toUpperCase();
-    const updated = opps.map((opp) => {
+    const updated = all.map((opp) => {
       if (opp.id === id) {
         return {
           ...opp,
@@ -183,13 +270,13 @@ export const apiFacade = {
       }
       return opp;
     });
-    setStorage('iot_opportunities', updated);
+    saveAllOpportunities(updated);
     return { success: true, id, priority: normalizedPriority };
   },
 
-  saveSettings: async (settings) => {
-    setStorage('iot_settings', settings);
+  saveSettings: async (settings, userId) => {
+    const key = userId ? `iot_settings_${String(userId).trim().toLowerCase()}` : 'iot_settings';
+    setStorage(key, settings);
     return { success: true, data: settings };
   }
 };
-

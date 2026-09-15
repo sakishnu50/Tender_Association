@@ -6,11 +6,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DB_FILE = path.join(__dirname, 'data.json');
 
-// Initial seed data aligned 100% with mockData.js
+// Initial seed data aligned 100% with mockData.js with explicit userId ownership
 const initialData = {
   opportunities: [
     {
       id: 'OPP-001',
+      userId: 'xyz10@gmail.com',
       name: 'Urban Infrastructure Development',
       source: 'World Bank',
       sector: 'Infrastructure',
@@ -33,6 +34,7 @@ const initialData = {
     },
     {
       id: 'OPP-002',
+      userId: 'xyz10@gmail.com',
       name: 'Highway Development Project',
       source: 'ADB',
       sector: 'Transport',
@@ -49,6 +51,7 @@ const initialData = {
     },
     {
       id: 'OPP-003',
+      userId: 'xyz10@gmail.com',
       name: 'Water Supply Project',
       source: 'JICA',
       sector: 'Water',
@@ -65,6 +68,7 @@ const initialData = {
     },
     {
       id: 'OPP-004',
+      userId: 'xyz10@gmail.com',
       name: 'Metro Rail Project',
       source: 'AIIB',
       sector: 'Transport',
@@ -81,6 +85,7 @@ const initialData = {
     },
     {
       id: 'OPP-005',
+      userId: 'xyz10@gmail.com',
       name: 'Industrial Park Development',
       source: 'World Bank',
       sector: 'Infrastructure',
@@ -220,11 +225,35 @@ function writeDb(data) {
 }
 
 export const db = {
-  getOpportunities: () => readDb().opportunities,
-  getOpportunityById: (id) => readDb().opportunities.find(o => o.id === id),
-  updateOpportunityStatus: (id, status) => {
+  getOpportunities: (userId) => {
+    const opps = readDb().opportunities || [];
+    if (!userId) return opps;
+    const cleanUserId = String(userId).trim().toLowerCase();
+    return opps.filter(o => (o.userId || '').toLowerCase() === cleanUserId);
+  },
+  getOpportunityById: (id, userId) => {
+    const opps = readDb().opportunities || [];
+    if (userId) {
+      const cleanUserId = String(userId).trim().toLowerCase();
+      return opps.find(o => o.id === id && (o.userId || '').toLowerCase() === cleanUserId);
+    }
+    return opps.find(o => o.id === id);
+  },
+  createOpportunity: (newOpp) => {
     const data = readDb();
-    const opp = data.opportunities.find(o => o.id === id);
+    data.opportunities = data.opportunities || [];
+    data.opportunities.unshift(newOpp);
+    writeDb(data);
+    return newOpp;
+  },
+  updateOpportunityStatus: (id, status, userId) => {
+    const data = readDb();
+    const opp = data.opportunities.find(o => {
+      if (userId) {
+        return o.id === id && (o.userId || '').toLowerCase() === userId.toLowerCase();
+      }
+      return o.id === id;
+    });
     if (opp) {
       opp.status = status;
       writeDb(data);

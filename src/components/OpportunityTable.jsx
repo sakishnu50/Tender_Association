@@ -10,7 +10,7 @@ import { Eye } from 'lucide-react';
 export default function OpportunityTable({
   data = [],
   onSelectOpportunity,
-  pageSize = 5,
+  pageSize = 8,
   isLoading = false,
   isError = false
 }) {
@@ -18,6 +18,11 @@ export default function OpportunityTable({
     pageIndex: 0,
     pageSize
   });
+
+  // Sync pageSize if prop changes
+  useEffect(() => {
+    setPagination((prev) => ({ ...prev, pageSize }));
+  }, [pageSize]);
 
   // Reset to first page when underlying data changes (e.g. after search/filter)
   useEffect(() => {
@@ -32,7 +37,17 @@ export default function OpportunityTable({
         header: 'Project Name',
         meta: { align: 'left', width: '28%' },
         cell: (info) => (
-          <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>
+          <span
+            style={{
+              fontWeight: '600',
+              color: 'var(--text-main)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: 'block'
+            }}
+            title={info.getValue()}
+          >
             {info.getValue()}
           </span>
         )
@@ -41,20 +56,32 @@ export default function OpportunityTable({
         accessorKey: 'source',
         header: 'Source',
         meta: { align: 'left', width: '12%' },
-        cell: (info) => info.getValue() || '—'
+        cell: (info) => (
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+            {info.getValue() || '—'}
+          </span>
+        )
       },
       {
         accessorKey: 'sector',
         header: 'Sector',
         meta: { align: 'left', width: '12%' },
-        cell: (info) => info.getValue() || '—'
+        cell: (info) => (
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+            {info.getValue() || '—'}
+          </span>
+        )
       },
       {
         id: 'location',
         accessorFn: (row) => row.location || row.country || '',
         header: 'Location',
         meta: { align: 'left', width: '14%' },
-        cell: (info) => info.getValue() || '—'
+        cell: (info) => (
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
+            {info.getValue() || '—'}
+          </span>
+        )
       },
       {
         id: 'aiScore',
@@ -66,7 +93,7 @@ export default function OpportunityTable({
           return (
             <span
               className="badge badge-info"
-              style={{ fontSize: '0.8rem', fontWeight: '700' }}
+              style={{ fontSize: '0.75rem', fontWeight: '700', padding: '0.2rem 0.55rem', lineHeight: '1.2' }}
             >
               {typeof score === 'number' ? score.toFixed(1) : score}
             </span>
@@ -78,7 +105,7 @@ export default function OpportunityTable({
         header: 'Deadline',
         meta: { align: 'center', width: '11%' },
         cell: (info) => (
-          <span style={{ whiteSpace: 'nowrap' }}>
+          <span style={{ whiteSpace: 'nowrap', display: 'block' }}>
             {info.getValue() || '—'}
           </span>
         )
@@ -95,7 +122,14 @@ export default function OpportunityTable({
               : val.toLowerCase() === 'declined'
               ? 'badge-priority'
               : 'badge-new';
-          return <span className={`badge ${badgeClass}`}>{val}</span>;
+          return (
+            <span
+              className={`badge ${badgeClass}`}
+              style={{ padding: '0.2rem 0.55rem', fontSize: '0.75rem', lineHeight: '1.2' }}
+            >
+              {val}
+            </span>
+          );
         }
       },
       {
@@ -105,20 +139,27 @@ export default function OpportunityTable({
         cell: ({ row }) => (
           <button
             type="button"
-            className="btn btn-primary"
             style={{
-              padding: '0.35rem 0.5rem',
+              padding: '0.25rem 0.5rem',
               fontSize: '0.75rem',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              borderRadius: '6px'
+              borderRadius: '5px',
+              backgroundColor: '#FFFFFF',
+              border: '1px solid #E2E8F0',
+              color: '#2563EB',
+              cursor: 'pointer',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+              transition: 'all 0.15s ease',
+              height: '28px',
+              width: '30px'
             }}
             onClick={() => onSelectOpportunity?.(row.original)}
             title={`View ${row.original.name || row.original.title || 'opportunity'}`}
             aria-label={`View ${row.original.name || row.original.title || 'opportunity'}`}
           >
-            <Eye size={13} />
+            <Eye size={13} color="#2563EB" />
           </button>
         )
       }
@@ -161,8 +202,9 @@ export default function OpportunityTable({
                       style={{
                         textAlign: align,
                         width: width,
-                        padding: '0.75rem 0.875rem',
-                        whiteSpace: 'nowrap'
+                        padding: '0.7rem 0.875rem',
+                        whiteSpace: 'nowrap',
+                        verticalAlign: 'middle'
                       }}
                     >
                       {flexRender(header.column.columnDef.header, header.getContext())}
@@ -200,27 +242,25 @@ export default function OpportunityTable({
                   No opportunities match your filter criteria.
                 </td>
               </tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => {
-                    const align = cell.column.columnDef.meta?.align || 'left';
-                    return (
-                      <td
-                        key={cell.id}
-                        style={{
-                          textAlign: align,
-                          padding: '0.75rem 0.875rem',
-                          verticalAlign: 'middle'
-                        }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))
-            )}
+            ) : table.getRowModel().rows.map((row) => (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  const align = cell.column.columnDef.meta?.align || 'left';
+                  return (
+                    <td
+                      key={cell.id}
+                      style={{
+                        textAlign: align,
+                        padding: '0.68rem 0.875rem',
+                        verticalAlign: 'middle'
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -260,19 +300,19 @@ export default function OpportunityTable({
             &lt;
           </button>
 
-          {Array.from({ length: pageCount }, (_, i) => (
-            <button
-              key={i}
-              type="button"
-              className={`btn ${pageIndex === i ? 'btn-primary' : 'btn-outline'}`}
-              style={{ padding: '0.2rem 0.55rem', fontSize: '0.75rem', minWidth: '1.75rem' }}
-              onClick={() => table.setPageIndex(i)}
-              aria-label={`Page ${i + 1}`}
-              aria-current={pageIndex === i ? 'page' : undefined}
-            >
-              {i + 1}
-            </button>
-          ))}
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{
+              padding: '0.2rem 0.55rem',
+              fontSize: '0.75rem',
+              minWidth: '1.75rem'
+            }}
+            aria-label={`Page ${pageIndex + 1}`}
+            aria-current="page"
+          >
+            {pageIndex + 1}
+          </button>
 
           <button
             type="button"
