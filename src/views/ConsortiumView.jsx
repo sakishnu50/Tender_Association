@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { mockConsortium, mockOpportunityRequirements } from '../data/mockData';
+import { Search } from 'lucide-react';
 import {
   useConsortium,
   useOpportunityRequirements,
@@ -10,114 +11,8 @@ import PartnerTable from '../components/consortium/PartnerTable';
 import PartnerProfileModal from '../components/consortium/PartnerProfileModal';
 
 import {
-  Layers, AlertTriangle, CheckCircle2, Sparkles,
-  Building, MapPin, Calendar, Filter, RotateCcw
+  Filter, RotateCcw
 } from 'lucide-react';
-
-/* ── Inline Capabilities Panel ── */
-function CapabilitiesPanel({ requirements }) {
-  if (!requirements) return null;
-  return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-      gap: '1rem',
-      marginBottom: '1rem',
-    }}>
-      {/* Required Capabilities */}
-      <div style={{
-        backgroundColor: 'var(--bg-subtle)',
-        borderRadius: 'var(--radius-md)',
-        padding: '1rem',
-        border: '1px solid var(--border-color)',
-        display: 'flex', flexDirection: 'column', gap: '0.75rem',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Layers size={15} color="var(--primary)" />
-            <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-main)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-              Required Capabilities
-            </span>
-          </div>
-          <span style={{
-            fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px',
-            backgroundColor: 'var(--primary-light)', color: 'var(--primary)',
-          }}>
-            {requirements.requiredCapabilities?.length || 0} Mandated
-          </span>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-          {requirements.requiredCapabilities?.map((cap, idx) => (
-            <div key={idx} title={cap.description} style={{
-              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-              padding: '0.3rem 0.65rem', borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)',
-              fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-main)',
-            }}>
-              <CheckCircle2 size={13} color="var(--success)" style={{ flexShrink: 0 }} />
-              {cap.name}
-            </div>
-          ))}
-        </div>
-        <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', lineHeight: '1.5', display: 'flex', gap: '0.4rem' }}>
-          <Layers size={12} color="var(--primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <span>Mandatory technical and operational benchmarks required by{' '}
-            <strong style={{ color: 'var(--text-main)' }}>{requirements.fundingAgency}</strong> for consortium qualification.
-          </span>
-        </div>
-      </div>
-
-      {/* Missing Capabilities */}
-      <div style={{
-        backgroundColor: 'rgba(254,243,199,0.18)',
-        borderRadius: 'var(--radius-md)',
-        padding: '1rem',
-        border: '1px solid var(--warning)',
-        display: 'flex', flexDirection: 'column', gap: '0.75rem',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <AlertTriangle size={15} color="var(--warning)" />
-            <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--warning-text)', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-              Missing Capabilities ({requirements.targetCompany})
-            </span>
-          </div>
-          <span style={{
-            fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '9999px',
-            backgroundColor: 'var(--warning-bg)', color: 'var(--warning-text)',
-            border: '1px solid var(--warning)',
-          }}>
-            Action Needed
-          </span>
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-          {requirements.missingCapabilities?.map((gap, idx) => (
-            <div key={idx} title={gap.reason} style={{
-              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-              padding: '0.3rem 0.65rem', borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--warning-bg)', border: '1px solid rgba(217,119,6,0.35)',
-              fontSize: '0.8rem', fontWeight: '700', color: 'var(--warning-text)',
-            }}>
-              <AlertTriangle size={13} color="var(--warning)" style={{ flexShrink: 0 }} />
-              {gap.name}
-            </div>
-          ))}
-        </div>
-        <div style={{ fontSize: '0.73rem', lineHeight: '1.5', display: 'flex', gap: '0.4rem' }}>
-          <Sparkles size={12} color="var(--warning)" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <span>
-            <strong style={{ color: 'var(--warning-text)' }}>AI Recommendation:</strong>{' '}
-            <span style={{ color: 'var(--text-muted)' }}>Partner with listed consortium candidates below to bridge these missing capabilities and reach 100% tender compliance.</span>
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
-
 
 /* ══════════════════════════════════════════ */
 export default function ConsortiumView({ searchVal = '' }) {
@@ -125,15 +20,34 @@ export default function ConsortiumView({ searchVal = '' }) {
   const { data: fetchedRequirements } = useOpportunityRequirements();
   const updateStatusMutation = useUpdateConsortiumStatus();
 
-  const consortiumList = fetchedConsortium || mockConsortium;
+  const rawConsortium   = fetchedConsortium || mockConsortium;
   const requirements   = fetchedRequirements || mockOpportunityRequirements;
 
+  /* ── Local status overrides for instant UI feedback ── */
+  const [statusOverrides, setStatusOverrides] = useState({});
+  const consortiumList = useMemo(() =>
+    rawConsortium.map(p => statusOverrides[p.id] !== undefined
+      ? { ...p, status: statusOverrides[p.id] }
+      : p
+    ),
+    [rawConsortium, statusOverrides]
+  );
+
   const [searchQuery,     setSearchQuery]     = useState('');
+  /* ── Applied (active) filters — these drive the table ── */
   const [expertiseFilter, setExpertiseFilter] = useState('');
   const [experienceFilter,setExperienceFilter]= useState('');
   const [matchScoreFilter,setMatchScoreFilter]= useState('');
   const [locationFilter,  setLocationFilter]  = useState('');
   const [statusFilter,    setStatusFilter]    = useState('');
+
+  /* ── Draft filters — user picks here, applied on "Apply" ── */
+  const [draftExpertise,  setDraftExpertise]  = useState('');
+  const [draftExperience, setDraftExperience] = useState('');
+  const [draftMatchScore, setDraftMatchScore] = useState('');
+  const [draftLocation,   setDraftLocation]   = useState('');
+  const [draftStatus,     setDraftStatus]     = useState('');
+
   // Sync global header search into local search query
   React.useEffect(() => {
     setSearchQuery(searchVal || '');
@@ -191,9 +105,23 @@ export default function ConsortiumView({ searchVal = '' }) {
     return true;
   });
 
+  /* ── Apply: commit draft → active filters ── */
+  const handleApplyFilters = () => {
+    setExpertiseFilter(draftExpertise);
+    setExperienceFilter(draftExperience);
+    setMatchScoreFilter(draftMatchScore);
+    setLocationFilter(draftLocation);
+    setStatusFilter(draftStatus);
+    setShowFilters(false);
+  };
+
+  /* ── Reset: clear both draft and active ── */
   const handleResetFilters = () => {
-    setSearchQuery(''); setExpertiseFilter(''); setExperienceFilter('');
-    setMatchScoreFilter(''); setLocationFilter(''); setStatusFilter('');
+    setSearchQuery('');
+    setDraftExpertise(''); setDraftExperience(''); setDraftMatchScore('');
+    setDraftLocation(''); setDraftStatus('');
+    setExpertiseFilter(''); setExperienceFilter(''); setMatchScoreFilter('');
+    setLocationFilter(''); setStatusFilter('');
   };
 
   const hasActiveFilters = Boolean(
@@ -203,8 +131,11 @@ export default function ConsortiumView({ searchVal = '' }) {
 
   const handleViewProfile = partner => { setSelectedPartner(partner); setIsProfileOpen(true); };
   const handleUpdateStatus = async (id, status) => {
-    await updateStatusMutation.mutateAsync({ id, status });
+    // Instantly update local state so table reflects the change
+    setStatusOverrides(prev => ({ ...prev, [id]: status }));
     if (selectedPartner?.id === id) setSelectedPartner(prev => prev ? { ...prev, status } : prev);
+    // Fire API mutation in background (best-effort)
+    try { await updateStatusMutation.mutateAsync({ id, status }); } catch { /* noop */ }
   };
 
   const activeFilterCount = [
@@ -212,7 +143,42 @@ export default function ConsortiumView({ searchVal = '' }) {
     matchScoreFilter, locationFilter, statusFilter,
   ].filter(Boolean).length;
 
-  // Flat filter panel — all filters visible at once, panel stays open on selection
+  /* Count of draft selections (to hint user before applying) */
+  const draftPickCount = [
+    draftExpertise, draftExperience, draftMatchScore,
+    draftLocation, draftStatus,
+  ].filter(Boolean).length;
+
+  // Sync drafts from active filters when panel opens
+  const handleToggleFilters = (e) => {
+    e.stopPropagation();
+    setShowFilters(p => {
+      if (!p) {
+        // Opening: seed drafts from current active filters
+        setDraftExpertise(expertiseFilter);
+        setDraftExperience(experienceFilter);
+        setDraftMatchScore(matchScoreFilter);
+        setDraftLocation(locationFilter);
+        setDraftStatus(statusFilter);
+      }
+      return !p;
+    });
+  };
+
+  const selectStyle = (isActive) => ({
+    width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
+    border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
+    backgroundColor: isActive ? 'var(--primary-light)' : 'var(--bg-card)',
+    color: isActive ? 'var(--primary)' : 'var(--text-main)',
+    outline: 'none', cursor: 'pointer', fontWeight: isActive ? '600' : '400',
+  });
+
+  const labelStyle = {
+    fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)',
+    textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px',
+  };
+
+  // Flat filter panel
   const filterSlot = (
     <div ref={filterDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
       {/* Filter icon toggle button */}
@@ -220,26 +186,27 @@ export default function ConsortiumView({ searchVal = '' }) {
         type="button"
         className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
         style={{
-          height: '26px',
+          height: '36px',
           padding: activeFilterCount > 0 ? '0 0.5rem' : '0',
-          width: activeFilterCount > 0 ? 'auto' : '26px',
+          width: activeFilterCount > 0 ? 'auto' : '36px',
+          minWidth: '36px',
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          gap: '0.3rem', borderRadius: 'var(--radius-md)', flexShrink: 0,
-          fontSize: '0.72rem', fontWeight: '700',
+          gap: '0.35rem', borderRadius: 'var(--radius-md, 6px)', flexShrink: 0,
+          fontSize: '0.75rem', fontWeight: '700',
         }}
         onMouseDown={e => e.stopPropagation()}
-        onClick={e => { e.stopPropagation(); setShowFilters(p => !p); }}
+        onClick={handleToggleFilters}
         title="Filter consortium partners"
         aria-label="Filter consortium partners"
         aria-expanded={showFilters}
       >
-        <Filter size={13} />
+        <Filter size={15} />
         {activeFilterCount > 0 && (
-          <span style={{ fontSize: '0.68rem', fontWeight: '700', lineHeight: 1 }}>{activeFilterCount}</span>
+          <span style={{ fontSize: '0.75rem', fontWeight: '700', lineHeight: 1 }}>{activeFilterCount}</span>
         )}
       </button>
 
-      {/* Flat filter panel — stopPropagation on mousedown keeps it open during interaction */}
+      {/* Filter panel */}
       {showFilters && (
         <div
           className="card"
@@ -254,7 +221,7 @@ export default function ConsortiumView({ searchVal = '' }) {
             overflow: 'hidden',
           }}
         >
-          {/* Panel header with reset */}
+          {/* Panel header */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '0.55rem 0.75rem 0.45rem',
@@ -263,72 +230,15 @@ export default function ConsortiumView({ searchVal = '' }) {
             <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Filters
             </span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {activeFilterCount > 0 && (
-                <button
-                  type="button"
-                  onClick={e => { e.stopPropagation(); handleResetFilters(); }}
-                  title="Reset all filters"
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
-                    display: 'inline-flex', alignItems: 'center', gap: '3px',
-                    color: 'var(--primary)', borderRadius: '4px',
-                    fontSize: '0.68rem', fontWeight: '600',
-                  }}
-                >
-                  <RotateCcw size={11} /> Reset
-                </button>
-              )}
-            </div>
           </div>
 
           {/* Scrollable filter body */}
           <div style={{ padding: '0.5rem 0.75rem 0.625rem', display: 'flex', flexDirection: 'column', gap: '0.55rem', overflowY: 'auto', maxHeight: '360px' }}>
 
-            {/* Search */}
+            {/* Expertise — draft */}
             <div>
-              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                Search Partner
-              </label>
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '5px',
-                backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-color)',
-                padding: '0.3rem 0.5rem', borderRadius: 'var(--radius-md)',
-              }}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                  fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search partners…"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: '0.79rem', width: '100%', color: 'var(--text-main)' }}
-                />
-                {searchQuery && (
-                  <button onClick={e => { e.stopPropagation(); setSearchQuery(''); }}
-                    style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontWeight: '700', fontSize: '0.72rem', lineHeight: 1, padding: 0 }}>✕</button>
-                )}
-              </div>
-            </div>
-
-            {/* Expertise */}
-            <div>
-              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                Expertise
-              </label>
-              <select
-                value={expertiseFilter}
-                onChange={e => setExpertiseFilter(e.target.value)}
-                style={{
-                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
-                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-                  backgroundColor: expertiseFilter ? 'var(--primary-light)' : 'var(--bg-card)',
-                  color: expertiseFilter ? 'var(--primary)' : 'var(--text-main)',
-                  outline: 'none', cursor: 'pointer', fontWeight: expertiseFilter ? '600' : '400',
-                }}
-              >
+              <label style={labelStyle}>Expertise</label>
+              <select value={draftExpertise} onChange={e => setDraftExpertise(e.target.value)} style={selectStyle(draftExpertise)}>
                 <option value="">All Expertise</option>
                 <option value="Transport Infrastructure">Transport Infrastructure</option>
                 <option value="Environmental Consultancy">Environmental Consultancy</option>
@@ -343,22 +253,10 @@ export default function ConsortiumView({ searchVal = '' }) {
               </select>
             </div>
 
-            {/* Experience */}
+            {/* Experience — draft */}
             <div>
-              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                Experience
-              </label>
-              <select
-                value={experienceFilter}
-                onChange={e => setExperienceFilter(e.target.value)}
-                style={{
-                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
-                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-                  backgroundColor: experienceFilter ? 'var(--primary-light)' : 'var(--bg-card)',
-                  color: experienceFilter ? 'var(--primary)' : 'var(--text-main)',
-                  outline: 'none', cursor: 'pointer', fontWeight: experienceFilter ? '600' : '400',
-                }}
-              >
+              <label style={labelStyle}>Experience</label>
+              <select value={draftExperience} onChange={e => setDraftExperience(e.target.value)} style={selectStyle(draftExperience)}>
                 <option value="">All Experience</option>
                 <option value="5">5+ Years</option>
                 <option value="10">10+ Years</option>
@@ -366,22 +264,10 @@ export default function ConsortiumView({ searchVal = '' }) {
               </select>
             </div>
 
-            {/* Match Score */}
+            {/* Match Score — draft */}
             <div>
-              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                Match Score
-              </label>
-              <select
-                value={matchScoreFilter}
-                onChange={e => setMatchScoreFilter(e.target.value)}
-                style={{
-                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
-                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-                  backgroundColor: matchScoreFilter ? 'var(--primary-light)' : 'var(--bg-card)',
-                  color: matchScoreFilter ? 'var(--primary)' : 'var(--text-main)',
-                  outline: 'none', cursor: 'pointer', fontWeight: matchScoreFilter ? '600' : '400',
-                }}
-              >
+              <label style={labelStyle}>Match Score</label>
+              <select value={draftMatchScore} onChange={e => setDraftMatchScore(e.target.value)} style={selectStyle(draftMatchScore)}>
                 <option value="">All Scores</option>
                 <option value="90">90%+ High</option>
                 <option value="80">80%+ Good</option>
@@ -389,22 +275,10 @@ export default function ConsortiumView({ searchVal = '' }) {
               </select>
             </div>
 
-            {/* Location */}
+            {/* Location — draft */}
             <div>
-              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                Location
-              </label>
-              <select
-                value={locationFilter}
-                onChange={e => setLocationFilter(e.target.value)}
-                style={{
-                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
-                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-                  backgroundColor: locationFilter ? 'var(--primary-light)' : 'var(--bg-card)',
-                  color: locationFilter ? 'var(--primary)' : 'var(--text-main)',
-                  outline: 'none', cursor: 'pointer', fontWeight: locationFilter ? '600' : '400',
-                }}
-              >
+              <label style={labelStyle}>Location</label>
+              <select value={draftLocation} onChange={e => setDraftLocation(e.target.value)} style={selectStyle(draftLocation)}>
                 <option value="">All Locations</option>
                 <option value="Karnataka">Karnataka</option>
                 <option value="Maharashtra">Maharashtra</option>
@@ -416,22 +290,10 @@ export default function ConsortiumView({ searchVal = '' }) {
               </select>
             </div>
 
-            {/* Status */}
+            {/* Status — draft */}
             <div>
-              <label style={{ fontSize: '0.62rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '4px' }}>
-                Status
-              </label>
-              <select
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-                style={{
-                  width: '100%', padding: '0.32rem 0.5rem', fontSize: '0.8rem',
-                  border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-                  backgroundColor: statusFilter ? 'var(--primary-light)' : 'var(--bg-card)',
-                  color: statusFilter ? 'var(--primary)' : 'var(--text-main)',
-                  outline: 'none', cursor: 'pointer', fontWeight: statusFilter ? '600' : '400',
-                }}
-              >
+              <label style={labelStyle}>Status</label>
+              <select value={draftStatus} onChange={e => setDraftStatus(e.target.value)} style={selectStyle(draftStatus)}>
                 <option value="">All Statuses</option>
                 <option value="accepted">Accepted</option>
                 <option value="invited">Invited</option>
@@ -442,6 +304,38 @@ export default function ConsortiumView({ searchVal = '' }) {
               </select>
             </div>
           </div>
+
+          {/* ── Action buttons: Apply & Reset ── */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            padding: '0.5rem 0.75rem',
+            borderTop: '1px solid var(--border-color)',
+          }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={e => { e.stopPropagation(); handleApplyFilters(); }}
+              style={{
+                flex: 1, fontSize: '0.75rem', fontWeight: '700',
+                padding: '0.35rem 0', borderRadius: 'var(--radius-md)',
+              }}
+            >
+              Apply Filters{draftPickCount > 0 ? ` (${draftPickCount})` : ''}
+            </button>
+            <button
+              type="button"
+              onClick={e => { e.stopPropagation(); handleResetFilters(); }}
+              title="Reset all filters"
+              style={{
+                background: 'none', border: '1px solid var(--border-color)', cursor: 'pointer',
+                padding: '0.35rem 0.55rem', borderRadius: 'var(--radius-md)',
+                display: 'inline-flex', alignItems: 'center', gap: '3px',
+                color: 'var(--text-muted)', fontSize: '0.72rem', fontWeight: '600',
+              }}
+            >
+              <RotateCcw size={11} /> Reset
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -449,52 +343,84 @@ export default function ConsortiumView({ searchVal = '' }) {
 
   // ── JSX return ──
   return (
-    <div className="page-container">
+    <div className="page-container" style={{ padding: '1rem 1.5rem', gap: '0.875rem', width: '100%', boxSizing: 'border-box' }}>
+      {/* Single Control Row: Heading on Left, Search + Filter on Right */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          gap: '1rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        <h1
+          style={{
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            margin: 0,
+            color: 'var(--text-main)',
+            letterSpacing: '-0.01em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Consortium
+        </h1>
 
-      {/* ── Page Header ── */}
-      <div className="page-header" style={{ paddingTop: 0, paddingBottom: 0, minHeight: 'unset' }}>
-        <div style={{
-          paddingTop: '24px', paddingBottom: '14px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          flexWrap: 'wrap', gap: '10px',
-        }}>
-          {/* Opportunity info */}
-          <div>
-            <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-              Opportunity:{' '}
-              <strong style={{ color: 'var(--text-main)', fontWeight: '700' }}>
-                {requirements?.opportunityName || 'Highway Development Project'}
-              </strong>
-              {' '}({requirements?.location || 'Karnataka'})
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '5px', fontSize: '0.77rem', color: 'var(--text-muted)' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <Building size={12} color="var(--primary)" />
-                Target Lead: <strong style={{ color: 'var(--text-main)', marginLeft: '2px' }}>{requirements?.targetCompany}</strong>
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <MapPin size={12} color="var(--primary)" />
-                Location: <strong style={{ color: 'var(--text-main)', marginLeft: '2px' }}>{requirements?.location}</strong>
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <Calendar size={12} color="var(--primary)" />
-                Deadline: <strong style={{ color: 'var(--text-main)', marginLeft: '2px' }}>{requirements?.submissionDeadline}</strong>
-              </span>
-            </div>
+        {/* Grouped Right Controls: Search + Filter */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            flexShrink: 0,
+          }}
+        >
+          {/* Search Bar */}
+          <div style={{ position: 'relative', width: '260px', maxWidth: '100%' }}>
+            <Search
+              size={15}
+              color="var(--text-muted)"
+              style={{
+                position: 'absolute',
+                left: '0.75rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none',
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search partners..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                height: '36px',
+                padding: '0 0.75rem 0 2.2rem',
+                borderRadius: 'var(--radius-md, 6px)',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
           </div>
+
+          {/* Filter Button & Floating Dropdown */}
+          {filterSlot}
         </div>
       </div>
 
-      {/* ── Capabilities Panel (always visible) ── */}
-      <CapabilitiesPanel requirements={requirements} />
-
-      {/* ── Full-width Partner Table (filter icon embedded in strip) ── */}
+      {/* ── Full-width Partner Table (no filter bar inside) ── */}
       <PartnerTable
         filteredList={filteredList}
         consortiumList={consortiumList}
         onViewProfile={handleViewProfile}
         onUpdateStatus={handleUpdateStatus}
-        filterSlot={filterSlot}
       />
 
       {/* ── Partner Profile Modal ── */}
@@ -507,3 +433,4 @@ export default function ConsortiumView({ searchVal = '' }) {
     </div>
   );
 }
+
