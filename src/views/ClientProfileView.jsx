@@ -65,7 +65,7 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
           <TrendingUp size={18} color="var(--primary, #2563EB)" />
           <h3
             style={{
-              fontSize: '1.05rem',
+              fontSize: '1.25rem',
               fontWeight: '700',
               color: 'var(--text-main, #0F172A)',
               margin: 0,
