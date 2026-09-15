@@ -22,7 +22,10 @@ import Dashboard from './views/Dashboard';
 import ClientProfileView from './views/ClientProfileView';
 import LogoutModal from './components/LogoutModal';
 
+<<<<<<< HEAD
 import { useQueryClient } from '@tanstack/react-query';
+=======
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 import { useAuth } from './context/AuthContext';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
 import { mockClientProfile } from './data/clientProfileData';
@@ -31,7 +34,10 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
+<<<<<<< HEAD
   const queryClient = useQueryClient();
+=======
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 
   const [tabState, setTabState] = useState('dashboard');
   const [searchVal, setSearchVal] = useState('');
@@ -44,7 +50,11 @@ export default function App() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // User-isolated opportunities from React Query
+<<<<<<< HEAD
   const { data: userOpportunities = [], refetch: refetchOpportunities } = useOpportunities();
+=======
+  const { data: userOpportunities = [] } = useOpportunities();
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
   const pursueMutation = usePursueOpportunity();
   const declineMutation = useDeclineOpportunity();
 
@@ -77,7 +87,11 @@ export default function App() {
     return tabState;
   }, [location.pathname, tabState]);
 
-  const setActiveTab = setTabState;
+  const setActiveTab = (tab) => {
+    setTabState(tab);
+    // Clear search when switching pages so stale queries don’t carry over
+    setSearchVal('');
+  };
 
   const toggleTheme = () => {
     const nextMode = !darkMode;
@@ -170,6 +184,7 @@ export default function App() {
 
       {/* Main Workspace Area */}
       <div className="main-content">
+        {/* Global Header — search bar, download, notifications, theme, profile */}
         <Header
           searchVal={searchVal}
           setSearchVal={setSearchVal}
@@ -180,7 +195,10 @@ export default function App() {
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
+<<<<<<< HEAD
           onRefresh={handleGlobalRefresh}
+=======
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
         />
 
         {/* Declarative View Router */}
@@ -256,7 +274,11 @@ export default function App() {
             }
           />
           <Route path="/calendar" element={<BidCalendarView searchVal={searchVal} onSelectOpportunity={handleSelectOpportunity} />} />
+<<<<<<< HEAD
           <Route path="/consortium" element={<ConsortiumView />} />
+=======
+          <Route path="/consortium" element={<ConsortiumView searchVal={searchVal} />} />
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
           <Route
             path="/client-profile"
             element={
@@ -267,9 +289,15 @@ export default function App() {
             }
           />
           <Route path="/reports" element={<ReportsView />} />
+<<<<<<< HEAD
           <Route path="/sources" element={<SourcesView />} />
           <Route path="/offices" element={<OfficesView />} />
           <Route path="/users" element={<UsersRolesView />} />
+=======
+          <Route path="/sources" element={<SourcesView searchVal={searchVal} />} />
+          <Route path="/offices" element={<OfficesView searchVal={searchVal} />} />
+          <Route path="/users" element={<UsersRolesView searchVal={searchVal} />} />
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
           <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
           <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
           <Route path="/dashboard" element={<Dashboard />} />

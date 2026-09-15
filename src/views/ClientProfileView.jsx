@@ -25,6 +25,12 @@ import { exportService } from '../services/exportService';
 export default function ClientProfileView({ activeProject, setActiveProject }) {
   const [selectedProject, setSelectedProject] = useState(null);
   const pastProjects = mockClientProfile.pastProjects || [];
+<<<<<<< HEAD
+=======
+  const completedCount = pastProjects.filter(p => p.status === 'Completed').length;
+  const ongoingCount = pastProjects.filter(p => p.status !== 'Completed').length;
+  const completeness = mockClientProfile.profileCompleteness || 87;
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 
   const handleOpenProject = (project) => {
     setSelectedProject(project);
@@ -183,6 +189,38 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
             </tbody>
           </table>
         </div>
+<<<<<<< HEAD
+=======
+
+        {/* Table Footer */}
+        <div
+          style={{
+            padding: '0.9rem 1.25rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            fontSize: '0.825rem',
+            color: 'var(--text-muted, #64748B)',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            backgroundColor: 'var(--bg-card, #FFFFFF)'
+          }}
+        >
+          <span>
+            Showing <strong>{pastProjects.length}</strong> projects ·{' '}
+            <span style={{ color: '#166534', fontWeight: '700' }}>
+              {completedCount} Completed
+            </span>
+            {' · '}
+            <span style={{ color: '#92400E', fontWeight: '700' }}>
+              {ongoingCount} Ongoing / Upcoming
+            </span>
+          </span>
+          <span>
+            Profile Completeness: <strong>{completeness}%</strong>
+          </span>
+        </div>
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       </div>
 
       {/* ── Project Details Modal ────────────────────────────────────────── */}
@@ -299,6 +337,33 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
                   type="button"
+<<<<<<< HEAD
+=======
+                  onClick={() => exportService.exportSingleProjectPDF(selectedProject)}
+                  title="Download Project Details PDF"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    padding: '0.4rem 0.75rem',
+                    borderRadius: '0.5rem',
+                    border: '1px solid rgba(37, 99, 235, 0.3)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    color: 'var(--primary, #2563EB)',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.2)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.1)')}
+                >
+                  <Download size={13} />
+                  <span>PDF</span>
+                </button>
+                <button
+                  type="button"
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                   onClick={() => setSelectedProject(null)}
                   style={{
                     border: 'none',

@@ -1,19 +1,37 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { UserPlus, Edit2, CheckCircle2 } from 'lucide-react';
 import { mockUsers } from '../data/mockData';
 import { useUsers } from '../hooks/useApiQueries';
 
-export default function UsersRolesView() {
+export default function UsersRolesView({ searchVal = '' }) {
   const { data: fetchedUsers } = useUsers();
   const usersList = fetchedUsers || mockUsers;
+
+  const filteredUsers = useMemo(() => {
+    const term = (searchVal || '').trim().toLowerCase();
+    if (!term) return usersList;
+    return usersList.filter(u =>
+      (u.name || '').toLowerCase().includes(term) ||
+      (u.office || '').toLowerCase().includes(term) ||
+      (u.role || '').toLowerCase().includes(term) ||
+      (u.status || '').toLowerCase().includes(term)
+    );
+  }, [usersList, searchVal]);
 
   return (
     <div className="page-container">
       <div className="page-header">
-        <h2 className="page-title">Users & Roles</h2>
-        <button className="btn btn-primary">
-          <UserPlus size={16} /> Add User
-        </button>
+        <h2 className="page-title">Users &amp; Roles</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {searchVal && (
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              {filteredUsers.length} result{filteredUsers.length !== 1 ? 's' : ''} for &quot;{searchVal}&quot;
+            </span>
+          )}
+          <button className="btn btn-primary">
+            <UserPlus size={16} /> Add User
+          </button>
+        </div>
       </div>
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -29,7 +47,7 @@ export default function UsersRolesView() {
               </tr>
             </thead>
             <tbody>
-              {usersList.map((u, idx) => (
+              {filteredUsers.map((u, idx) => (
                 <tr key={idx}>
                   <td style={{ fontWeight: '600' }}>{u.name}</td>
                   <td>{u.office}</td>

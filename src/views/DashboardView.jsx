@@ -21,7 +21,12 @@ import {
   RefreshCw,
   SlidersHorizontal,
   ChevronRight,
+<<<<<<< HEAD
   Calendar
+=======
+  Calendar,
+  X
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
 } from 'lucide-react';
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
@@ -289,6 +294,177 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
 
   return (
     <div className="page-container" style={{ padding: '32px', gap: '32px' }}>
+<<<<<<< HEAD
+
+      {/* Time Period Filter Bar (Positioned above Metric Cards Grid) */}
+      <div style={{
+=======
+      {/* 1. Welcome & Hero Toolbar (Title, AI Engine Active & Filters) */}
+      <div style={{
+        backgroundColor: 'var(--bg-card)',
+        borderRadius: '1rem',
+        padding: '24px 28px',
+        border: '1px solid var(--border-color)',
+        boxShadow: 'var(--shadow-sm)',
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1rem',
+        marginTop: '4px',
+        marginBottom: '-8px'
+      }}>
+<<<<<<< HEAD
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <h2 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
+            Key Performance Indicators
+          </h2>
+          {isFilterLoading && (
+            <span style={{ fontSize: '0.725rem', color: 'var(--primary)', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+              <RefreshCw size={12} className="spin-icon" /> Updating period...
+            </span>
+          )}
+        </div>
+
+        {/* Single Unified Time Period Filter Control */}
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          backgroundColor: 'var(--bg-card)',
+          padding: '0.35rem 0.85rem',
+          borderRadius: '9999px',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-xs)'
+        }}>
+          <Calendar size={14} color="var(--primary)" />
+          <span style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+            Time Period:
+          </span>
+          <select
+            value={timeRange}
+            onChange={(e) => handleTimeRangeChange(e.target.value)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--primary)',
+              fontSize: '0.8rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              outline: 'none',
+              padding: '0.1rem 0.25rem'
+            }}
+          >
+            <option value="all">All Time</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+          </select>
+        </div>
+      </div>
+
+=======
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: '1.35rem', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.02em', margin: 0 }}>
+              Enterprise Intelligence Dashboard
+            </h1>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px', margin: 0 }}>
+              Real-time tender tracking, AI matching scores & pipeline analytics
+            </p>
+          </div>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+            fontSize: '0.725rem',
+            fontWeight: '700',
+            padding: '0.25rem 0.75rem',
+            borderRadius: '9999px',
+            backgroundColor: 'var(--primary-light)',
+            color: 'var(--primary)',
+            border: '1px solid var(--primary-border)'
+          }}>
+            <Sparkles size={13} /> AI Engine Active
+          </span>
+        </div>
+
+        {/* Toolbar Quick Indicators + Search Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Global Search Bar */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.6rem',
+            backgroundColor: 'var(--bg-subtle)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '0.625rem',
+            padding: '0 0.875rem',
+            height: '38px',
+            width: '340px',
+            maxWidth: '100%',
+            transition: 'border-color 0.2s, box-shadow 0.2s',
+          }}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = '#2563EB';
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.12)';
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = 'var(--border-color)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <Search size={15} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+            <input
+              type="text"
+              placeholder="Search project name, tender ID, source, sector..."
+              value={searchVal}
+              onChange={e => setSearchVal && setSearchVal(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                outline: 'none',
+                fontSize: '0.82rem',
+                color: 'var(--text-main)',
+                width: '100%',
+              }}
+            />
+            {searchVal ? (
+              <button
+                onClick={() => setSearchVal && setSearchVal('')}
+                title="Clear search"
+                style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px', flexShrink: 0 }}
+              >
+                <X size={13} />
+              </button>
+            ) : (
+              <span style={{
+                fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-muted)',
+                backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)',
+                padding: '0.15rem 0.4rem', borderRadius: '0.3rem', flexShrink: 0, lineHeight: 1
+              }}>⌘K</span>
+            )}
+          </div>
+
+          {lastRefreshedTime && (
+            <span style={{
+              fontSize: '0.725rem',
+              fontWeight: '600',
+              color: 'var(--success-text)',
+              backgroundColor: 'var(--success-bg)',
+              border: '1px solid var(--success-border)',
+              padding: '0.25rem 0.6rem',
+              borderRadius: '0.4rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem'
+            }}>
+              ✓ Refreshed {lastRefreshedTime}
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* Time Period Filter Bar (Positioned above Metric Cards Grid) */}
       <div style={{
@@ -348,6 +524,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
         </div>
       </div>
 
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       {/* 2. Enterprise Metric KPI Cards Grid */}
       <div className="kpi-cards-grid">
         {kpis.map((kpi) => {

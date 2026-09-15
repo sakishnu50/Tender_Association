@@ -41,7 +41,12 @@ const navSections = [
       { id: 'offices', label: 'Offices', icon: Building2, path: '/offices' },
       { id: 'users', label: 'Users & Roles', icon: UserCheck, path: '/users' },
       { id: 'audit', label: 'Audit Trail', icon: History, path: '/audit' },
+<<<<<<< HEAD
       { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' }
+=======
+      { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
+      { id: 'login', label: 'Logout', icon: LogOut, path: '/login' }
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     ]
   }
 ];
@@ -82,7 +87,11 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
   return (
     <aside className="sidebar">
       {/* Sidebar Branding Header */}
+<<<<<<< HEAD
       <div className="sidebar-header">
+=======
+      <div className="sidebar-header" style={{ padding: '1.25rem 1.15rem' }}>
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
         <div style={{
           width: '36px',
           height: '36px',
@@ -100,21 +109,40 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
           TA
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+<<<<<<< HEAD
           <span className="sidebar-brand-title">
             Tender Hub
           </span>
           <span style={{ fontSize: '0.675rem', color: 'var(--sidebar-text-muted)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+=======
+          <span className="sidebar-brand-title" style={{ letterSpacing: '0.04em', fontSize: '0.85rem' }}>
+            Tender Hub
+          </span>
+          <span style={{ fontSize: '0.675rem', color: '#64748B', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
             <ShieldCheck size={11} color="#10B981" /> Enterprise SaaS
           </span>
         </div>
       </div>
 
       {/* Navigation Sections */}
+<<<<<<< HEAD
       <nav className="sidebar-nav">
         {navSections.map((section, idx) => (
           <div
             key={idx}
             className={idx < navSections.length - 1 ? 'nav-section-divider' : ''}
+=======
+      <nav className="sidebar-nav" style={{ padding: '0.75rem 0.65rem' }}>
+        {navSections.map((section, idx) => (
+          <div
+            key={idx}
+            style={{
+              marginBottom: idx < navSections.length - 1 ? '0.75rem' : '0',
+              paddingBottom: idx < navSections.length - 1 ? '0.75rem' : '0',
+              borderBottom: idx < navSections.length - 1 ? '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))' : 'none'
+            }}
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               {section.items.map((item) => {
@@ -125,15 +153,48 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
                     key={item.id}
                     className={`nav-item ${isActive ? 'active' : ''}`}
                     onClick={() => handleNavClick(item)}
+<<<<<<< HEAD
                     type="button"
                   >
                     <div className="nav-item-content">
                       <Icon size={17} className="nav-icon" />
+=======
+                    style={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.55rem 0.75rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.825rem',
+                      fontWeight: isActive ? '600' : '500',
+                      color: isActive ? '#FFFFFF' : '#94A3B8',
+                      backgroundColor: isActive ? 'rgba(37, 99, 235, 0.16)' : 'transparent',
+                      borderLeft: isActive ? '3px solid #2563EB' : '3px solid transparent',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div className="nav-item-content" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                      <Icon size={17} style={{ color: isActive ? '#3B82F6' : '#64748B', flexShrink: 0 }} />
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                       <span>{item.label}</span>
                     </div>
 
                     {item.count !== undefined && (
+<<<<<<< HEAD
                       <span className={`nav-badge ${item.urgent ? 'urgent' : ''}`}>
+=======
+                      <span className={`nav-badge ${item.urgent ? 'urgent' : ''}`} style={{
+                        fontSize: '0.7rem',
+                        fontWeight: '700',
+                        padding: '0.1rem 0.45rem',
+                        borderRadius: '9999px',
+                        backgroundColor: item.urgent ? '#DC2626' : 'rgba(255, 255, 255, 0.1)',
+                        color: '#FFFFFF',
+                        boxShadow: item.urgent ? '0 0 8px rgba(220, 38, 38, 0.5)' : 'none'
+                      }}>
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
                         {item.count}
                       </span>
                     )}
@@ -145,6 +206,7 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         ))}
       </nav>
 
+<<<<<<< HEAD
       {/* Bottom Logout Navigation Area (Pinned at absolute bottom) */}
       <div className="sidebar-bottom-actions">
         <button
@@ -158,6 +220,25 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
             <span>Logout</span>
           </div>
         </button>
+=======
+      {/* Footer Status */}
+      <div style={{
+        padding: '0.85rem 1rem',
+        borderTop: '1px solid var(--sidebar-border, rgba(255, 255, 255, 0.08))',
+        fontSize: '0.725rem',
+        color: '#64748B',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
+      }}>
+        <span style={{
+          width: '7px',
+          height: '7px',
+          borderRadius: '50%',
+          backgroundColor: '#10B981',
+          boxShadow: '0 0 6px #10B981'
+        }} title="System Operational" />
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       </div>
     </aside>
   );

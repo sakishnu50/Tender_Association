@@ -236,20 +236,36 @@ export const exportService = {
    * File name: Tender_Report_[TODAY'S DATE].pdf
    */
   exportToPDF: (opportunities = mockOpportunities, customFilename = null) => {
+<<<<<<< HEAD
+=======
+    // Determine target date format: YYYY-MM-DD for filename
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     const today = new Date();
     const isoDate = today.toISOString().slice(0, 10);
     const filename = customFilename || `Tender_Report_${isoDate}.pdf`;
 
+<<<<<<< HEAD
+=======
+    // Initialize A4 Portrait Document
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4'
     });
 
+<<<<<<< HEAD
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 14;
 
+=======
+    const pageWidth = doc.internal.pageSize.getWidth(); // 210mm
+    const pageHeight = doc.internal.pageSize.getHeight(); // 297mm
+    const margin = 14;
+
+    // Derived Metrics
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     const oppList = Array.isArray(opportunities) && opportunities.length > 0 ? opportunities : mockOpportunities;
     const totalCount = oppList.length;
     const highMatchCount = oppList.filter((o) => (o.aiScore || 0) >= 8.5).length;
@@ -257,9 +273,17 @@ export const exportService = {
     const pursuedCount = oppList.filter((o) => o.status === 'Pursued').length;
     const avgScore = (oppList.reduce((acc, o) => acc + (o.aiScore || 0), 0) / (totalCount || 1)).toFixed(1);
 
+<<<<<<< HEAD
     doc.setFillColor(30, 58, 138);
     doc.rect(0, 0, pageWidth, 6, 'F');
 
+=======
+    // --- 1. Document Branding Header ---
+    doc.setFillColor(30, 58, 138); // Primary Navy Blue (#1E3A8A)
+    doc.rect(0, 0, pageWidth, 6, 'F');
+
+    // Title Block
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(18);
     doc.setTextColor(30, 58, 138);
@@ -267,9 +291,16 @@ export const exportService = {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
+<<<<<<< HEAD
     doc.setTextColor(100, 116, 139);
     doc.text('Executive Intelligence & Pipeline Summary Report', margin, 24);
 
+=======
+    doc.setTextColor(100, 116, 139); // Slate muted (#64748B)
+    doc.text('Executive Intelligence & Pipeline Summary Report', margin, 24);
+
+    // Metadata Right-Aligned Block
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     doc.setFontSize(8.5);
     doc.setTextColor(71, 85, 105);
     const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
@@ -279,6 +310,7 @@ export const exportService = {
     doc.text(`Total Tenders Tracked: ${totalCount}`, pageWidth - margin, 23, { align: 'right' });
     doc.text(`Report File: Tender_Report_${isoDate}.pdf`, pageWidth - margin, 28, { align: 'right' });
 
+<<<<<<< HEAD
     doc.setDrawColor(226, 232, 240);
     doc.setLineWidth(0.5);
     doc.line(margin, 31, pageWidth - margin, 31);
@@ -294,6 +326,25 @@ export const exportService = {
       { label: 'Urgent Action', val: `${urgentCount}`, color: [239, 68, 68] },
       { label: 'Pursued Tenders', val: `${pursuedCount}`, color: [2, 132, 199] },
       { label: 'Avg AI Score', val: `${avgScore} / 10`, color: [124, 58, 237] }
+=======
+    // Top Divider Line
+    doc.setDrawColor(226, 232, 240); // Subtle Border (#E2E8F0)
+    doc.setLineWidth(0.5);
+    doc.line(margin, 31, pageWidth - margin, 31);
+
+    // --- 2. Executive KPI Metrics Cards ---
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(30, 41, 59); // Charcoal (#1E293B)
+    doc.text('1. Executive KPI Summary', margin, 38);
+
+    const kpis = [
+      { label: 'Total Tracked', val: `${totalCount}`, color: [37, 99, 235] },      // Blue
+      { label: 'High Match (8.5+)', val: `${highMatchCount}`, color: [16, 185, 129] }, // Green
+      { label: 'Urgent Action', val: `${urgentCount}`, color: [239, 68, 68] },    // Red
+      { label: 'Pursued Tenders', val: `${pursuedCount}`, color: [2, 132, 199] },   // Sky Blue
+      { label: 'Avg AI Score', val: `${avgScore} / 10`, color: [124, 58, 237] }    // Purple
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     ];
 
     const cardWidth = (pageWidth - margin * 2 - (kpis.length - 1) * 3) / kpis.length;
@@ -303,25 +354,46 @@ export const exportService = {
     kpis.forEach((kpi, idx) => {
       const cardX = margin + idx * (cardWidth + 3);
 
+<<<<<<< HEAD
       doc.setFillColor(248, 250, 252);
+=======
+      // Card Background Box
+      doc.setFillColor(248, 250, 252); // Off-white/slate-50
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       doc.setDrawColor(226, 232, 240);
       doc.setLineWidth(0.3);
       doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 1.5, 1.5, 'FD');
 
+<<<<<<< HEAD
       doc.setFillColor(kpi.color[0], kpi.color[1], kpi.color[2]);
       doc.rect(cardX, cardY, cardWidth, 1.2, 'F');
 
+=======
+      // Top colored border indicator
+      doc.setFillColor(kpi.color[0], kpi.color[1], kpi.color[2]);
+      doc.rect(cardX, cardY, cardWidth, 1.2, 'F');
+
+      // Metric Value
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(kpi.color[0], kpi.color[1], kpi.color[2]);
       doc.text(kpi.val, cardX + cardWidth / 2, cardY + 8, { align: 'center' });
 
+<<<<<<< HEAD
+=======
+      // Metric Label
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(6.5);
       doc.setTextColor(100, 116, 139);
       doc.text(kpi.label, cardX + cardWidth / 2, cardY + 14, { align: 'center' });
     });
 
+<<<<<<< HEAD
+=======
+    // --- 3. Opportunity Directory Table ---
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     const tableStartY = 66;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
@@ -350,7 +422,11 @@ export const exportService = {
       margin: { left: margin, right: margin, bottom: 20 },
       theme: 'grid',
       headStyles: {
+<<<<<<< HEAD
         fillColor: [30, 58, 138],
+=======
+        fillColor: [30, 58, 138], // Navy Blue header
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
         textColor: [255, 255, 255],
         fontSize: 8,
         fontStyle: 'bold',
@@ -363,6 +439,7 @@ export const exportService = {
         cellPadding: 2.2
       },
       alternateRowStyles: {
+<<<<<<< HEAD
         fillColor: [248, 250, 252]
       },
       columnStyles: {
@@ -374,6 +451,19 @@ export const exportService = {
         5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' },
         6: { cellWidth: 18, halign: 'center' },
         7: { cellWidth: 16, halign: 'center' }
+=======
+        fillColor: [248, 250, 252] // Light slate zebra striping
+      },
+      columnStyles: {
+        0: { cellWidth: 18, fontStyle: 'bold' }, // ID
+        1: { cellWidth: 46 },                   // Name
+        2: { cellWidth: 26 },                   // Source
+        3: { cellWidth: 26 },                   // Location
+        4: { cellWidth: 20, halign: 'right' },  // Value
+        5: { cellWidth: 18, halign: 'center', fontStyle: 'bold' }, // AI Score
+        6: { cellWidth: 18, halign: 'center' }, // Deadline
+        7: { cellWidth: 16, halign: 'center' }  // Status
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
       },
       didDrawPage: (data) => {
         const pageCount = doc.internal.getNumberOfPages();
@@ -391,6 +481,10 @@ export const exportService = {
       }
     });
 
+<<<<<<< HEAD
+=======
+    // Save PDF file
+>>>>>>> 41a291905ed2a7152d14b9ba76338a48322d47af
     doc.save(filename);
   },
 
