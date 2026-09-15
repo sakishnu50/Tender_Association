@@ -197,6 +197,17 @@ export default function AuditRecordDetailsPage() {
                 <strong>—</strong>
               )}
             </div>
+            {record.aiScore !== undefined && record.aiScore !== null && (
+              <div className={styles.changeItem}>
+                <span className={styles.label}>AI Score</span>
+                <div>
+                  <span className={styles.aiScoreBadge}>
+                    <span className={styles.aiScoreValue}>{Number(record.aiScore).toFixed(1)}</span>
+                    <span className={styles.aiScoreScale}> / 10</span>
+                  </span>
+                </div>
+              </div>
+            )}
             <div className={styles.changeItemWide}>
               <span className={styles.label}>Description</span>
               <strong>{description}</strong>
