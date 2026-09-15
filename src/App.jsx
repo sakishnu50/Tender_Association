@@ -27,6 +27,7 @@ export default function App() {
   const [searchVal, setSearchVal] = useState('');
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [isPursueOpen, setIsPursueOpen] = useState(false);
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
@@ -44,10 +45,10 @@ export default function App() {
     }
   };
 
-  const handleSelectOpportunity = (opp) => {
+  const handleSelectOpportunity = (opp, calendarDate) => {
     setSelectedOpp(opp || mockOpportunities[0]);
     setActiveTab('opp_details');
-    navigate('/opportunities/details');
+    navigate('/opportunities/details', { state: { calendarDate } });
   };
 
   const titlesMap = {
@@ -69,7 +70,12 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isOpen={isMobileSidebarOpen} 
+        setIsOpen={setIsMobileSidebarOpen} 
+      />
 
       {/* Main Workspace Area */}
       <div className="main-content">
@@ -79,6 +85,7 @@ export default function App() {
           activeTabTitle={titlesMap[activeTab]}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
+          onMenuClick={() => setIsMobileSidebarOpen(true)}
         />
 
         {/* Declarative View Router */}
@@ -104,9 +111,9 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp || mockOpportunities[0]}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  setActiveTab('calendar');
+                  navigate('/calendar', { state: { targetDate: calendarDate } });
                 }}
                 onOpenPursue={() => setIsPursueOpen(true)}
                 onOpenDecline={() => setIsDeclineOpen(true)}

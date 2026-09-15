@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { Calendar as CalendarIcon, Search, X, ChevronLeft, ChevronRight, XCircle, Filter } from 'lucide-react';
 import { mockCalendarEvents, mockOpportunities } from '../data/mockData';
 import { useCalendar } from '../hooks/useApiQueries';
@@ -10,7 +11,13 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
   
   const activeSearch = propSearchVal || '';
 
-  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const location = useLocation();
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (location.state && location.state.targetDate) {
+      return new Date(location.state.targetDate);
+    }
+    return new Date();
+  });
   const [view, setView] = useState('Month'); // 'Year', 'Month', 'Week', 'List'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
@@ -90,7 +97,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
 
     if (!onSelectOpportunity) return;
     const opp = mockOpportunities.find(o => o.name.includes(evt.desc) || evt.desc.includes(o.name)) || mockOpportunities[0];
-    onSelectOpportunity(opp);
+    onSelectOpportunity(opp, evt.date);
   };
 
   const handlePrev = () => {
@@ -160,6 +167,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           justifyContent: 'flex-start',
           cursor: cellEvents.length > 0 ? 'pointer' : 'default',
           transition: 'all 0.2s',
+          minWidth: 0,
         }}
         className="calendar-cell"
       >
@@ -182,7 +190,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           </span>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%', minWidth: 0 }}>
           {cellEvents.map((evt, i) => {
             const isDead = evt.type === 'deadline';
             const isMeet = evt.type === 'meeting';
@@ -192,7 +200,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             const borderColor = isDead ? 'var(--danger)' : isMeet ? 'var(--warning)' : isCut ? 'var(--info)' : 'var(--border-color)';
             
             return (
-              <div key={i} style={{
+              <div key={i} className="calendar-cell-event" style={{
                 fontSize: '0.7rem',
                 padding: '0.3rem 0.4rem',
                 borderRadius: '4px',
@@ -202,7 +210,8 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                fontWeight: '600'
+                fontWeight: '600',
+                minWidth: 0
               }} title={evt.title}>
                 {evt.title}
               </div>
@@ -386,6 +395,17 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             grid-template-columns: 1fr;
             gap: 0.5rem !important;
           }
+          .calendar-cell {
+            padding: 0.25rem !important;
+            min-height: 70px !important;
+          }
+          .calendar-cell > div > span {
+            font-size: 0.75rem !important;
+          }
+          .calendar-cell-event {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.2rem !important;
+          }
         }
       `}</style>
 
@@ -411,7 +431,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             </div>
           </div>
 
-          {view !== 'List' && view !== 'Year' && (
+          {view !== 'List' && view !== 'Year' && view !== 'Week' && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
               {weekDays.map(d => <div key={d}>{d}</div>)}
             </div>
@@ -430,10 +450,17 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           )}
 
           {view === 'Week' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
-              {weekDaysArray.map((cellDate, i) => {
-                return renderCell(cellDate, `week-day-${i}`, true);
-              })}
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
+              <div style={{ minWidth: '700px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
+                  {weekDays.map(d => <div key={d}>{d}</div>)}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+                  {weekDaysArray.map((cellDate, i) => {
+                    return renderCell(cellDate, `week-day-${i}`, true);
+                  })}
+                </div>
+              </div>
             </div>
           )}
 

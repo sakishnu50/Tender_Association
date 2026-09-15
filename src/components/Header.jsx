@@ -1,13 +1,18 @@
 import React from 'react';
-import { Search, Bell, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Search, Bell, ChevronDown, Sun, Moon, Menu } from 'lucide-react';
 
-export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMode, toggleTheme }) {
+export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMode, toggleTheme, onMenuClick }) {
   return (
     <header className="top-header">
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
-          {activeTabTitle || 'Dashboard'}
-        </h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button className="mobile-menu-btn btn btn-outline" onClick={onMenuClick} style={{ padding: '0.4rem', border: 'none' }}>
+            <Menu size={20} />
+          </button>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
+            {activeTabTitle || 'Dashboard'}
+          </h2>
+        </div>
         <div className="header-search">
           <Search size={16} color="var(--text-muted)" />
           <input
@@ -40,7 +45,7 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
           )}
         </button>
 
-        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} />
+        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }} />
       </div>
     </header>
   );

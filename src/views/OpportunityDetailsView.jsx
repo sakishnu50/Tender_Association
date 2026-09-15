@@ -1,13 +1,17 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
 
 export default function OpportunityDetailsView({ opportunity, onBack, onOpenPursue, onOpenDecline }) {
+  const location = useLocation();
+  const calendarDate = location.state?.calendarDate;
+
   if (!opportunity) return null;
 
   return (
     <div className="page-container">
       <button
-        onClick={onBack}
+        onClick={() => onBack(calendarDate)}
         style={{
           border: 'none',
           background: 'none',
@@ -21,7 +25,7 @@ export default function OpportunityDetailsView({ opportunity, onBack, onOpenPurs
           width: 'fit-content'
         }}
       >
-        <ArrowLeft size={16} /> Back to Opportunities
+        <ArrowLeft size={16} /> Back to Bid Calendar
       </button>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>

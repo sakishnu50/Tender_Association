@@ -30,7 +30,7 @@ const navItems = [
   { id: 'login', label: 'Login Showcase', icon: LogIn, path: '/login' }
 ];
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,10 +45,18 @@ export default function Sidebar({ activeTab, setActiveTab }) {
   const handleNavClick = (item) => {
     setActiveTab(item.id);
     navigate(item.path);
+    if (setIsOpen) setIsOpen(false);
   };
 
   return (
-    <aside className="sidebar">
+    <>
+      {isOpen && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setIsOpen && setIsOpen(false)} 
+        />
+      )}
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div style={{
           width: '32px',
@@ -104,5 +112,6 @@ export default function Sidebar({ activeTab, setActiveTab }) {
         v2.4 Enterprise Edition
       </div>
     </aside>
+    </>
   );
 }
