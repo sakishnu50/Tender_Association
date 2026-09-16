@@ -42,7 +42,7 @@ const navSections = [
   }
 ];
 
-export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject }) {
+export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject, isOpen, setIsOpen }) {
   const navigate = useNavigate();
 
   const handleNavClick = (item) => {
@@ -52,6 +52,7 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
     if (item.path) {
       navigate(item.path);
     }
+    if (setIsOpen) setIsOpen(false);
   };
 
   const handleLogoutClick = () => {
@@ -63,7 +64,14 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
   };
 
   return (
-    <aside className="sidebar">
+    <>
+      {isOpen && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setIsOpen && setIsOpen(false)} 
+        />
+      )}
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       {/* Sidebar Branding Header */}
       <div className="sidebar-header">
         <div style={{
@@ -144,5 +152,6 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         </button>
       </div>
     </aside>
+    </>
   );
 }

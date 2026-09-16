@@ -16,7 +16,8 @@ import {
   LogIn,
   User,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  Menu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { exportService } from '../services/exportService';
@@ -34,7 +35,8 @@ export default function Header({
   onDownloadPDF,
   opportunities = mockOpportunities,
   filteredOpportunities = null,
-  onRequestLogout
+  onRequestLogout,
+  onMenuClick
 }) {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -163,6 +165,17 @@ export default function Header({
       {/* Accessibility Announcement for Screen Readers */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {ariaAnnouncement}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button className="mobile-menu-btn btn btn-outline" onClick={onMenuClick} style={{ padding: '0.4rem', border: 'none' }}>
+            <Menu size={20} />
+          </button>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
+            {activeTabTitle || 'Dashboard'}
+          </h2>
+        </div>
       </div>
 
       {/* 1. Real-Time Search Bar */}
@@ -326,6 +339,8 @@ export default function Header({
         >
           {darkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
         </button>
+
+        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }} />
 
         {/* 4. User Profile Section */}
         <div style={{ position: 'relative' }} ref={profileMenuRef}>
