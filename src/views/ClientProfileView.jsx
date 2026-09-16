@@ -89,7 +89,133 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
   };
 
   return (
-    <div className="page-container" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <div className="page-container" style={{ padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+      {/* Single Control Row: Heading on Left, Search + Filters on Right */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          gap: '1rem',
+          flexWrap: 'wrap'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(37, 99, 235, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary, #2563EB)'
+            }}
+          >
+            <TrendingUp size={18} />
+          </div>
+          <h1
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              color: 'var(--text-main, #0F172A)',
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.625rem',
+              letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Past Project Experience
+          </h1>
+        </div>
+
+        {/* Grouped Right Controls: Search + Sector Filter + Status Filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', flexShrink: 0 }}>
+          {/* Search Input */}
+          <div style={{ position: 'relative', width: '260px', maxWidth: '100%' }}>
+            <Search
+              size={15}
+              color="var(--text-muted, #64748B)"
+              style={{
+                position: 'absolute',
+                left: '0.75rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none'
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                height: '36px',
+                padding: '0 0.75rem 0 2.2rem',
+                borderRadius: 'var(--radius-md, 6px)',
+                border: '1px solid var(--border-color, #CBD5E1)',
+                backgroundColor: 'var(--bg-card, #FFFFFF)',
+                color: 'var(--text-main, #0F172A)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          {/* Sector Filter */}
+          <select
+            value={sectorFilter}
+            onChange={(e) => setSectorFilter(e.target.value)}
+            style={{
+              height: '36px',
+              padding: '0 0.75rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              border: '1px solid var(--border-color, #CBD5E1)',
+              backgroundColor: 'var(--bg-card, #FFFFFF)',
+              color: 'var(--text-main, #0F172A)',
+              fontSize: '0.875rem',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="ALL">All Sectors</option>
+            {sectorOptions.map((sec) => (
+              <option key={sec} value={sec}>
+                {sec}
+              </option>
+            ))}
+          </select>
+
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              height: '36px',
+              padding: '0 0.75rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              border: '1px solid var(--border-color, #CBD5E1)',
+              backgroundColor: 'var(--bg-card, #FFFFFF)',
+              color: 'var(--text-main, #0F172A)',
+              fontSize: '0.875rem',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="ALL">All Status</option>
+            <option value="Completed">Completed</option>
+            <option value="Ongoing">Ongoing</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Projects Table Card */}
       <div
         className="card"
         style={{
@@ -101,151 +227,18 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
           padding: 0
         }}
       >
-        {/* Projects Card Header & Controls */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            padding: '1.1rem 1.25rem',
-            borderBottom: '1px solid var(--border-color, #E2E8F0)',
-            backgroundColor: 'var(--bg-subtle, #F8FAFC)'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-            <div
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(37, 99, 235, 0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--primary, #2563EB)'
-              }}
-            >
-              <TrendingUp size={18} />
-            </div>
-            <h3
-              style={{
-                fontSize: '1.1rem',
-                fontWeight: '800',
-                color: 'var(--text-main, #0F172A)',
-                margin: 0,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.625rem'
-              }}
-            >
-              Past Project Experience
-              <span
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  padding: '0.2rem 0.65rem',
-                  borderRadius: '9999px',
-                  backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                  color: 'var(--primary, #2563EB)',
-                  border: '1px solid rgba(37, 99, 235, 0.2)'
-                }}
-              >
-                {totalProjects} Projects
-              </span>
-            </h3>
-          </div>
-
-          {/* Quick Filter & Search Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
-            {/* Search Input */}
-            <div style={{ position: 'relative', minWidth: '220px' }}>
-              <Search
-                size={14}
-                color="var(--text-muted, #64748B)"
-                style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)' }}
-              />
-              <input
-                type="text"
-                placeholder="Search projects..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%',
-                  height: '34px',
-                  padding: '0 0.75rem 0 2.2rem',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color, #CBD5E1)',
-                  backgroundColor: 'var(--bg-card, #FFFFFF)',
-                  color: 'var(--text-main, #0F172A)',
-                  fontSize: '0.8125rem',
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
-
-            {/* Sector Filter */}
-            <select
-              value={sectorFilter}
-              onChange={(e) => setSectorFilter(e.target.value)}
-              style={{
-                height: '34px',
-                padding: '0 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color, #CBD5E1)',
-                backgroundColor: 'var(--bg-card, #FFFFFF)',
-                color: 'var(--text-main, #0F172A)',
-                fontSize: '0.8125rem',
-                outline: 'none',
-                cursor: 'pointer'
-              }}
-            >
-              <option value="ALL">All Sectors</option>
-              {sectorOptions.map((sec) => (
-                <option key={sec} value={sec}>
-                  {sec}
-                </option>
-              ))}
-            </select>
-
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              style={{
-                height: '34px',
-                padding: '0 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color, #CBD5E1)',
-                backgroundColor: 'var(--bg-card, #FFFFFF)',
-                color: 'var(--text-main, #0F172A)',
-                fontSize: '0.8125rem',
-                outline: 'none',
-                cursor: 'pointer'
-              }}
-            >
-              <option value="ALL">All Statuses</option>
-              <option value="Completed">Completed</option>
-              <option value="Ongoing">Ongoing</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Projects Table */}
         <div className="table-container" style={{ border: 'none', overflowX: 'auto' }}>
           <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color, #E2E8F0)', backgroundColor: 'transparent' }}>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>PROJECT NAME</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>SECTOR</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>COUNTRY</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>YEAR</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>CLIENT / AGENCY</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>STATUS</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VALUE</th>
-                <th style={{ textAlign: 'center', padding: '0.85rem 1rem', fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VIEW</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>PROJECT NAME</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>SECTOR</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>COUNTRY</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>YEAR</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>CLIENT / AGENCY</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>STATUS</th>
+                <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VALUE</th>
+                <th style={{ textAlign: 'center', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VIEW</th>
               </tr>
             </thead>
             <tbody>
@@ -272,16 +265,16 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                       <td style={{ padding: '1rem 1.25rem', fontWeight: '700', color: 'var(--text-main, #0F172A)', fontSize: '0.875rem' }}>
                         {project.name}
                       </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.85rem' }}>
+                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
                         {project.sector}
                       </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.85rem' }}>
+                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
                         {project.country}
                       </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.85rem' }}>
+                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
                         {project.year}
                       </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-muted, #64748B)', fontSize: '0.85rem' }}>
+                      <td style={{ padding: '1rem 1rem', color: 'var(--text-muted, #64748B)', fontSize: '0.875rem' }}>
                         {project.client}
                       </td>
                       <td style={{ padding: '1rem 1rem' }}>
