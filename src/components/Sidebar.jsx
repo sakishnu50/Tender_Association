@@ -42,10 +42,15 @@ const navSections = [
   }
 ];
 
+<<<<<<< HEAD
 export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, activeProject }) {
+=======
+export default function Sidebar({ activeTab, setActiveTab, isOpen, setIsOpen }) {
+>>>>>>> calender-part
   const navigate = useNavigate();
 
   const handleNavClick = (item) => {
+<<<<<<< HEAD
     if (setActiveTab) {
       setActiveTab(item.id);
     }
@@ -65,6 +70,22 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
   return (
     <aside className="sidebar">
       {/* Sidebar Branding Header */}
+=======
+    setActiveTab(item.id);
+    navigate(item.path);
+    if (setIsOpen) setIsOpen(false);
+  };
+
+  return (
+    <>
+      {isOpen && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setIsOpen && setIsOpen(false)} 
+        />
+      )}
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+>>>>>>> calender-part
       <div className="sidebar-header">
         <div style={{
           width: '36px',
@@ -144,5 +165,6 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         </button>
       </div>
     </aside>
+    </>
   );
 }

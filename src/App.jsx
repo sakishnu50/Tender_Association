@@ -38,6 +38,7 @@ export default function App() {
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [activeProject, setActiveProject] = useState(mockClientProfile.pastProjects[0]);
   const [darkMode, setDarkMode] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [isPursueOpen, setIsPursueOpen] = useState(false);
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
@@ -89,6 +90,7 @@ export default function App() {
     }
   };
 
+<<<<<<< HEAD
   const handleSelectOpportunity = (opp) => {
     const selected = opp || userOpportunities[0] || null;
     setSelectedOpp(selected);
@@ -96,6 +98,12 @@ export default function App() {
     if (selected) {
       navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id } });
     }
+=======
+  const handleSelectOpportunity = (opp, calendarDate) => {
+    setSelectedOpp(opp || mockOpportunities[0]);
+    setActiveTab('opp_details');
+    navigate('/opportunities/details', { state: { calendarDate } });
+>>>>>>> calender-part
   };
 
   const titlesMap = {
@@ -161,11 +169,19 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
+<<<<<<< HEAD
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onRequestLogout={() => setIsLogoutModalOpen(true)}
         activeProject={activeProject}
+=======
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isOpen={isMobileSidebarOpen} 
+        setIsOpen={setIsMobileSidebarOpen} 
+>>>>>>> calender-part
       />
 
       {/* Main Workspace Area */}
@@ -178,10 +194,14 @@ export default function App() {
           activeTab={activeTab}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
+<<<<<<< HEAD
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
           onRefresh={handleGlobalRefresh}
+=======
+          onMenuClick={() => setIsMobileSidebarOpen(true)}
+>>>>>>> calender-part
         />
 
         {/* Declarative View Router */}
@@ -213,6 +233,7 @@ export default function App() {
             path="/opportunities/details"
             element={
               <OpportunityDetailsView
+<<<<<<< HEAD
                 opportunity={selectedOpp || userOpportunities[0]}
                 onBack={() => {
                   setActiveTab('opportunities');
@@ -241,6 +262,12 @@ export default function App() {
                 onBack={() => {
                   setActiveTab('opportunities');
                   navigate('/opportunities');
+=======
+                opportunity={selectedOpp || mockOpportunities[0]}
+                onBack={(calendarDate) => {
+                  setActiveTab('calendar');
+                  navigate('/calendar', { state: { targetDate: calendarDate } });
+>>>>>>> calender-part
                 }}
               />
             }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useCallback, useMemo } from 'react';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
@@ -82,6 +83,37 @@ function OpportunityDetailsContent({ opportunity, onBack }) {
           <ChevronRight size={13} className="breadcrumb-sep" />
           <span className="breadcrumb-current">Opportunity Details</span>
         </nav>
+=======
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { ArrowLeft, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
+
+export default function OpportunityDetailsView({ opportunity, onBack, onOpenPursue, onOpenDecline }) {
+  const location = useLocation();
+  const calendarDate = location.state?.calendarDate;
+
+  if (!opportunity) return null;
+
+  return (
+    <div className="page-container">
+      <button
+        onClick={() => onBack(calendarDate)}
+        style={{
+          border: 'none',
+          background: 'none',
+          color: 'var(--primary)',
+          fontSize: '0.875rem',
+          fontWeight: '600',
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.4rem',
+          width: 'fit-content'
+        }}
+      >
+        <ArrowLeft size={16} /> Back to Bid Calendar
+      </button>
+>>>>>>> calender-part
 
         <button
           id="btn-back-to-opportunities"

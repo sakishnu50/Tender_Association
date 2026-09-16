@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+<<<<<<< HEAD
 import { Calendar as CalendarIcon, Search, X, ChevronLeft, ChevronRight, XCircle, Filter } from 'lucide-react';
 import { mockCalendarEvents } from '../data/mockData';
 import { useCalendar, useOpportunities } from '../hooks/useApiQueries';
+=======
+import { useLocation } from 'react-router-dom';
+import { Calendar as CalendarIcon, Search, X, ChevronLeft, ChevronRight, XCircle, Filter } from 'lucide-react';
+import { mockCalendarEvents, mockOpportunities } from '../data/mockData';
+import { useCalendar } from '../hooks/useApiQueries';
+>>>>>>> calender-part
 
 export default function BidCalendarView({ searchVal: propSearchVal, onSelectOpportunity }) {
   const { data: fetchedEvents } = useCalendar();
@@ -12,7 +19,17 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
   
   const activeSearch = propSearchVal || '';
 
+<<<<<<< HEAD
   const [currentDate, setCurrentDate] = useState(() => new Date());
+=======
+  const location = useLocation();
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (location.state && location.state.targetDate) {
+      return new Date(location.state.targetDate);
+    }
+    return new Date();
+  });
+>>>>>>> calender-part
   const [view, setView] = useState('Month'); // 'Year', 'Month', 'Week', 'List'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
@@ -92,7 +109,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
 
     if (!onSelectOpportunity) return;
     const opp = mockOpportunities.find(o => o.name.includes(evt.desc) || evt.desc.includes(o.name)) || mockOpportunities[0];
-    onSelectOpportunity(opp);
+    onSelectOpportunity(opp, evt.date);
   };
 
   const handlePrev = () => {
@@ -162,6 +179,10 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           justifyContent: 'flex-start',
           cursor: cellEvents.length > 0 ? 'pointer' : 'default',
           transition: 'all 0.2s',
+<<<<<<< HEAD
+=======
+          minWidth: 0,
+>>>>>>> calender-part
         }}
         className="calendar-cell"
       >
@@ -184,7 +205,11 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           </span>
         </div>
         
+<<<<<<< HEAD
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%' }}>
+=======
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%', minWidth: 0 }}>
+>>>>>>> calender-part
           {cellEvents.map((evt, i) => {
             const isDead = evt.type === 'deadline';
             const isMeet = evt.type === 'meeting';
@@ -194,7 +219,11 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             const borderColor = isDead ? 'var(--danger)' : isMeet ? 'var(--warning)' : isCut ? 'var(--info)' : 'var(--border-color)';
             
             return (
+<<<<<<< HEAD
               <div key={i} style={{
+=======
+              <div key={i} className="calendar-cell-event" style={{
+>>>>>>> calender-part
                 fontSize: '0.7rem',
                 padding: '0.3rem 0.4rem',
                 borderRadius: '4px',
@@ -204,7 +233,12 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+<<<<<<< HEAD
                 fontWeight: '600'
+=======
+                fontWeight: '600',
+                minWidth: 0
+>>>>>>> calender-part
               }} title={evt.title}>
                 {evt.title}
               </div>
@@ -230,8 +264,101 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
     }
   };
 
+  const headerPortalElement = document.getElementById('header-actions-portal');
+
   return (
     <div className="page-container" style={{ position: 'relative', overflowX: 'hidden' }}>
+<<<<<<< HEAD
+=======
+      {headerPortalElement && createPortal(
+        <>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => setIsDrawerOpen(true)}
+            style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            <CalendarIcon size={16} /> View Events
+          </button>
+          
+          <div style={{ position: 'relative' }} ref={filterDropdownRef}>
+            <button
+              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
+              className="btn btn-outline"
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                padding: '0.4rem 1rem', 
+                fontSize: '0.85rem', 
+                fontWeight: '700',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: isFilterDropdownOpen ? 'var(--bg-subtle)' : 'var(--bg-main)',
+                color: 'var(--text-main)',
+                border: '1px solid var(--border-color)',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <Filter size={16} /> Filter
+            </button>
+            
+            {isFilterDropdownOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                right: 0,
+                marginTop: '0.5rem',
+                backgroundColor: 'var(--bg-main)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                zIndex: 100,
+                minWidth: '150px',
+                padding: '0.4rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.2rem'
+              }}>
+                {['Year', 'Month', 'Week', 'List'].map(v => (
+                  <button
+                    key={v}
+                    onClick={() => {
+                      setView(v);
+                      setIsFilterDropdownOpen(false);
+                    }}
+                    style={{
+                      padding: '0.6rem 1rem',
+                      fontSize: '0.85rem',
+                      fontWeight: '600',
+                      textAlign: 'left',
+                      borderRadius: 'var(--radius-sm)',
+                      backgroundColor: view === v ? 'var(--bg-subtle)' : 'transparent',
+                      color: view === v ? 'var(--primary)' : 'var(--text-main)',
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseOver={(e) => {
+                      if (view !== v) {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (view !== v) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </>,
+        headerPortalElement
+      )}
+>>>>>>> calender-part
 
       <style>{`
         .calendar-cell:hover {
@@ -298,6 +425,20 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             grid-template-columns: 1fr;
             gap: 0.5rem !important;
           }
+<<<<<<< HEAD
+=======
+          .calendar-cell {
+            padding: 0.25rem !important;
+            min-height: 70px !important;
+          }
+          .calendar-cell > div > span {
+            font-size: 0.75rem !important;
+          }
+          .calendar-cell-event {
+            font-size: 0.6rem !important;
+            padding: 0.15rem 0.2rem !important;
+          }
+>>>>>>> calender-part
         }
       `}</style>
 
@@ -323,7 +464,11 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             </div>
           </div>
 
+<<<<<<< HEAD
           {view !== 'List' && view !== 'Year' && (
+=======
+          {view !== 'List' && view !== 'Year' && view !== 'Week' && (
+>>>>>>> calender-part
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
               {weekDays.map(d => <div key={d}>{d}</div>)}
             </div>
@@ -342,10 +487,24 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           )}
 
           {view === 'Week' && (
+<<<<<<< HEAD
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
               {weekDaysArray.map((cellDate, i) => {
                 return renderCell(cellDate, `week-day-${i}`, true);
               })}
+=======
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
+              <div style={{ minWidth: '700px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
+                  {weekDays.map(d => <div key={d}>{d}</div>)}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+                  {weekDaysArray.map((cellDate, i) => {
+                    return renderCell(cellDate, `week-day-${i}`, true);
+                  })}
+                </div>
+              </div>
+>>>>>>> calender-part
             </div>
           )}
 
