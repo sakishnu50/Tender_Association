@@ -90,20 +90,13 @@ export default function App() {
     }
   };
 
-<<<<<<< HEAD
-  const handleSelectOpportunity = (opp) => {
+  const handleSelectOpportunity = (opp, calendarDate) => {
     const selected = opp || userOpportunities[0] || null;
     setSelectedOpp(selected);
     setActiveTab('opp_details');
     if (selected) {
-      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id } });
+      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id, calendarDate } });
     }
-=======
-  const handleSelectOpportunity = (opp, calendarDate) => {
-    setSelectedOpp(opp || mockOpportunities[0]);
-    setActiveTab('opp_details');
-    navigate('/opportunities/details', { state: { calendarDate } });
->>>>>>> calender-part
   };
 
   const titlesMap = {
@@ -169,19 +162,13 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Sidebar Navigation */}
-<<<<<<< HEAD
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onRequestLogout={() => setIsLogoutModalOpen(true)}
         activeProject={activeProject}
-=======
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
         isOpen={isMobileSidebarOpen} 
         setIsOpen={setIsMobileSidebarOpen} 
->>>>>>> calender-part
       />
 
       {/* Main Workspace Area */}
@@ -194,14 +181,11 @@ export default function App() {
           activeTab={activeTab}
           darkMode={darkMode}
           toggleTheme={toggleTheme}
-<<<<<<< HEAD
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
           onRefresh={handleGlobalRefresh}
-=======
           onMenuClick={() => setIsMobileSidebarOpen(true)}
->>>>>>> calender-part
         />
 
         {/* Declarative View Router */}
@@ -233,11 +217,15 @@ export default function App() {
             path="/opportunities/details"
             element={
               <OpportunityDetailsView
-<<<<<<< HEAD
                 opportunity={selectedOpp || userOpportunities[0]}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -247,9 +235,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -259,15 +252,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
-=======
-                opportunity={selectedOpp || mockOpportunities[0]}
                 onBack={(calendarDate) => {
-                  setActiveTab('calendar');
-                  navigate('/calendar', { state: { targetDate: calendarDate } });
->>>>>>> calender-part
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
