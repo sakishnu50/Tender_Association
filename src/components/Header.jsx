@@ -16,7 +16,8 @@ import {
   LogIn,
   User,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  Menu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { exportService } from '../services/exportService';
@@ -34,12 +35,15 @@ export default function Header({
   onDownloadPDF,
   opportunities = mockOpportunities,
   filteredOpportunities = null,
-  onRequestLogout
+  onRequestLogout,
+  onMenuClick
 }) {
   const navigate = useNavigate();
   const auth = useAuth();
   const isAuthenticated = Boolean(auth?.isAuthenticated);
-  const user = auth?.user || { name: 'S Sakishnu', role: 'Super Admin', email: 'sakishnu33@gmail.com' };
+  const user = auth?.user || { name: 'Usera', role: 'Admin', email: 'usera@tenderhub.org' };
+  const displayName = user?.name && user.name !== 'S Sakishnu' ? user.name : 'Usera';
+  const displayRole = user?.role && user.role !== 'Super Admin' ? user.role : 'Admin';
 
   const inputRef = useRef(null);
   const downloadMenuRef = useRef(null);
@@ -56,7 +60,7 @@ export default function Header({
   const [ariaAnnouncement, setAriaAnnouncement] = useState('');
 
   const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
-  const userInitial = isAuthenticated && user?.name ? user.name.trim().charAt(0).toUpperCase() : 'G';
+  const userInitial = displayName.charAt(0).toUpperCase() || 'U';
 
   // Keyboard shortcut listener (Cmd+K / Ctrl+K focus, Escape clear)
   useEffect(() => {
@@ -163,24 +167,35 @@ export default function Header({
         {ariaAnnouncement}
       </div>
 
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', flex: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button className="mobile-menu-btn btn btn-outline" onClick={onMenuClick} style={{ padding: '0.4rem', border: 'none' }}>
+            <Menu size={20} />
+          </button>
+          <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
+            {activeTabTitle || 'Dashboard'}
+          </h2>
+        </div>
+      </div>
+
       {/* 1. Real-Time Search Bar */}
       <div className="header-search" role="search">
-        <Search size={16} color="var(--text-muted)" style={{ flexShrink: 0 }} aria-hidden="true" />
+        <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search project name, tender ID, source, sector..."
+          placeholder="Search projects, tenders, sector, location..."
           value={searchVal || ''}
           onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
-          aria-label="Search opportunities by project, source, or sector"
+          aria-label="Search projects, tenders, sector, location"
         />
         {searchVal ? (
           <button
             onClick={() => setSearchVal && setSearchVal('')}
+            className="header-search-clear-btn"
             style={{
               border: 'none',
               background: 'none',
-              color: 'var(--text-muted)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -201,164 +216,25 @@ export default function Header({
 
       {/* Header Action Controls */}
       <div className="header-actions" role="toolbar" aria-label="Global header actions">
-        {/* 2. Refresh Button */}
+        {/* Refresh Button - immediately to the LEFT of the notification bell */}
         <button
-          className="btn-header-refresh"
+          className="header-refresh-btn"
           onClick={handleRefreshClick}
           title="Refresh Dashboard Data"
           aria-label={isRefreshing ? 'Refreshing data...' : 'Refresh dashboard data'}
           disabled={isRefreshing}
           type="button"
         >
-          <RefreshCw size={15} className={isRefreshing ? 'spin-icon' : ''} aria-hidden="true" />
-          <span>{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+          <RefreshCw size={17} className={isRefreshing ? 'spin-icon' : ''} aria-hidden="true" />
         </button>
 
-        {/* 3. Download Button & Dropdown */}
-        <div style={{ position: 'relative' }} ref={downloadMenuRef}>
-          <button
-            className="btn-header-download"
-            onClick={() => {
-              setShowDownloadMenu(!showDownloadMenu);
-              setShowNotifications(false);
-              setShowProfileMenu(false);
-            }}
-            title="Download or Export Tenders Data"
-            aria-label="Export or download tenders data"
-            aria-haspopup="true"
-            aria-expanded={showDownloadMenu}
-            disabled={isDownloading}
-            type="button"
-          >
-            {isDownloading ? (
-              <>
-                <RefreshCw size={15} className="spin-icon" aria-hidden="true" />
-                <span>{downloadingLabel || 'Downloading...'}</span>
-              </>
-            ) : (
-              <>
-                <Download size={15} aria-hidden="true" />
-                <span>Download</span>
-                <ChevronDown size={14} style={{ marginLeft: 3, opacity: 0.9 }} aria-hidden="true" />
-              </>
-            )}
-          </button>
-
-          {showDownloadMenu && (
-            <div
-              className="header-dropdown-menu"
-              role="menu"
-              aria-label="Download formats"
-              style={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                right: 0,
-                width: '230px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '0.75rem',
-                boxShadow: 'var(--shadow-xl)',
-                zIndex: 110,
-                padding: '0.5rem',
-                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-            >
-              <div style={{ padding: '0.35rem 0.6rem', fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                Export Options
-              </div>
-
-              {/* Option 1: Download CSV */}
-              <button
-                role="menuitem"
-                onClick={handleDownloadCSV}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.55rem 0.65rem',
-                  border: 'none',
-                  background: 'transparent',
-                  color: 'var(--text-main)',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                  color: '#10B981',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <Table size={15} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>Download CSV</div>
-                  <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>Spreadsheet data (.csv)</div>
-                </div>
-              </button>
-
-              {/* Option 2: Download PDF */}
-              <button
-                role="menuitem"
-                onClick={handleDownloadPDF}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.55rem 0.65rem',
-                  border: 'none',
-                  background: 'transparent',
-                  color: 'var(--text-main)',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  marginTop: '0.2rem',
-                  transition: 'background 0.15s ease'
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-              >
-                <div style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '6px',
-                  backgroundColor: 'rgba(37, 99, 235, 0.12)',
-                  color: '#2563EB',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
-                }}>
-                  <FileText size={15} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-main)' }}>Download PDF</div>
-                  <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)' }}>Intelligence report (.pdf)</div>
-                </div>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* 4. Notification Bell Icon */}
+        {/* 2. Notification Bell Icon */}
         <div style={{ position: 'relative' }} ref={notificationMenuRef}>
           <button
-            className="header-circle-btn"
+            className="header-icon-btn"
             onClick={() => {
               setShowNotifications(!showNotifications);
               setShowProfileMenu(false);
-              setShowDownloadMenu(false);
             }}
             title="Notifications (3 Urgent Alerts)"
             aria-label="Notifications, 3 urgent alerts available"
@@ -378,7 +254,7 @@ export default function Header({
               aria-label="Urgent notifications"
               style={{
                 position: 'absolute',
-                top: 'calc(100% + 10px)',
+                top: 'calc(100% + 8px)',
                 right: 0,
                 width: '330px',
                 backgroundColor: 'var(--bg-card)',
@@ -453,9 +329,9 @@ export default function Header({
           )}
         </div>
 
-        {/* 5. Dark Mode Toggle */}
+        {/* 3. Light/Dark Mode Toggle */}
         <button
-          className="header-circle-btn"
+          className="header-icon-btn"
           onClick={toggleTheme}
           title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -464,21 +340,22 @@ export default function Header({
           {darkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
         </button>
 
-        {/* 6. User Profile Card / Status Indicator */}
+        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }} />
+
+        {/* 4. User Profile Section */}
         <div style={{ position: 'relative' }} ref={profileMenuRef}>
           <div
             className={`header-user-profile ${isAuthenticated ? 'authenticated' : 'unauthenticated'}`}
             onClick={() => {
               setShowProfileMenu(!showProfileMenu);
               setShowNotifications(false);
-              setShowDownloadMenu(false);
             }}
-            title={isAuthenticated ? `Active User: ${user.name || 'Admin'} (${user.role || 'Super Admin'})` : 'Guest Session (Click for Options)'}
+            title={isAuthenticated ? `Active User: ${displayName} (${displayRole})` : 'Guest Session (Click for Options)'}
             role="button"
             tabIndex={0}
             aria-haspopup="true"
             aria-expanded={showProfileMenu}
-            aria-label={isAuthenticated ? `User menu for ${user.name || 'Admin'}` : 'Guest user menu'}
+            aria-label={`User menu for ${displayName}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -486,30 +363,18 @@ export default function Header({
               }
             }}
           >
-            <div
-              className="header-user-avatar"
-              style={{
-                backgroundColor: isAuthenticated ? 'var(--primary)' : 'var(--text-muted)'
-              }}
-            >
-              {isAuthenticated ? userInitial : <User size={16} />}
-              <span
-                className="header-user-status-dot"
-                style={{
-                  backgroundColor: isAuthenticated ? '#10B981' : '#94A3B8'
-                }}
-                aria-hidden="true"
-              />
+            <div className="header-user-avatar">
+              {userInitial}
             </div>
             <div className="header-user-info">
               <span className="header-user-name">
-                {isAuthenticated ? (user.name || 'S Sakishnu') : 'Guest User'}
+                {displayName}
               </span>
               <span className="header-user-role">
-                {isAuthenticated ? (user.role || 'Super Admin') : 'Not Signed In'}
+                {displayRole}
               </span>
             </div>
-            <ChevronDown size={14} color="var(--text-muted)" style={{ marginLeft: 2 }} aria-hidden="true" />
+            <ChevronDown size={14} className="header-user-chevron" style={{ marginLeft: 2 }} aria-hidden="true" />
           </div>
 
           {/* User Profile Menu Dropdown */}
@@ -520,7 +385,7 @@ export default function Header({
               aria-label="User profile options"
               style={{
                 position: 'absolute',
-                top: 'calc(100% + 10px)',
+                top: 'calc(100% + 8px)',
                 right: 0,
                 width: '230px',
                 backgroundColor: 'var(--bg-card)',
@@ -534,23 +399,23 @@ export default function Header({
             >
               <div style={{ padding: '0.5rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.5rem' }}>
                 <div style={{ fontSize: '0.825rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                  {isAuthenticated ? (user.name || 'S Sakishnu') : 'Guest Session'}
+                  {displayName}
                 </div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                  {isAuthenticated ? (user.email || 'sakishnu@tenderhub.org') : 'Sign in to access administration'}
+                  {user?.email || 'usera@tenderhub.org'}
                 </div>
                 <div style={{
                   display: 'inline-block',
                   marginTop: '6px',
                   fontSize: '0.65rem',
                   fontWeight: '700',
-                  color: isAuthenticated ? 'var(--primary)' : 'var(--text-muted)',
-                  backgroundColor: isAuthenticated ? 'var(--primary-light)' : 'var(--bg-subtle)',
+                  color: 'var(--primary)',
+                  backgroundColor: 'var(--primary-light)',
                   padding: '0.1rem 0.45rem',
                   borderRadius: '0.25rem',
                   border: '1px solid var(--border-color)'
                 }}>
-                  {isAuthenticated ? (user.role || 'Super Admin') : 'Guest Mode'}
+                  {displayRole}
                 </div>
               </div>
 
@@ -580,7 +445,6 @@ export default function Header({
                 <Settings size={15} color="var(--text-muted)" aria-hidden="true" /> Account Settings
               </button>
 
-              {/* In-Dropdown Action Toggle */}
               {isAuthenticated ? (
                 <button
                   role="menuitem"
@@ -633,16 +497,6 @@ export default function Header({
             </div>
           )}
         </div>
-
-
-        <div
-          id="header-actions-portal"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-          }}
-        />
       </div>
     </header>
   );

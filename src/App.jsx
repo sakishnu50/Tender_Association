@@ -22,6 +22,7 @@ import Dashboard from './views/Dashboard';
 import ClientProfileView from './views/ClientProfileView';
 import LogoutModal from './components/LogoutModal';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from './context/AuthContext';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from './hooks/useApiQueries';
 import { mockClientProfile } from './data/clientProfileData';
@@ -30,21 +31,30 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, logout } = useAuth();
+  const queryClient = useQueryClient();
 
   const [tabState, setTabState] = useState('dashboard');
   const [searchVal, setSearchVal] = useState('');
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [activeProject, setActiveProject] = useState(mockClientProfile.pastProjects[0]);
   const [darkMode, setDarkMode] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [isPursueOpen, setIsPursueOpen] = useState(false);
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // User-isolated opportunities from React Query
-  const { data: userOpportunities = [] } = useOpportunities();
+  const { data: userOpportunities = [], refetch: refetchOpportunities } = useOpportunities();
   const pursueMutation = usePursueOpportunity();
   const declineMutation = useDeclineOpportunity();
+
+  const handleGlobalRefresh = async () => {
+    await queryClient.invalidateQueries();
+    if (refetchOpportunities) {
+      await refetchOpportunities();
+    }
+  };
 
   // Derive activeTab from current route pathname
   const activeTab = React.useMemo(() => {
@@ -80,12 +90,12 @@ export default function App() {
     }
   };
 
-  const handleSelectOpportunity = (opp) => {
+  const handleSelectOpportunity = (opp, calendarDate) => {
     const selected = opp || userOpportunities[0] || null;
     setSelectedOpp(selected);
     setActiveTab('opp_details');
     if (selected) {
-      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id } });
+      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id, calendarDate } });
     }
   };
 
@@ -157,10 +167,13 @@ export default function App() {
         setActiveTab={setActiveTab}
         onRequestLogout={() => setIsLogoutModalOpen(true)}
         activeProject={activeProject}
+        isOpen={isMobileSidebarOpen} 
+        setIsOpen={setIsMobileSidebarOpen} 
       />
 
       {/* Main Workspace Area */}
       <div className="main-content">
+        {/* Global Header — search bar, download, notifications, theme, profile */}
         <Header
           searchVal={searchVal}
           setSearchVal={setSearchVal}
@@ -171,6 +184,8 @@ export default function App() {
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
+          onRefresh={handleGlobalRefresh}
+          onMenuClick={() => setIsMobileSidebarOpen(true)}
         />
 
         {/* Declarative View Router */}
@@ -203,9 +218,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp || userOpportunities[0]}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -215,9 +235,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -227,9 +252,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -246,7 +276,7 @@ export default function App() {
             }
           />
           <Route path="/calendar" element={<BidCalendarView searchVal={searchVal} onSelectOpportunity={handleSelectOpportunity} />} />
-          <Route path="/consortium" element={<ConsortiumView />} />
+          <Route path="/consortium" element={<ConsortiumView searchVal={searchVal} />} />
           <Route
             path="/client-profile"
             element={
@@ -257,9 +287,9 @@ export default function App() {
             }
           />
           <Route path="/reports" element={<ReportsView />} />
-          <Route path="/sources" element={<SourcesView />} />
-          <Route path="/offices" element={<OfficesView />} />
-          <Route path="/users" element={<UsersRolesView />} />
+          <Route path="/sources" element={<SourcesView searchVal={searchVal} />} />
+          <Route path="/offices" element={<OfficesView searchVal={searchVal} />} />
+          <Route path="/users" element={<UsersRolesView searchVal={searchVal} />} />
           <Route path="/audit" element={<AuditTrail searchVal={searchVal} setSearchVal={setSearchVal} />} />
           <Route path="/audit/details/:auditId" element={<AuditRecordDetailsPage />} />
           <Route path="/dashboard" element={<Dashboard />} />

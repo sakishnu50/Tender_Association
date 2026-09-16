@@ -214,6 +214,171 @@ export const mockClientProfile = {
         'Real-time water quality compliance achieved 99.4% adherence to WHO drinking water standards.'
       ],
       standards: 'ADB Environmental & Social Safeguards, Bureau of Indian Standards (IS 10500:2012), CPHEEO Manual'
+    },
+    {
+      id: 'PP-006',
+      name: 'Bengaluru Smart Water & Sewerage SCADA Overhaul',
+      sector: 'Water Infrastructure',
+      country: 'India',
+      location: 'Bengaluru Core Zones & Tech Corridors, Karnataka',
+      year: '2023',
+      duration: '2022 – 2023 (18 Months)',
+      client: 'ADB / BWSSB',
+      contractRef: 'BWSSB/ADB/SCADA-SMART/2022-09',
+      status: 'Completed',
+      value: '₹58 Crore',
+      projectLead: 'S. N. Anantharaman (Chief Systems Architect)',
+      teamSize: '36 Automation & Hydraulic Engineers',
+      overview: 'End-to-end integration of automated PLC/SCADA controls, pressure management valves, and 24x7 DMA monitoring across the Bengaluru metropolitan water supply and sewage transmission network.',
+      scope: 'Installation of 320 ultrasonic bulk flowmeters, cloud telemetry interface, automated surge anticipation valves, and real-time hydraulic transient analysis.',
+      objectives: [
+        'Automate distribution pumping across 18 major master balancing reservoirs in Bengaluru.',
+        'Mitigate pipe burst frequency and reduce water transmission losses to below 18%.',
+        'Implement an integrated operations command center dashboard for emergency dispatch.'
+      ],
+      keyActivities: [
+        'Deployment of IoT telemetry RTUs at all major pumping stations and reservoirs.',
+        'Hydraulic transient pressure modeling and automated PRV valve modulation.',
+        'Commissioning of centralized monitoring operations center at BWSSB headquarters.'
+      ],
+      outcomes: [
+        'Pumping energy consumption optimized with an 18.4% reduction in annual power bills.',
+        'Mean time to detect and isolate distribution leaks reduced from 14 hours to 35 minutes.',
+        'Reliable 24x7 water pressure supplied to over 500,000 urban consumers.'
+      ],
+      standards: 'ISO 27001 Cybersecurity, IEC 61131-3 PLC Standards, BIS 10500 Guidelines'
+    },
+    {
+      id: 'PP-007',
+      name: 'Kuala Lumpur Urban Transit Corridor DPR & Feasibility',
+      sector: 'Transportation',
+      country: 'Malaysia',
+      location: 'Klang Valley & Greater Kuala Lumpur',
+      year: '2022',
+      duration: '2021 – 2022 (16 Months)',
+      client: 'World Bank / Prasarana',
+      contractRef: 'PRASARANA/WB/TRANSIT-DPR/2021-06',
+      status: 'Completed',
+      value: '$9.4M',
+      projectLead: 'Azman bin Roslan (Senior Transit Specialist)',
+      teamSize: '24 Urban Transit Planners & Geotechnical Consultants',
+      overview: 'Detailed Project Report (DPR), ridership forecasting, alignment optimization, and multimodal interchange engineering for a 32 km automated light rail transit corridor expansion.',
+      scope: 'Multi-modal transit modeling, subterranean geological boring analysis, station pedestrian accessibility studies, and Environmental & Social Impact Assessment (ESIA).',
+      objectives: [
+        'Provide high-capacity transit links connecting suburban growth clusters to downtown Kuala Lumpur.',
+        'Achieve seamless multi-modal transfer with existing LRT and MRT lines.',
+        'Deliver a bankable public-private partnership (PPP) concession structure.'
+      ],
+      keyActivities: [
+        'Comprehensive 4-step transport demand modeling using EMME software.',
+        'Geotechnical risk assessment along 14 km of underground limestone cavern terrain.',
+        'Preparation of comprehensive contractor tender documents and EPC specifications.'
+      ],
+      outcomes: [
+        'Feasibility report cleared with 100% stakeholder compliance and cabinet sanction.',
+        'Optimized alignment reduced projected capital expenditure by $42 Million USD.',
+        'Forecasted daily ridership of 240,000 passenger trips upon full corridor commissioning.'
+      ],
+      standards: 'World Bank ESF, FIDIC Yellow Book, Malaysia Urban Transport Guidelines'
+    },
+    {
+      id: 'PP-008',
+      name: 'Gujarat Coastal Flood Mitigation & Stormwater Drainage',
+      sector: 'Urban Development',
+      country: 'India',
+      location: 'Surat & Gulf of Khambhat Coastal Belt, Gujarat',
+      year: '2024',
+      duration: '2023 – 2025 (Ongoing · 24 Months)',
+      client: 'JICA / GIDB',
+      contractRef: 'GIDB/JICA/COAST-DRAIN/2023-14',
+      status: 'Ongoing',
+      value: '₹74 Crore',
+      projectLead: 'Dr. Rameshwar Patel (Coastal Engineering Lead)',
+      teamSize: '40 Marine & Hydrological Engineers',
+      overview: 'Engineering design and construction oversight of climate-resilient sea dykes, automated tidal sluice gates, and high-capacity stormwater outfalls to protect coastal urban clusters.',
+      scope: '54 km of reinforced coastal dykes, 16 automated dual-action flap gates, tidal hydrodynamics modeling, and GIS-linked early warning flood sensor arrays.',
+      objectives: [
+        'Protect over 1.2 million urban residents from extreme monsoon storm surges and tidal inundation.',
+        'Modernize urban macro-drainage channels discharging into the Arabian Sea.',
+        'Integrate satellite radar telemetry for automated flood gate operations.'
+      ],
+      keyActivities: [
+        '2D hydrodynamic storm surge simulation using MIKE 21 coastal modeling suite.',
+        'Construction supervision of automated tidal barrage gates and seawall riprap.',
+        'Installation of solar-powered real-time water level transmitters across 28 estuaries.'
+      ],
+      outcomes: [
+        'Zero inundation recorded across pilot zones during peak 2024 monsoon high tides.',
+        'Drainage outflow efficiency improved by 65% during concurrent rainfall and tidal crests.',
+        'Project awarded National Climate Resilience Award 2024 by Ministry of Jal Shakti.'
+      ],
+      standards: 'JICA Environmental Guidelines, IRC:SP:42 Drainage Manual, Coastal Regulation Zone (CRZ-I)'
+    },
+    {
+      id: 'PP-009',
+      name: 'Mombasa Port Access Expressway Engineering Study',
+      sector: 'Transportation',
+      country: 'Kenya',
+      location: 'Mombasa Coastal Corridor & Port Link',
+      year: '2023',
+      duration: '2022 – 2023 (14 Months)',
+      client: 'AfDB / KeNHA',
+      contractRef: 'KeNHA/AfDB/MBA-EXPWY/2022-04',
+      status: 'Completed',
+      value: '$18.5M',
+      projectLead: 'Peter Ombati (Highway Infrastructure Director)',
+      teamSize: '32 Bridge & Pavement Engineers',
+      overview: 'Comprehensive highway geometric engineering, bridge structural design, and freight traffic optimization for a 26 km access expressway connecting Kilindini Port to the Northern Corridor.',
+      scope: 'Detailed Project Report (DPR), design of 6 multi-lane viaduct bridges across mangrove channels, intelligent toll collection system design, and pavement life-cycle analysis.',
+      objectives: [
+        'Eliminate heavy truck queuing and congestion bottleneck at the port container terminal gate.',
+        'Deliver heavy-duty pavement design capable of enduring 80 kN standard axle freight loads.',
+        'Preserve environmentally sensitive coastal mangrove wetlands along the alignment.'
+      ],
+      keyActivities: [
+        'Topographic surveying and ground LiDAR mapping across 26 km of coastal terrain.',
+        'Structural modeling of prestressed concrete continuous girder bridges over marine channels.',
+        'Formulation of a stringent Mangrove Wetland Protection and Reforestation plan.'
+      ],
+      outcomes: [
+        'Freight clearance turnaround time at Mombasa Port improved from 4.8 hours to 45 minutes.',
+        'Project DPR praised by AfDB as exemplary model for African transport corridors.',
+        'Zero net loss of mangrove forest verified through post-project environmental audit.'
+      ],
+      standards: 'AfDB Environmental Safeguards, BS 5400 Bridge Design, Kenya Road Design Manual'
+    },
+    {
+      id: 'PP-010',
+      name: 'Abu Dhabi Sustainable Smart City District Infrastructure',
+      sector: 'Urban Development',
+      country: 'UAE',
+      location: 'Masdar City & South Yas Infrastructure Zone, Abu Dhabi',
+      year: '2021',
+      duration: '2020 – 2021 (20 Months)',
+      client: 'Masdar / DMT',
+      contractRef: 'MASDAR/DMT/SMART-DIST/2020-11',
+      status: 'Completed',
+      value: 'AED 28M',
+      projectLead: 'Khalid Al-Hosani (Urban Systems Director)',
+      teamSize: '30 Smart City & District Cooling Specialists',
+      overview: 'Complete master planning and infrastructure engineering for a zero-carbon urban expansion district, including district cooling networks, vacuum waste collection, and recycled graywater irrigation.',
+      scope: '35 km vacuum waste collection tubing, 18 km pre-insulated district cooling piping, tertiary wastewater treatment polishing plant, and AI-enabled smart microgrid distribution.',
+      objectives: [
+        'Design net-zero carbon municipal infrastructure conforming to Estidama 4-Pearl rating.',
+        'Reduce potable municipal water demand for landscaping by 100% using treated effluent.',
+        'Incorporate subterranean pneumatic waste transport eliminating trash trucks.'
+      ],
+      keyActivities: [
+        'Thermal energy modeling for optimal district cooling chiller plant operation.',
+        'Engineering design of automated pneumatic waste inlets inside residential towers.',
+        'Integration of SCADA smart water reuse sensors adhering to Abu Dhabi DMT standards.'
+      ],
+      outcomes: [
+        'District achieved Estidama 4-Pearl sustainability accreditation.',
+        '40% reduction in annual cooling energy consumption compared to conventional baseline.',
+        'Landfill diversion rate exceeded 82% across residential and commercial sectors.'
+      ],
+      standards: 'Estidama Pearl Building Rating System, ASHRAE 90.1, Abu Dhabi Urban Planning Council (UPC)'
     }
   ]
 };
