@@ -19,8 +19,6 @@ function statusBadge(status) {
       return { label: 'Shortlisted', bg: '#DBEAFE', color: '#1E40AF' };
     case 'contacted':
       return { label: 'Contacted', bg: '#F3E8FF', color: '#7E22CE' };
-    case 'invited':
-      return { label: 'Invited', bg: '#FEF3C7', color: '#92400E' };
     default:
       return { label: 'Not Actioned', bg: '#F1F5F9', color: '#64748B' };
   }
