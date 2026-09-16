@@ -54,12 +54,12 @@
 
   /* Card & Shadow Tokens */
   --border-color: #E2E8F0;
-<<<<<<< HEAD
   --border-card: rgba(0, 0, 0, 0.06);
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.13);
   --radius-sm: 0.25rem;   /* 4px – inputs */
@@ -67,19 +67,6 @@
   --radius-lg: 0.5rem;    /* 8px – larger cards */
   --radius-xl: 0.75rem;   /* 12px – modals */
   --radius-2xl: 1rem;     /* 16px – hero cards */
-=======
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-  --shadow-card-hover: 0 12px 24px -4px rgba(37, 99, 235, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
->>>>>>> 7875f6a76e6987f13bf3cd221df9a10f0c835690
 }
 
 [data-theme="dark"] {
@@ -97,10 +84,7 @@
   --sidebar-bg: #070A12;
   --sidebar-border: #1E293B;
 
-<<<<<<< HEAD
-=======
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
->>>>>>> 7875f6a76e6987f13bf3cd221df9a10f0c835690
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
@@ -1361,7 +1345,6 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-<<<<<<< HEAD
 /* ─── Key Performance Indicators (KPI) Metric Cards ─── */
 .kpi-cards-grid {
   display: grid;
@@ -1471,7 +1454,7 @@ textarea {
 [data-theme="dark"] [class*="text-muted"] {
   color: #94A3B8;  /* Slate-400: 4.6:1 on dark bg #151D30 – WCAG AA */
 }
-=======
+
 /* ─── Responsive Navbar Breakpoints ─── */
 @media (max-width: 1100px) {
   .top-header {
@@ -1532,6 +1515,4 @@ textarea {
     font-size: 0.8rem;
   }
 }
-
->>>>>>> 7875f6a76e6987f13bf3cd221df9a10f0c835690
 
