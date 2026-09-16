@@ -202,19 +202,25 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             const borderColor = isDead ? 'var(--danger)' : isMeet ? 'var(--warning)' : isCut ? 'var(--info)' : 'var(--border-color)';
             
             return (
-              <div key={i} className="calendar-cell-event" style={{
-                fontSize: '0.7rem',
-                padding: '0.3rem 0.4rem',
-                borderRadius: '4px',
-                backgroundColor: bgColor,
-                color: textColor,
-                borderLeft: `3px solid ${borderColor}`,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                fontWeight: '600',
-                minWidth: 0
-              }} title={evt.title}>
+              <div
+                key={i}
+                className="calendar-cell-event"
+                style={{
+                  backgroundColor: bgColor,
+                  color: textColor,
+                  border: `1px solid ${borderColor}`,
+                  borderRadius: '4px',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: '100%',
+                  fontSize: '0.7rem',
+                  padding: '0.3rem 0.4rem',
+                  fontWeight: '600',
+                  minWidth: 0
+                }}
+                title={evt.title}
+              >
                 {evt.title}
               </div>
             );
@@ -248,31 +254,32 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           <button 
             className="btn btn-primary" 
             onClick={() => setIsDrawerOpen(true)}
-            style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+            title="View Events"
+            style={{ padding: '0.4rem 0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 'var(--radius-md)' }}
           >
-            <CalendarIcon size={16} /> View Events
+            <CalendarIcon size={18} />
           </button>
           
           <div style={{ position: 'relative' }} ref={filterDropdownRef}>
             <button
               onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
               className="btn btn-outline"
+              title="Filter"
               style={{ 
                 display: 'flex', 
-                alignItems: 'center', 
-                gap: '0.5rem', 
-                padding: '0.4rem 1rem', 
-                fontSize: '0.85rem', 
-                fontWeight: '700',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.4rem 0.6rem', 
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: isFilterDropdownOpen ? 'var(--bg-subtle)' : 'var(--bg-main)',
                 color: 'var(--text-main)',
                 border: '1px solid var(--border-color)',
                 cursor: 'pointer',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                flexShrink: 0
               }}
             >
-              <Filter size={16} /> Filter
+              <Filter size={18} />
             </button>
             
             {isFilterDropdownOpen && (
@@ -407,26 +414,43 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           .calendar-cell-event {
             font-size: 0.6rem !important;
             padding: 0.15rem 0.2rem !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+          .calendar-header-top {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+            margin-bottom: 1rem !important;
+          }
+          .calendar-title {
+            font-size: 1.1rem !important;
+          }
+          .calendar-weekdays-grid, .calendar-month-grid {
+            gap: 0.25rem !important;
+          }
+          .calendar-weekdays-grid div {
+            font-size: 0.65rem !important;
           }
         }
       `}</style>
 
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {/* Main Calendar View Area */}
-        <div className="card" style={{ flex: 1, minHeight: '600px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>{getCalendarTitle()}</h3>
+        <div className="card mobile-compact-card" style={{ flex: 1, minHeight: '500px' }}>
+          <div className="calendar-header-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <h3 className="calendar-title" style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', whiteSpace: 'nowrap' }}>{getCalendarTitle()}</h3>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                <button onClick={handlePrev} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'nowrap' }}>
+                <button onClick={handlePrev} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)', flexShrink: 0 }}>
                   <ChevronLeft size={18} />
                 </button>
-                <button onClick={handleToday} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700' }}>
+                <button onClick={handleToday} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700', flexShrink: 0 }}>
                   Today
                 </button>
-                <button onClick={handleNext} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)' }}>
+                <button onClick={handleNext} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)', flexShrink: 0 }}>
                   <ChevronRight size={18} />
                 </button>
               </div>
@@ -434,13 +458,13 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           </div>
 
           {view !== 'List' && view !== 'Year' && view !== 'Week' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
-              {weekDays.map(d => <div key={d}>{d}</div>)}
+            <div className="calendar-weekdays-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
+              {weekDays.map(d => <div key={d} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{d}</div>)}
             </div>
           )}
 
           {view === 'Month' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+            <div className="calendar-month-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
               {[...Array(firstDayOfMonth)].map((_, i) => (
                 <div key={`blank-${i}`} style={{ minHeight: '90px', backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', opacity: 0.3 }} />
               ))}
