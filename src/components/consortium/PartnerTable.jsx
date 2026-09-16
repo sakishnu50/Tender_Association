@@ -134,7 +134,7 @@ export default function PartnerTable({
                       </span>
                     </td>
                     <td style={{ ...tdBase, textAlign: 'center', padding: '1rem 1rem' }}>
-                      <span style={{ fontWeight: '700', fontSize: '0.875rem', color: scoreColor(techScore) }}>
+                      <span style={{ fontWeight: '700', fontSize: '0.875rem', color: 'var(--text-secondary, #334155)' }}>
                         {partner.technicalMatch || `${techScore}%`}
                       </span>
                     </td>
