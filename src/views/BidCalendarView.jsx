@@ -170,7 +170,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
         }}
         className={`calendar-cell ${isToday ? 'is-today' : ''}`}
       >
-        <div style={{
+        <div className="calendar-cell-header" style={{
           width: '100%',
           display: 'flex',
           justifyContent: 'space-between',
@@ -183,7 +183,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
               {cellDate.getDate()}
             </span>
           ) : (
-            <span style={{ 
+            <span className="calendar-cell-date" style={{ 
               fontSize: '0.8rem', 
               fontWeight: '600',
               color: 'var(--text-main)',
@@ -196,7 +196,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           )}
         </div>
         
-        <div style={{ 
+        <div className="calendar-events-container" style={{ 
           display: 'flex', 
           flexDirection: 'column', 
           gap: '0.2rem', 
@@ -213,6 +213,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             const bgColor = isDead ? 'var(--danger-bg)' : isMeet ? 'var(--warning-bg)' : isCut ? 'var(--info-bg)' : 'var(--bg-subtle)';
             const textColor = isDead ? 'var(--danger-text)' : isMeet ? 'var(--warning-text)' : isCut ? 'var(--info-text)' : 'var(--text-main)';
             const borderColor = isDead ? 'var(--danger)' : isMeet ? 'var(--warning)' : isCut ? 'var(--info)' : 'var(--border-color)';
+            const dotColor = isDead ? '#EF4444' : isMeet ? '#F59E0B' : isCut ? '#3B82F6' : 'var(--primary)';
             
             return (
               <div key={i} className="calendar-cell-event" style={{
@@ -229,7 +230,8 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                 minWidth: 0,
                 flexShrink: 0
               }} title={evt.title}>
-                {evt.title}
+                <span className="calendar-event-text">{evt.title}</span>
+                <span className="calendar-event-dot" style={{ backgroundColor: dotColor }} />
               </div>
             );
           })}
@@ -291,6 +293,16 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           border: 1px solid rgba(59, 130, 246, 0.5);
           font-weight: 800;
         }
+        .calendar-event-text {
+          display: inline-block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 100%;
+        }
+        .calendar-event-dot {
+          display: none;
+        }
         .event-card {
           transition: all 0.2s ease;
         }
@@ -348,6 +360,276 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
         .events-drawer.open {
           transform: translateX(0);
         }
+        .calendar-toolbar {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          margin-top: 0.25rem;
+          margin-bottom: 0.75rem;
+          flex-shrink: 0;
+          position: relative;
+          z-index: 40;
+        }
+        .calendar-filter-dropdown {
+          position: absolute;
+          top: calc(100% + 6px);
+          right: 0;
+          background-color: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-xl);
+          z-index: 50;
+          min-width: 130px;
+          padding: 0.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          box-sizing: border-box;
+        }
+        .calendar-filter-item {
+          padding: 0.5rem 0.75rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          text-align: left;
+          border-radius: var(--radius-sm);
+          background-color: transparent;
+          color: #111827;
+          border: none;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.5rem;
+          transition: all 0.15s ease;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .calendar-filter-item:hover {
+          background-color: var(--bg-subtle);
+          color: #111827;
+        }
+        .calendar-filter-item.active {
+          background-color: var(--primary-light);
+          color: var(--primary);
+          font-weight: 700;
+        }
+        [data-theme="dark"] .calendar-filter-dropdown {
+          background-color: #151D30;
+          border-color: #26334D;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
+        }
+        [data-theme="dark"] .calendar-filter-item {
+          color: #F3F4F6;
+        }
+        [data-theme="dark"] .calendar-filter-item:hover {
+          background-color: #1E293B;
+          color: #FFFFFF;
+        }
+        [data-theme="dark"] .calendar-filter-item.active {
+          color: #60A5FA;
+          background-color: rgba(37, 99, 235, 0.22);
+        }
+        .calendar-filter-check {
+          font-size: 0.85rem;
+          font-weight: 800;
+          color: var(--primary);
+          flex-shrink: 0;
+        }
+        [data-theme="dark"] .calendar-filter-check {
+          color: #60A5FA;
+        }
+        .calendar-toolbar-title {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: var(--text-main);
+          margin: 0;
+          padding: 0.25rem 0;
+        }
+        .calendar-toolbar-controls {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          flex-wrap: nowrap;
+          flex-shrink: 0;
+        }
+        .calendar-ctrl-btn {
+          width: 38px;
+          height: 38px;
+          padding: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: var(--radius-md);
+          background-color: var(--bg-card);
+          border: 1px solid var(--border-color);
+          color: var(--text-main);
+          cursor: pointer;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+        }
+        .calendar-ctrl-btn:hover {
+          background-color: var(--bg-subtle);
+          border-color: var(--primary);
+          color: var(--primary);
+        }
+        .calendar-today-group {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          flex-shrink: 0;
+        }
+        .calendar-today-btn {
+          height: 38px;
+          padding: 0 0.95rem;
+          font-size: 0.85rem;
+          font-weight: 700;
+          border-radius: var(--radius-md);
+          background-color: var(--bg-card);
+          border: 1px solid var(--border-color);
+          color: var(--text-main);
+          cursor: pointer;
+          transition: all 0.15s ease;
+          flex-shrink: 0;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .calendar-today-btn:hover {
+          background-color: var(--bg-subtle);
+          border-color: var(--primary);
+          color: var(--primary);
+        }
+        .calendar-grid-wrapper {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+        }
+        .calendar-grid-inner {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+        }
+        @media (max-width: 640px) {
+          .calendar-page-container {
+            padding: 0.75rem 0.5rem !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: calc(100vh - 120px);
+          }
+          .calendar-card {
+            padding: 0.65rem 0.5rem !important;
+          }
+          .calendar-toolbar {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 0.4rem !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.5rem !important;
+          }
+          .calendar-toolbar-title {
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 1.15rem !important;
+            line-height: 1.2;
+          }
+          .calendar-toolbar-controls {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: flex-end !important;
+            gap: 0.35rem !important;
+            flex-wrap: nowrap !important;
+            flex-shrink: 0 !important;
+          }
+          .calendar-ctrl-btn {
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0 !important;
+          }
+          .calendar-today-group {
+            gap: 0.25rem !important;
+          }
+          .calendar-today-btn {
+            height: 32px !important;
+            padding: 0 0.65rem !important;
+            font-size: 0.775rem !important;
+          }
+          .calendar-grid-wrapper {
+            overflow: hidden !important;
+            width: 100% !important;
+            padding: 0 !important;
+          }
+          .calendar-grid-inner {
+            min-width: 0 !important;
+            width: 100% !important;
+            min-height: 0 !important;
+          }
+          .calendar-grid-header {
+            gap: 2px !important;
+            font-size: 10px !important;
+            margin-bottom: 4px !important;
+          }
+          .calendar-month-grid {
+            gap: 2px !important;
+          }
+          .calendar-cell {
+            padding: 2px !important;
+            border-radius: 4px !important;
+          }
+          .calendar-cell-header {
+            margin-bottom: 2px !important;
+            justify-content: center !important;
+          }
+          .calendar-cell-date {
+            font-size: 10px !important;
+            font-weight: 700 !important;
+          }
+          .today-badge {
+            font-size: 9px !important;
+            padding: 0px 3px !important;
+            border-radius: 3px !important;
+          }
+          .calendar-events-container {
+            flex-direction: row !important;
+            flex-wrap: wrap !important;
+            gap: 2px !important;
+            justify-content: center !important;
+            align-items: center !important;
+            overflow: hidden !important;
+          }
+          .calendar-cell-event {
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            min-width: unset !important;
+            width: auto !important;
+            height: auto !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            margin: 0 !important;
+          }
+          .calendar-event-text {
+            display: none !important;
+          }
+          .calendar-event-dot {
+            display: block !important;
+            width: 5px !important;
+            height: 5px !important;
+            border-radius: 50% !important;
+            box-shadow: 0 0 1px rgba(0,0,0,0.5);
+          }
+        }
         .list-grid-view {
           display: grid;
           grid-template-columns: 120px 2fr 1.5fr;
@@ -357,106 +639,58 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             grid-template-columns: 1fr;
             gap: 0.5rem !important;
           }
-          .calendar-cell {
-            padding: 0.2rem !important;
-          }
-          .calendar-cell > div > span {
-            font-size: 0.7rem !important;
-          }
-          .calendar-cell-event {
-            font-size: 0.55rem !important;
-            padding: 0.1rem 0.2rem !important;
-          }
         }
       `}</style>
 
       <div style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Main Calendar View Area */}
-        <div className="card" style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: '1rem 1.25rem', overflow: 'hidden', boxSizing: 'border-box' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.75rem', flexShrink: 0 }}>
+        <div className="card calendar-card" style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: '1rem 1.25rem', overflow: 'hidden', boxSizing: 'border-box' }}>
+          <div className="calendar-toolbar">
             {/* 1. Left Side: Display ONLY the current month and year title */}
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
+            <h3 className="calendar-toolbar-title">
               {getCalendarTitle()}
             </h3>
             
             {/* 2. Right Side Controls: Strict Left-to-Right Sequence */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            <div className="calendar-toolbar-controls">
               {/* First: Filter Icon Button ONLY (view switcher: Month, Week, Year, List) */}
               <div style={{ position: 'relative' }} ref={filterMenuRef}>
                 <button
                   onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-                  className="btn btn-outline"
+                  className="btn btn-outline calendar-ctrl-btn"
                   style={{
-                    width: '38px',
-                    height: '38px',
-                    padding: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 'var(--radius-md)',
                     backgroundColor: isFilterMenuOpen ? 'var(--bg-subtle)' : 'var(--bg-card)',
                     borderColor: isFilterMenuOpen ? 'var(--primary)' : 'var(--border-color)',
-                    color: isFilterMenuOpen ? 'var(--primary)' : 'var(--text-main)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
+                    color: isFilterMenuOpen ? 'var(--primary)' : 'var(--text-main)'
                   }}
                   title="Switch View"
                   aria-label="Switch calendar view"
                   aria-haspopup="true"
                   aria-expanded={isFilterMenuOpen}
                 >
-                  <Filter size={17} />
+                  <Filter size={16} />
                 </button>
 
                 {isFilterMenuOpen && (
                   <div
-                    style={{
-                      position: 'absolute',
-                      top: 'calc(100% + 6px)',
-                      right: 0,
-                      backgroundColor: 'var(--bg-card)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-md)',
-                      boxShadow: 'var(--shadow-xl)',
-                      zIndex: 100,
-                      minWidth: '145px',
-                      padding: '0.4rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.2rem'
-                    }}
+                    className="calendar-filter-dropdown"
+                    role="menu"
+                    aria-label="View switcher options"
                   >
                     {['Year', 'Month'].map((v) => (
                       <button
                         key={v}
+                        role="menuitem"
                         onClick={() => {
                           setView(v);
                           setIsFilterMenuOpen(false);
                         }}
-                        style={{
-                          padding: '0.5rem 0.75rem',
-                          fontSize: '0.825rem',
-                          fontWeight: view === v ? '700' : '500',
-                          textAlign: 'left',
-                          borderRadius: 'var(--radius-sm)',
-                          backgroundColor: view === v ? 'var(--primary-light)' : 'transparent',
-                          color: view === v ? 'var(--primary)' : 'var(--text-main)',
-                          border: 'none',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          transition: 'all 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (view !== v) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
-                        }}
-                        onMouseLeave={(e) => {
-                          if (view !== v) e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
+                        className={`calendar-filter-item ${view === v ? 'active' : ''}`}
                       >
                         <span>{v}</span>
-                        {view === v && <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: '800' }}>✓</span>}
+                        {view === v && (
+                          <span className="calendar-filter-check" aria-hidden="true">✓</span>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -466,104 +700,57 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
               {/* Second: Calendar Icon Button ONLY (All Events) */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="btn btn-outline"
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  padding: 0,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--bg-card)',
-                  borderColor: 'var(--border-color)',
-                  color: 'var(--text-main)',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
+                className="btn btn-outline calendar-ctrl-btn"
                 title="All Events"
                 aria-label="View all events"
               >
-                <CalendarIcon size={17} />
+                <CalendarIcon size={16} />
               </button>
 
               {/* Third: Today Navigation Group (<, Today, >) */}
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+              <div className="calendar-today-group">
                 <button
                   onClick={handlePrev}
-                  className="btn btn-outline"
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    padding: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--bg-card)',
-                    borderColor: 'var(--border-color)',
-                    color: 'var(--text-main)'
-                  }}
+                  className="btn btn-outline calendar-ctrl-btn"
                   title="Previous Period"
                   aria-label="Previous period"
                 >
-                  <ChevronLeft size={18} />
+                  <ChevronLeft size={17} />
                 </button>
                 <button
                   onClick={handleToday}
-                  className="btn btn-outline"
-                  style={{
-                    height: '38px',
-                    padding: '0 0.95rem',
-                    fontSize: '0.85rem',
-                    fontWeight: '700',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--bg-card)',
-                    borderColor: 'var(--border-color)',
-                    color: 'var(--text-main)'
-                  }}
+                  className="btn btn-outline calendar-today-btn"
                 >
                   Today
                 </button>
                 <button
                   onClick={handleNext}
-                  className="btn btn-outline"
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    padding: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: 'var(--bg-card)',
-                    borderColor: 'var(--border-color)',
-                    color: 'var(--text-main)'
-                  }}
+                  className="btn btn-outline calendar-ctrl-btn"
                   title="Next Period"
                   aria-label="Next period"
                 >
-                  <ChevronRight size={18} />
+                  <ChevronRight size={17} />
                 </button>
               </div>
             </div>
           </div>
 
-          {view !== 'List' && view !== 'Year' && view !== 'Week' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.35rem', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.35rem', flexShrink: 0 }}>
-              {weekDays.map(d => <div key={d}>{d}</div>)}
-            </div>
-          )}
-
           {view === 'Month' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'repeat(auto-fit, minmax(0, 1fr))', gridAutoRows: '1fr', gap: '0.35rem', flex: 1, minHeight: 0, height: '100%' }}>
-              {[...Array(firstDayOfMonth)].map((_, i) => (
-                <div key={`blank-${i}`} style={{ minHeight: 0, height: '100%', backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', opacity: 0.3 }} />
-              ))}
-              {daysInMonth.map(day => {
-                const cellDate = new Date(currentYear, currentMonth, day);
-                return renderCell(cellDate, day);
-              })}
+            <div className="calendar-grid-wrapper">
+              <div className="calendar-grid-inner">
+                <div className="calendar-grid-header" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.35rem', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.35rem', flexShrink: 0 }}>
+                  {weekDays.map(d => <div key={d}>{d}</div>)}
+                </div>
+                <div className="calendar-month-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'repeat(auto-fit, minmax(0, 1fr))', gridAutoRows: '1fr', gap: '0.35rem', flex: 1, minHeight: 0, height: '100%' }}>
+                  {[...Array(firstDayOfMonth)].map((_, i) => (
+                    <div key={`blank-${i}`} style={{ minHeight: 0, height: '100%', backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', opacity: 0.3 }} />
+                  ))}
+                  {daysInMonth.map(day => {
+                    const cellDate = new Date(currentYear, currentMonth, day);
+                    return renderCell(cellDate, day);
+                  })}
+                </div>
+              </div>
             </div>
           )}
 

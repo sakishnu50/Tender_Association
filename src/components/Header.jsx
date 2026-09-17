@@ -167,75 +167,32 @@ export default function Header({
         {ariaAnnouncement}
       </div>
 
-      {/* 1. Real-Time Search Bar - Positioned at the Left Corner */}
-      <div className="header-search" role="search">
-        <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder={
-            activeTab === 'opportunities' || activeTab === 'opp_details'
-              ? 'Search opportunities, sectors, values...'
-              : activeTab === 'calendar'
-              ? 'Search events, submission deadlines...'
-              : activeTab === 'consortium'
-              ? 'Search partners, expertise, credentials...'
-              : activeTab === 'sources'
-              ? 'Search monitored portals, agencies...'
-              : activeTab === 'offices'
-              ? 'Search regional offices, locations...'
-              : activeTab === 'users'
-              ? 'Search users, roles, email accounts...'
-              : activeTab === 'audit'
-              ? 'Search audit logs, actions, records...'
-              : activeTab === 'client_profile'
-              ? 'Search client profile, past projects...'
-              : activeTab === 'reports'
-              ? 'Search analytics, export reports...'
-              : 'Search tenders, projects, locations, sectors...'
-          }
-          value={searchVal || ''}
-          onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
-          aria-label="Search content"
-        />
-        {searchVal ? (
-          <button
-            onClick={() => setSearchVal && setSearchVal('')}
-            className="header-search-clear-btn"
-            style={{
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '2px',
-              flexShrink: 0
-            }}
-            title="Clear search (Esc)"
-            aria-label="Clear search input"
-          >
-            <X size={14} />
-          </button>
-        ) : (
-          <span className="header-search-badge" aria-hidden="true">
-            ⌘K
-          </span>
-        )}
-      </div>
-
-      {/* Header Action Controls */}
-      <div className="header-actions" role="toolbar" aria-label="Global header actions">
-        {/* Refresh Button - immediately to the LEFT of the notification bell */}
+      {/* Top Header Navigation Bar (Mobile: Hamburger on left, Actions on right; Desktop: Actions on right) */}
+      <div className="top-header-nav-bar">
+        {/* Mobile Hamburger Menu Toggle Button */}
         <button
-          className="btn-header-refresh"
-          onClick={handleRefreshClick}
-          title="Refresh Dashboard Data"
-          aria-label={isRefreshing ? 'Refreshing data...' : 'Refresh dashboard data'}
-          disabled={isRefreshing}
+          className="header-mobile-menu-btn"
+          onClick={onMenuClick}
+          title="Open Navigation Menu"
+          aria-label="Open navigation menu"
           type="button"
         >
-          <RefreshCw size={17} className={isRefreshing ? 'spin-icon' : ''} aria-hidden="true" />
+          <Menu size={20} aria-hidden="true" />
         </button>
+
+        {/* Header Action Controls */}
+        <div className="header-actions" role="toolbar" aria-label="Global header actions">
+          {/* Refresh Button - immediately to the LEFT of the notification bell */}
+          <button
+            className="btn-header-refresh"
+            onClick={handleRefreshClick}
+            title="Refresh Dashboard Data"
+            aria-label={isRefreshing ? 'Refreshing data...' : 'Refresh dashboard data'}
+            disabled={isRefreshing}
+            type="button"
+          >
+            <RefreshCw size={17} className={isRefreshing ? 'spin-icon' : ''} aria-hidden="true" />
+          </button>
 
         {/* 2. Notification Bell Icon */}
         <div style={{ position: 'relative' }} ref={notificationMenuRef}>
@@ -504,6 +461,63 @@ export default function Header({
             </div>
           )}
         </div>
+      </div>
+    </div>
+
+      {/* Real-Time Search Bar */}
+      <div className="header-search" role="search">
+        <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
+        <input
+          ref={inputRef}
+          type="text"
+          placeholder={
+            activeTab === 'opportunities' || activeTab === 'opp_details'
+              ? 'Search opportunities, sectors, values...'
+              : activeTab === 'calendar'
+              ? 'Search events, submission deadlines...'
+              : activeTab === 'consortium'
+              ? 'Search partners, expertise, credentials...'
+              : activeTab === 'sources'
+              ? 'Search monitored portals, agencies...'
+              : activeTab === 'offices'
+              ? 'Search regional offices, locations...'
+              : activeTab === 'users'
+              ? 'Search users, roles, email accounts...'
+              : activeTab === 'audit'
+              ? 'Search audit logs, actions, records...'
+              : activeTab === 'client_profile'
+              ? 'Search client profile, past projects...'
+              : activeTab === 'reports'
+              ? 'Search analytics, export reports...'
+              : 'Search tenders, projects, locations, sectors...'
+          }
+          value={searchVal || ''}
+          onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
+          aria-label="Search content"
+        />
+        {searchVal ? (
+          <button
+            onClick={() => setSearchVal && setSearchVal('')}
+            className="header-search-clear-btn"
+            style={{
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '2px',
+              flexShrink: 0
+            }}
+            title="Clear search (Esc)"
+            aria-label="Clear search input"
+          >
+            <X size={14} />
+          </button>
+        ) : (
+          <span className="header-search-badge" aria-hidden="true">
+            ⌘K
+          </span>
+        )}
       </div>
     </header>
   );
