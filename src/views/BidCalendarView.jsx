@@ -266,17 +266,22 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
         }
         .year-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1rem;
+          grid-template-columns: repeat(4, 1fr);
+          grid-template-rows: repeat(3, 1fr);
+          gap: 0.65rem;
         }
         @media (max-width: 900px) {
           .year-grid {
             grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto;
+            overflow-y: auto;
           }
         }
         @media (max-width: 600px) {
           .year-grid {
             grid-template-columns: 1fr;
+            grid-template-rows: auto;
+            overflow-y: auto;
           }
         }
         .drawer-overlay {
@@ -387,7 +392,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                       gap: '0.2rem'
                     }}
                   >
-                    {['Year', 'Month', 'Week', 'List'].map((v) => (
+                    {['Year', 'Month', 'List'].map((v) => (
                       <button
                         key={v}
                         onClick={() => {
@@ -620,7 +625,20 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           )}
 
           {view === 'Year' && (
-            <div className="year-grid" style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '0.25rem' }}>
+            <div
+              className="year-grid"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gridTemplateRows: 'repeat(3, 1fr)',
+                gridAutoRows: '1fr',
+                gap: '0.65rem',
+                flex: 1,
+                minHeight: 0,
+                height: '100%',
+                overflow: 'hidden'
+              }}
+            >
               {Array.from({ length: 12 }, (_, i) => {
                 const monthDate = new Date(currentYear, i, 1);
                 const monthName = monthDate.toLocaleString('default', { month: 'long' });
@@ -641,27 +659,30 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                     style={{
                       cursor: 'pointer',
                       backgroundColor: 'var(--bg-subtle)',
-                      padding: '1.25rem',
-                      borderRadius: 'var(--radius-lg)',
+                      padding: '0.75rem 1rem',
+                      borderRadius: 'var(--radius-md)',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.5rem',
+                      gap: '0.35rem',
                       border: count > 0 ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-                      minHeight: '100px'
+                      height: '100%',
+                      minHeight: 0,
+                      boxSizing: 'border-box'
                     }}
                   >
-                    <span style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                    <span style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: 1.2 }}>
                       {monthName}
                     </span>
                     <span style={{ 
-                      fontSize: '0.8rem', 
+                      fontSize: '0.75rem', 
                       color: count > 0 ? '#FFF' : 'var(--text-muted)', 
                       fontWeight: '700',
                       backgroundColor: count > 0 ? 'var(--primary)' : 'transparent',
-                      padding: count > 0 ? '0.15rem 0.75rem' : '0',
-                      borderRadius: 'var(--radius-full)'
+                      padding: count > 0 ? '0.1rem 0.6rem' : '0',
+                      borderRadius: 'var(--radius-full)',
+                      lineHeight: 1.2
                     }}>
                       {count} {count === 1 ? 'Event' : 'Events'}
                     </span>
