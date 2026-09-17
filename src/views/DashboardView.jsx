@@ -29,6 +29,7 @@ import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '.
 import DashboardQuickViewModal from '../components/dashboard/DashboardQuickViewModal';
 import KpiDetailModal from '../components/dashboard/KpiDetailModal';
 import RecentActivityFeed from '../components/dashboard/RecentActivityFeed';
+import { PursueModal, DeclineModal } from './PursueModal';
 import { exportService } from '../services/exportService';
 
 export default function DashboardView({ onSelectOpportunity, onViewAll, searchVal = '', setSearchVal }) {
@@ -61,6 +62,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshedTime, setLastRefreshedTime] = useState(null);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+
+  // Pursue / Decline Modal State
+  const [isPursueModalOpen, setIsPursueModalOpen] = useState(false);
+  const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
+  const [selectedPursueOpp, setSelectedPursueOpp] = useState(null);
 
   // KPI Card Modal State
   const [isKpiModalOpen, setIsKpiModalOpen] = useState(false);
@@ -118,14 +124,35 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     setIsKpiModalOpen(true);
   };
 
-  const handlePursue = async (opp) => {
-    await pursueMutation.mutateAsync({ id: opp.id, details: { priority: 'High' } });
-    alert(`Opportunity "${opp.name}" marked as PURSUED!`);
+  // Opens PursueModal for a given opportunity
+  const handlePursue = (opp) => {
+    setSelectedPursueOpp(opp);
+    setIsPursueModalOpen(true);
+    // Close quick-view modal if open so pursue modal sits on top
+    setIsQuickViewOpen(false);
   };
 
-  const handleDecline = async (opp) => {
-    await declineMutation.mutateAsync({ id: opp.id, details: { reason: 'Budget Constraints' } });
-    alert(`Opportunity "${opp.name}" DECLINED.`);
+  // Fires the actual mutation after user confirms in PursueModal
+  const handleConfirmPursue = async () => {
+    if (!selectedPursueOpp) return;
+    await pursueMutation.mutateAsync({ id: selectedPursueOpp.id, details: { priority: 'High' } });
+    setIsPursueModalOpen(false);
+    setSelectedPursueOpp(null);
+  };
+
+  // Opens DeclineModal for a given opportunity
+  const handleDecline = (opp) => {
+    setSelectedPursueOpp(opp);
+    setIsDeclineModalOpen(true);
+    setIsQuickViewOpen(false);
+  };
+
+  // Fires the actual mutation after user confirms in DeclineModal
+  const handleConfirmDecline = async () => {
+    if (!selectedPursueOpp) return;
+    await declineMutation.mutateAsync({ id: selectedPursueOpp.id, details: { reason: 'Budget Constraints' } });
+    setIsDeclineModalOpen(false);
+    setSelectedPursueOpp(null);
   };
 
   // Metric trend and text mapping per time range
@@ -670,6 +697,20 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
           onClose={() => setIsQuickViewOpen(false)}
           onPursue={handlePursue}
           onDecline={handleDecline}
+        />
+
+        {/* 8. Pursue Confirmation Modal */}
+        <PursueModal
+          isOpen={isPursueModalOpen}
+          onClose={() => { setIsPursueModalOpen(false); setSelectedPursueOpp(null); }}
+          onConfirm={handleConfirmPursue}
+        />
+
+        {/* 9. Decline Confirmation Modal */}
+        <DeclineModal
+          isOpen={isDeclineModalOpen}
+          onClose={() => { setIsDeclineModalOpen(false); setSelectedPursueOpp(null); }}
+          onConfirm={handleConfirmDecline}
         />
 
         {/* 7. KPI Stat Cards Detail Modal (Opens when any stat card is clicked) */}
