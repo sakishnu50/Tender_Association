@@ -91,6 +91,7 @@
   --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.7);
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --primary-light: rgba(37, 99, 235, 0.18);
 
   /* ── Dark-mode warning tokens: bright amber on dark ── */
   --warning:      #F59E0B;          /* vivid amber – icons & borders */

@@ -47,10 +47,9 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
     return matchTitle || matchDesc || matchSource || matchSector;
   });
 
-  // When search becomes active and finds results, switch to List view and navigate to the first match's month
+  // When search becomes active and finds results, navigate to the first match's month
   useEffect(() => {
     if (activeSearch && filteredEvents.length > 0) {
-      setView('List');
       const firstEventDate = new Date(filteredEvents[0].date);
       setCurrentDate(new Date(firstEventDate.getFullYear(), firstEventDate.getMonth(), 1));
     }
@@ -122,6 +121,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
   const handleToday = () => {
     const today = new Date();
     setCurrentDate(today);
+    setView('Month');
   };
   
   const daysInMonth = Array.from({ length: numDays }, (_, i) => i + 1);
@@ -159,19 +159,16 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           minHeight: 0,
           padding: '0.35rem 0.45rem',
           borderRadius: '8px',
-          border: isToday ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-          backgroundColor: isToday ? 'var(--bg-subtle)' : 'transparent',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
           justifyContent: 'flex-start',
           cursor: cellEvents.length > 0 ? 'pointer' : 'default',
-          transition: 'all 0.15s ease',
           minWidth: 0,
           overflow: 'hidden',
           boxSizing: 'border-box'
         }}
-        className="calendar-cell"
+        className={`calendar-cell ${isToday ? 'is-today' : ''}`}
       >
         <div style={{
           width: '100%',
@@ -181,17 +178,22 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           marginBottom: '0.2rem',
           flexShrink: 0
         }}>
-          <span style={{ 
-            fontSize: '0.8rem', 
-            fontWeight: isToday ? '800' : '600',
-            color: isToday ? 'var(--primary)' : 'var(--text-main)',
-            backgroundColor: isToday ? 'var(--bg-hover)' : 'transparent',
-            padding: isToday ? '0.05rem 0.35rem' : '0',
-            borderRadius: '4px',
-            lineHeight: 1.2
-          }}>
-            {cellDate.getDate()}
-          </span>
+          {isToday ? (
+            <span className="today-badge">
+              {cellDate.getDate()}
+            </span>
+          ) : (
+            <span style={{ 
+              fontSize: '0.8rem', 
+              fontWeight: '600',
+              color: 'var(--text-main)',
+              padding: '0',
+              borderRadius: '4px',
+              lineHeight: 1.2
+            }}>
+              {cellDate.getDate()}
+            </span>
+          )}
         </div>
         
         <div style={{ 
@@ -254,8 +256,40 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
   return (
     <div className="page-container calendar-page-container" style={{ height: 'calc(100vh - 68px)', maxHeight: 'calc(100vh - 68px)', padding: '1rem 1.75rem', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 0, position: 'relative' }}>
       <style>{`
+        .calendar-cell {
+          border: 1px solid var(--border-color);
+          background-color: transparent;
+          transition: all 0.15s ease;
+        }
         .calendar-cell:hover {
           background-color: var(--bg-hover) !important;
+        }
+        .calendar-cell.is-today {
+          border: 2px solid #2563EB !important;
+          background-color: rgba(37, 99, 235, 0.08) !important;
+          box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25) !important;
+        }
+        [data-theme="dark"] .calendar-cell.is-today {
+          border: 2px solid #3B82F6 !important;
+          background-color: rgba(37, 99, 235, 0.18) !important;
+          box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35) !important;
+        }
+        .today-badge {
+          font-size: 0.8rem;
+          font-weight: 800;
+          color: #FFFFFF;
+          background-color: #2563EB;
+          padding: 0.1rem 0.45rem;
+          border-radius: 4px;
+          line-height: 1.2;
+          display: inline-block;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+        }
+        [data-theme="dark"] .today-badge {
+          color: #BFDBFE;
+          background-color: rgba(30, 58, 138, 0.7);
+          border: 1px solid rgba(59, 130, 246, 0.5);
+          font-weight: 800;
         }
         .event-card {
           transition: all 0.2s ease;
@@ -392,7 +426,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                       gap: '0.2rem'
                     }}
                   >
-                    {['Year', 'Month', 'List'].map((v) => (
+                    {['Year', 'Month'].map((v) => (
                       <button
                         key={v}
                         onClick={() => {
