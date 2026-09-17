@@ -24,6 +24,7 @@ import {
 import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
 import DashboardAnalytics from '../components/dashboard/DashboardAnalytics';
+import RecentActivityFeed from '../components/dashboard/RecentActivityFeed';
 import DashboardQuickViewModal from '../components/dashboard/DashboardQuickViewModal';
 import KpiDetailModal from '../components/dashboard/KpiDetailModal';
 
@@ -508,7 +509,10 @@ export default function DashboardView({ onSelectOpportunity, onViewAll }) {
         </div>
       </div>
 
-      {/* 4. Interactive Recharts Visual Analytics (wired to timeRange) */}
+      {/* 4. Recent Activity Feed */}
+      <RecentActivityFeed />
+
+      {/* 5. Interactive Recharts Visual Analytics (wired to timeRange) */}
       <DashboardAnalytics timeRange={timeRange} />
 
       {/* 5. Opportunities Workspace (Table / Card Explorer) */}
