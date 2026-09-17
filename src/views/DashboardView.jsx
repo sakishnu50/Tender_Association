@@ -657,7 +657,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       </div>
 
       {/* Recent Activity Feed */}
-      <RecentActivityFeed />
+      <RecentActivityFeed
+        opportunities={timeFilteredOpportunities}
+        onInspectOpportunity={handleOpenQuickView}
+        onPursueOpportunity={handlePursue}
+      />
 
       {/* 6. Quick View Detail Modal */}
         <DashboardQuickViewModal
