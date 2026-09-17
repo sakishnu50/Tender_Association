@@ -167,15 +167,10 @@ export default function Header({
         {ariaAnnouncement}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button className="mobile-menu-btn btn btn-outline" onClick={onMenuClick} style={{ padding: '0.4rem', border: 'none' }}>
-            <Menu size={20} />
-          </button>
-          <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)' }}>
-            {activeTabTitle || 'Dashboard'}
-          </h2>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button className="mobile-menu-btn btn btn-outline" onClick={onMenuClick} style={{ padding: '0.4rem', border: 'none' }} aria-label="Toggle Navigation Menu">
+          <Menu size={20} />
+        </button>
       </div>
 
       {/* 1. Real-Time Search Bar */}
