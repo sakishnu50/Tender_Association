@@ -11,7 +11,7 @@ export default function Header({ searchVal, setSearchVal, activeTabTitle, darkMo
           <Menu size={20} />
         </button>
         <h2 style={{ fontSize: '1.125rem', fontWeight: '700', color: 'var(--text-main)', whiteSpace: 'nowrap', margin: 0 }}>
-          {activeTabTitle || 'Bid Calendar'}
+          {activeTabTitle}
         </h2>
       </div>
       

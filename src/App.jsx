@@ -56,7 +56,7 @@ export default function App() {
     opportunities: 'Opportunities List',
     opp_details: 'Opportunity Details',
     alerts: 'Alerts & Priority Notifications',
-    calendar: 'Bid Calendar',
+    calendar: '',
     consortium: 'Consortium Recommendations',
     reports: 'Reports & Analytics',
     sources: 'Monitored Sources',
