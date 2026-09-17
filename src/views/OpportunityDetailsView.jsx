@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
 import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 
 import OpportunityHeader from '../components/ui/OpportunityHeader';
@@ -22,7 +22,7 @@ let _seq = 100;
 function uid() { return `DYN-${++_seq}`; }
 
 /* ─── Inner Content Component (re-keyed per opportunity) ─── */
-function OpportunityDetailsContent({ opportunity, onBack }) {
+function OpportunityDetailsContent({ opportunity, onBack, calendarDate }) {
   // Local status state (decoupled from global list)
   const [status, setStatus] = useState(opportunity?.status || 'New');
 
@@ -78,7 +78,7 @@ function OpportunityDetailsContent({ opportunity, onBack }) {
       {/* ── 1. Breadcrumb + Back ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         <nav className="breadcrumb" aria-label="Breadcrumb">
-          <span>Opportunities</span>
+          <span>{calendarDate ? 'Bid Calendar' : 'Opportunities'}</span>
           <ChevronRight size={13} className="breadcrumb-sep" />
           <span className="breadcrumb-current">Opportunity Details</span>
         </nav>
@@ -104,7 +104,7 @@ function OpportunityDetailsContent({ opportunity, onBack }) {
           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
         >
           <ArrowLeft size={15} />
-          Back to Opportunities
+          {calendarDate ? 'Back to Bid Calendar' : 'Back to Opportunities'}
         </button>
       </div>
 
@@ -153,6 +153,7 @@ export default function OpportunityDetailsView({ opportunity: propOpportunity, o
   const { id: routeId } = useParams();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const calendarDate = location.state?.calendarDate;
 
   // Extract opportunity ID from route param, query string, navigation state, or prop
   const activeId = routeId || searchParams.get('id') || location.state?.id || propOpportunity?.id || 'OPP-001';
@@ -169,11 +170,11 @@ export default function OpportunityDetailsView({ opportunity: propOpportunity, o
   // Safe back handler
   const handleBack = useCallback(() => {
     if (onBack) {
-      onBack();
+      onBack(calendarDate);
     } else {
       navigate('/opportunities');
     }
-  }, [onBack, navigate]);
+  }, [onBack, navigate, calendarDate]);
 
   if (!opportunity) return null;
 
@@ -182,6 +183,7 @@ export default function OpportunityDetailsView({ opportunity: propOpportunity, o
       key={opportunity.id}
       opportunity={opportunity}
       onBack={handleBack}
+      calendarDate={calendarDate}
     />
   );
 }

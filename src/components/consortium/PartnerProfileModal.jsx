@@ -4,265 +4,320 @@ import {
   Users,
   MapPin,
   CheckCircle2,
-  TrendingUp,
   ThumbsUp,
   Star,
   MessageSquare,
-  Sparkles
+  Sparkles,
+  Check,
+  Target,
+  TrendingUp
 } from 'lucide-react';
 
-export default function PartnerProfileModal({
-  partner,
-  isOpen,
-  onClose,
-  onUpdateStatus
-}) {
+/* ── score helpers ── */
+function scoreColor(score) {
+  if (score >= 90) return 'var(--success)';
+  if (score >= 80) return 'var(--primary)';
+  if (score >= 70) return 'var(--warning)';
+  return 'var(--text-muted)';
+}
+function scoreBg(score) {
+  if (score >= 90) return 'rgba(16,185,129,0.08)';
+  if (score >= 80) return 'rgba(99,102,241,0.08)';
+  if (score >= 70) return 'rgba(245,158,11,0.08)';
+  return 'rgba(156,163,175,0.08)';
+}
+function scoreBorder(score) {
+  if (score >= 90) return 'rgba(16,185,129,0.3)';
+  if (score >= 80) return 'rgba(99,102,241,0.3)';
+  if (score >= 70) return 'rgba(245,158,11,0.3)';
+  return 'rgba(156,163,175,0.3)';
+}
+
+/* ── section heading ── */
+function SectionTitle({ children }) {
+  return (
+    <div style={{
+      fontSize: '0.69rem',
+      fontWeight: '800',
+      color: 'var(--text-muted)',
+      textTransform: 'uppercase',
+      letterSpacing: '0.07em',
+      marginBottom: '10px',
+    }}>
+      {children}
+    </div>
+  );
+}
+
+export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdateStatus }) {
   if (!isOpen || !partner) return null;
-
-  const getScoreColor = (score) => {
-    if (score >= 90) return 'var(--success)';
-    if (score >= 80) return 'var(--primary)';
-    if (score >= 70) return 'var(--warning)';
-    return 'var(--text-muted)';
-  };
-
-  const getScoreBg = (score) => {
-    if (score >= 90) return 'var(--success-bg)';
-    if (score >= 80) return 'var(--primary-light)';
-    if (score >= 70) return 'var(--warning-bg)';
-    return 'var(--bg-subtle)';
-  };
 
   const isRecommended = partner.status === 'recommended';
   const isShortlisted = partner.status === 'shortlisted';
-  const isContacted = partner.status === 'contacted';
+  const isContacted   = partner.status === 'contacted';
+
+  const techScore    = partner.technicalScore  || parseInt(partner.technicalMatch)  || 94;
+  const geoScore     = partner.geographicScore || parseInt(partner.geographicMatch) || 92;
+  const overallScore = partner.overallMatch    || partner.match                     || 90;
+
+  const breakdownMetrics = [
+    { label: 'Technical Match',  value: partner.technicalMatch  || `${techScore}%`,    num: techScore,    color: scoreColor(techScore) },
+    { label: 'Geographic Match', value: partner.geographicMatch || `${geoScore}%`,     num: geoScore,     color: scoreColor(geoScore) },
+    { label: 'Overall Score',    value: `${overallScore}%`,                             num: overallScore, color: scoreColor(overallScore) },
+  ];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0,
+        backgroundColor: 'rgba(0,0,0,0.45)',
+        backdropFilter: 'blur(2px)',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+      }}
+    >
       <div
-        className="modal-card"
-        style={{ maxWidth: '680px', width: '92vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: '640px',
+          maxHeight: '90vh',
+          backgroundColor: 'var(--bg-card)',
+          borderRadius: '14px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+        }}
       >
-        {/* Modal Header */}
-        <div className="modal-header" style={{ padding: '1.25rem 1.5rem', background: 'var(--bg-card)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
+        {/* ── Header ── */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          padding: '20px 24px 16px',
+          borderBottom: '1px solid var(--border-color)',
+          backgroundColor: 'var(--bg-card)',
+          flexShrink: 0,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Avatar */}
             <div style={{
-              width: '46px',
-              height: '46px',
-              borderRadius: 'var(--radius-lg)',
-              backgroundColor: 'var(--info-bg)',
-              color: 'var(--info-text)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: '800',
-              flexShrink: 0
+              width: '44px', height: '44px',
+              borderRadius: '10px',
+              backgroundColor: isRecommended ? 'var(--success-bg)' : 'var(--info-bg)',
+              color: isRecommended ? 'var(--success-text)' : 'var(--info-text)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <Users size={24} />
+              <Users size={22} />
             </div>
+
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
-                  {partner.name}
-                </h3>
-                {partner.status && partner.status !== 'none' && (
-                  <span style={{
-                    fontSize: '0.7rem',
-                    fontWeight: '700',
-                    padding: '0.15rem 0.5rem',
-                    borderRadius: '9999px',
-                    textTransform: 'uppercase',
-                    backgroundColor: isRecommended ? 'var(--success-bg)' : isShortlisted ? 'var(--primary-light)' : 'rgba(147, 51, 234, 0.15)',
-                    color: isRecommended ? 'var(--success-text)' : isShortlisted ? 'var(--primary)' : '#7E22CE',
-                    border: `1px solid ${isRecommended ? 'var(--success)' : isShortlisted ? 'var(--primary)' : '#9333EA'}`
-                  }}>
-                    {partner.status === 'recommended' && '✓ Recommended'}
-                    {partner.status === 'shortlisted' && '★ Shortlisted'}
-                    {partner.status === 'contacted' && '✉ Contacted'}
-                  </span>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, lineHeight: '1.3' }}>
+                {partner.name}
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{partner.expertise}</span>
+                {(partner.headquarters || partner.location) && (
+                  <>
+                    <span style={{ color: 'var(--border-color)' }}>•</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '3px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      <MapPin size={11} /> {partner.headquarters || partner.location}
+                    </span>
+                  </>
                 )}
-              </div>
-              <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                <span>{partner.expertise}</span>
-                <span>•</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <MapPin size={12} /> {partner.headquarters || partner.location}
-                </span>
               </div>
             </div>
           </div>
+
+          {/* Close */}
           <button
             onClick={onClose}
             style={{
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-              color: 'var(--text-muted)',
-              padding: '0.25rem'
+              border: 'none', background: 'transparent',
+              cursor: 'pointer', color: 'var(--text-muted)',
+              padding: '4px', borderRadius: '6px', flexShrink: 0,
+              lineHeight: 0,
             }}
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* Modal Scrollable Body */}
-        <div className="modal-body" style={{ padding: '1.5rem', overflowY: 'auto', gap: '1.25rem' }}>
-          
-          {/* Detailed Match Breakdown Section */}
-          <div style={{
-            backgroundColor: 'var(--bg-subtle)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '1.25rem',
-            border: '1px solid var(--border-color)'
-          }}>
+        {/* ── Scrollable body — no horizontal scroll ── */}
+        <div style={{ overflowY: 'auto', overflowX: 'hidden', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+
+
+          {/* ── Partner Details grid ── */}
+          <div>
+            <SectionTitle>Partner Details</SectionTitle>
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '1rem'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+              gap: '10px',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700', fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                <TrendingUp size={18} color="var(--primary)" />
-                <span>AI Consortium Match Breakdown</span>
-              </div>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                backgroundColor: getScoreBg(partner.overallMatch || 90),
-                padding: '0.25rem 0.75rem',
-                borderRadius: '9999px',
-                border: `1px solid ${getScoreColor(partner.overallMatch || 90)}`
-              }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)' }}>Overall Match:</span>
-                <strong style={{ fontSize: '0.95rem', color: getScoreColor(partner.overallMatch || 90) }}>
-                  {partner.overallMatch || partner.match}%
-                </strong>
-              </div>
-            </div>
-
-            {/* Score Bars Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-              {/* Technical Match */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.35rem' }}>
-                  <span style={{ color: 'var(--text-main)' }}>Technical Match</span>
-                  <span style={{ color: 'var(--success)', fontWeight: '700' }}>{partner.technicalMatch || `${partner.technicalScore}%`}</span>
+              {[
+                { label: 'Expertise',   value: partner.expertise  },
+                { label: 'Experience',  value: partner.experience },
+                { label: 'Location',    value: partner.headquarters || partner.location },
+                { label: 'Team Size',   value: partner.teamSize || '200+ Personnel' },
+                { label: 'Contact',     value: partner.representative || 'Managing Director' },
+                { label: 'Email',       value: partner.contactEmail || 'contact@partner.com' },
+              ].filter(d => d.value).map(d => (
+                <div key={d.label} style={{
+                  padding: '10px 12px',
+                  backgroundColor: 'var(--bg-subtle)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                }}>
+                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    {d.label}
+                  </div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-main)', wordBreak: 'break-word' }}>
+                    {d.value}
+                  </div>
                 </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-color)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div style={{ width: partner.technicalMatch || `${partner.technicalScore}%`, height: '100%', backgroundColor: 'var(--success)', borderRadius: '9999px', transition: 'width 0.5s ease' }} />
-                </div>
-              </div>
-
-              {/* Experience Match */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.35rem' }}>
-                  <span style={{ color: 'var(--text-main)' }}>Experience Match</span>
-                  <span style={{ color: 'var(--primary)', fontWeight: '700' }}>{partner.experienceMatch || `${partner.experienceScore}%`}</span>
-                </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-color)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div style={{ width: partner.experienceMatch || `${partner.experienceScore}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '9999px', transition: 'width 0.5s ease' }} />
-                </div>
-              </div>
-
-              {/* Geographic Match */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.35rem' }}>
-                  <span style={{ color: 'var(--text-main)' }}>Geographic Match</span>
-                  <span style={{ color: 'var(--info)', fontWeight: '700' }}>{partner.geographicMatch || `${partner.geographicScore}%`}</span>
-                </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-color)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div style={{ width: partner.geographicMatch || `${partner.geographicScore}%`, height: '100%', backgroundColor: 'var(--info)', borderRadius: '9999px', transition: 'width 0.5s ease' }} />
-                </div>
-              </div>
-
-              {/* Overall Match Score */}
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.35rem' }}>
-                  <span style={{ color: 'var(--text-main)' }}>Overall Match Score</span>
-                  <span style={{ color: getScoreColor(partner.overallMatch || 90), fontWeight: '700' }}>{partner.overallMatch || partner.match}%</span>
-                </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-color)', borderRadius: '9999px', overflow: 'hidden' }}>
-                  <div style={{ width: `${partner.overallMatch || 90}%`, height: '100%', backgroundColor: getScoreColor(partner.overallMatch || 90), borderRadius: '9999px', transition: 'width 0.5s ease' }} />
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Why Recommended Highlight Box */}
-          <div style={{
-            backgroundColor: 'rgba(29, 78, 216, 0.05)',
-            borderLeft: '4px solid var(--primary)',
-            padding: '1rem',
-            borderRadius: '0 var(--radius-md) var(--radius-md) 0'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.825rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '0.35rem' }}>
-              <Sparkles size={16} />
-              <span>Why Recommended:</span>
+          {/* ── Why Recommended ── */}
+          {partner.whyRecommended && (
+            <div style={{
+              padding: '14px 16px',
+              backgroundColor: 'rgba(29,78,216,0.04)',
+              borderLeft: '4px solid var(--primary)',
+              borderRadius: '0 8px 8px 0',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '6px' }}>
+                <Sparkles size={14} /> Why Recommended
+              </div>
+              <p style={{ fontSize: '0.845rem', color: 'var(--text-main)', lineHeight: '1.55', margin: 0 }}>
+                {partner.whyRecommended}
+              </p>
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: '1.5', margin: 0 }}>
-              {partner.whyRecommended}
-            </p>
+          )}
+
+          {/* ── Match Information ── */}
+          <div>
+            <SectionTitle>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <Target size={12} /> Match Information
+              </span>
+            </SectionTitle>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '10px',
+            }}>
+              {[
+                { label: 'Technical Match',  value: partner.technicalMatch  || `${techScore}%`,    color: scoreColor(techScore),    bg: scoreBg(techScore),    border: scoreBorder(techScore) },
+                { label: 'Geographic Match', value: partner.geographicMatch || `${geoScore}%`,     color: scoreColor(geoScore),     bg: scoreBg(geoScore),     border: scoreBorder(geoScore) },
+                { label: 'Overall Score',    value: `${overallScore}%`,                             color: scoreColor(overallScore), bg: scoreBg(overallScore), border: scoreBorder(overallScore) },
+              ].map(m => (
+                <div key={m.label} style={{
+                  padding: '12px',
+                  backgroundColor: m.bg,
+                  border: `1px solid ${m.border}`,
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    {m.label}
+                  </div>
+                  <div style={{ fontSize: '1.2rem', fontWeight: '800', color: m.color }}>
+                    {m.value}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Missing Capabilities Covered */}
-          {partner.capabilitiesCovered && partner.capabilitiesCovered.length > 0 && (
+          {/* ── Bridges Gaps ── */}
+          {partner.capabilitiesCovered?.length > 0 && (
             <div>
-              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                Solves Mukesh & Associates Gap:
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                {partner.capabilitiesCovered.map((cap, idx) => (
-                  <span
-                    key={idx}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
-                      padding: '0.3rem 0.65rem',
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'var(--success-bg)',
-                      color: 'var(--success-text)',
-                      border: '1px solid var(--success)'
-                    }}
-                  >
-                    <CheckCircle2 size={13} color="var(--success)" />
-                    {cap}
+              <SectionTitle>Bridges Capability Gaps</SectionTitle>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {partner.capabilitiesCovered.map((cap, i) => (
+                  <span key={i} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '5px',
+                    fontSize: '0.78rem', fontWeight: '600',
+                    padding: '5px 10px', borderRadius: '9999px',
+                    backgroundColor: 'var(--success-bg)', color: 'var(--success-text)',
+                    border: '1px solid rgba(16,185,129,0.3)',
+                  }}>
+                    <CheckCircle2 size={12} color="var(--success)" /> {cap}
                   </span>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Past Project Experience */}
-          {partner.pastProjects && partner.pastProjects.length > 0 && (
+          {/* ── Match Breakdown (vertical bars) ── */}
+          <div>
+            <SectionTitle>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <TrendingUp size={12} /> Match Breakdown
+              </span>
+            </SectionTitle>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {breakdownMetrics.map(m => (
+                <div key={m.label}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                      {m.label}
+                    </span>
+                    <strong style={{ fontSize: '0.95rem', fontWeight: '800', color: m.color }}>
+                      {m.value}
+                    </strong>
+                  </div>
+                  <div style={{ width: '100%', height: '7px', backgroundColor: 'var(--border-color)', borderRadius: '9999px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: m.value,
+                      height: '100%',
+                      backgroundColor: m.color,
+                      borderRadius: '9999px',
+                      transition: 'width 0.5s ease',
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Past Projects ── */}
+          {partner.pastProjects?.length > 0 && (
             <div>
-              <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                Key Benchmark Projects:
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {partner.pastProjects.map((proj, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.6rem 0.8rem',
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'var(--bg-subtle)',
-                      border: '1px solid var(--border-color)',
-                      fontSize: '0.8rem'
-                    }}
-                  >
+              <SectionTitle>Key Benchmark Projects</SectionTitle>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {partner.pastProjects.map((proj, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: 'var(--bg-subtle)',
+                    border: '1px solid var(--border-color)',
+                    fontSize: '0.8rem',
+                  }}>
                     <div>
                       <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>{proj.title}</div>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Client: {proj.client} • Year: {proj.year}</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '2px' }}>
+                        Client: {proj.client} · {proj.year}
+                      </div>
                     </div>
-                    <span style={{ fontWeight: '700', color: 'var(--primary)', backgroundColor: 'var(--bg-card)', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+                    <span style={{
+                      fontWeight: '700', color: 'var(--primary)',
+                      padding: '2px 8px', borderRadius: '6px',
+                      border: '1px solid var(--border-color)',
+                      backgroundColor: 'var(--bg-card)',
+                      fontSize: '0.78rem',
+                      whiteSpace: 'nowrap',
+                      marginLeft: '8px',
+                    }}>
                       {proj.value}
                     </span>
                   </div>
@@ -271,91 +326,75 @@ export default function PartnerProfileModal({
             </div>
           )}
 
-          {/* Company Details & Contact Info */}
+          {/* ── Partner Status / actions (at bottom) ── */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '0.75rem',
-            padding: '1rem',
-            backgroundColor: 'var(--bg-subtle)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border-color)',
-            fontSize: '0.8rem'
+            display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
+            padding: '14px 16px',
+            backgroundColor: isRecommended ? 'rgba(16,185,129,0.06)' : 'var(--bg-subtle)',
+            borderRadius: '10px',
+            border: `1px solid ${isRecommended ? 'rgba(16,185,129,0.25)' : 'var(--border-color)'}`,
           }}>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.725rem', textTransform: 'uppercase', fontWeight: '700' }}>
-                Representative Contact
-              </span>
-              <strong style={{ color: 'var(--text-main)' }}>{partner.representative || 'Managing Director'}</strong>
-            </div>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.725rem', textTransform: 'uppercase', fontWeight: '700' }}>
-                Email
-              </span>
-              <span style={{ color: 'var(--primary)', fontWeight: '500' }}>{partner.contactEmail || 'contact@partner.com'}</span>
-            </div>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.725rem', textTransform: 'uppercase', fontWeight: '700' }}>
-                Phone
-              </span>
-              <span style={{ color: 'var(--text-main)', fontWeight: '500' }}>{partner.contactPhone || '+91 80 4000 0000'}</span>
-            </div>
-            <div>
-              <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.725rem', textTransform: 'uppercase', fontWeight: '700' }}>
-                Team Size & Certifications
-              </span>
-              <span style={{ color: 'var(--text-main)', fontWeight: '500' }}>{partner.teamSize || '200+ Personnel'}</span>
-            </div>
-          </div>
+            <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-muted)', marginRight: 'auto' }}>
+              Partner Status
+            </span>
 
-        </div>
-
-        {/* Modal Actions Footer */}
-        <div className="modal-footer" style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button className="btn btn-outline" onClick={onClose} style={{ fontSize: '0.825rem' }}>
-            Close
-          </button>
-
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {/* Shortlist */}
             <button
-              className="btn btn-outline"
-              onClick={() => onUpdateStatus(partner.id, 'shortlisted')}
+              onClick={() => onUpdateStatus(partner.id, isShortlisted ? 'none' : 'shortlisted')}
               style={{
-                fontSize: '0.8rem',
+                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                padding: '0.35rem 0.75rem', fontSize: '0.78rem', fontWeight: '600',
+                border: `1px solid ${isShortlisted ? 'var(--primary)' : 'var(--border-color)'}`,
+                borderRadius: 'var(--radius-md)',
                 backgroundColor: isShortlisted ? 'var(--primary-light)' : 'transparent',
-                borderColor: isShortlisted ? 'var(--primary)' : 'var(--border-color)',
-                color: isShortlisted ? 'var(--primary)' : 'var(--text-main)'
+                color: isShortlisted ? 'var(--primary)' : 'var(--text-main)',
+                cursor: 'pointer',
               }}
             >
-              <Star size={14} /> {isShortlisted ? 'Shortlisted ✓' : 'Shortlist'}
+              <Star size={13} />
+              {isShortlisted ? 'Shortlisted ✓' : 'Shortlist'}
             </button>
 
+            {/* Mark Contacted */}
             <button
-              className="btn btn-outline"
-              onClick={() => onUpdateStatus(partner.id, 'contacted')}
+              onClick={() => onUpdateStatus(partner.id, isContacted ? 'none' : 'contacted')}
               style={{
-                fontSize: '0.8rem',
-                backgroundColor: isContacted ? 'rgba(147, 51, 234, 0.1)' : 'transparent',
-                borderColor: isContacted ? '#9333EA' : 'var(--border-color)',
-                color: isContacted ? '#9333EA' : 'var(--text-main)'
+                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                padding: '0.35rem 0.75rem', fontSize: '0.78rem', fontWeight: '600',
+                border: `1px solid ${isContacted ? '#9333EA' : 'var(--border-color)'}`,
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: isContacted ? 'rgba(147,51,234,0.1)' : 'transparent',
+                color: isContacted ? '#9333EA' : 'var(--text-main)',
+                cursor: 'pointer',
               }}
             >
-              <MessageSquare size={14} /> {isContacted ? 'Contacted ✓' : 'Mark Contacted'}
+              <MessageSquare size={13} />
+              {isContacted ? 'Contacted ✓' : 'Mark Contacted'}
             </button>
 
+            {/* Recommend — turns green when active */}
             <button
-              className="btn btn-primary"
               onClick={() => onUpdateStatus(partner.id, isRecommended ? 'none' : 'recommended')}
               style={{
-                fontSize: '0.825rem',
-                backgroundColor: isRecommended ? 'var(--success)' : 'var(--primary)'
+                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                padding: '0.38rem 0.9rem', fontSize: '0.8rem', fontWeight: '700',
+                border: `1px solid ${isRecommended ? 'var(--success)' : 'var(--primary)'}`,
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: isRecommended ? 'var(--success)' : 'var(--primary)',
+                color: '#ffffff',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
               }}
             >
-              <ThumbsUp size={14} /> {isRecommended ? 'Recommended ✓' : 'Recommend Partner'}
+              {isRecommended ? '✓ Recommended' : 'Recommend'}
             </button>
           </div>
+
+          {/* bottom padding */}
+          <div style={{ height: '4px' }} />
         </div>
       </div>
     </div>
   );
 }
+
