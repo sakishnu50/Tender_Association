@@ -69,7 +69,7 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
           onClick={() => setIsOpen && setIsOpen(false)} 
         />
       )}
-      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+      <aside className={`sidebar ${isOpen ? 'open' : ''} dark:bg-[#070A12] dark:border-slate-800`}>
       {/* Sidebar Branding Header */}
       <div className="sidebar-header">
         <div style={{
@@ -89,10 +89,10 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
           TA
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-          <span className="sidebar-brand-title">
+          <span className="sidebar-brand-title dark:text-slate-100">
             TENDER HUB
           </span>
-          <span style={{ fontSize: '0.675rem', color: 'var(--sidebar-text-muted)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ fontSize: '0.675rem', color: 'var(--sidebar-text-muted)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }} className="dark:text-slate-400">
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }}></span> Enterprise SaaS
           </span>
         </div>
@@ -103,7 +103,7 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         {navSections.map((section, idx) => (
           <div
             key={idx}
-            className={idx < navSections.length - 1 ? 'nav-section-divider' : ''}
+            className={idx < navSections.length - 1 ? 'nav-section-divider dark:border-slate-800' : ''}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               {section.items.map((item) => {
@@ -113,17 +113,25 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
                 return (
                   <button
                     key={item.id}
-                    className={`nav-item ${isActive ? 'active' : ''}`}
+                    className={`nav-item ${
+                      isActive 
+                        ? 'active dark:bg-blue-600 dark:text-white' 
+                        : 'dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                    }`}
                     onClick={() => handleNavClick(item)}
                     type="button"
                   >
                     <div className="nav-item-content">
-                      <Icon size={17} className="nav-icon" />
+                      <Icon size={17} className={`nav-icon ${isActive ? 'dark:text-white' : 'dark:text-slate-400'}`} />
                       <span>{item.label}</span>
                     </div>
 
                     {item.count !== undefined && (
-                      <span className={`nav-badge ${item.urgent ? 'urgent' : ''}`}>
+                      <span className={`nav-badge ${item.urgent ? 'urgent' : ''} ${
+                        isActive 
+                          ? 'dark:bg-white/20 dark:text-white' 
+                          : 'dark:bg-blue-500/20 dark:text-blue-200'
+                      }`}>
                         {item.count}
                       </span>
                     )}
@@ -136,15 +144,15 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
       </nav>
 
       {/* Bottom Logout Navigation Area */}
-      <div className="sidebar-bottom-actions">
+      <div className="sidebar-bottom-actions dark:border-slate-800">
         <button
-          className="sidebar-logout-btn"
+          className="sidebar-logout-btn dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-red-400"
           onClick={handleLogoutClick}
           title="Sign out of your session"
           type="button"
         >
           <div className="nav-item-content">
-            <LogOut size={17} className="nav-icon" />
+            <LogOut size={17} className="nav-icon dark:text-slate-400" />
             <span>Logout</span>
           </div>
         </button>

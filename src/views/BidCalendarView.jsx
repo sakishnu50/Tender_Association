@@ -316,18 +316,24 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           grid-template-rows: repeat(3, 1fr);
           gap: 0.65rem;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 767px) {
           .year-grid {
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: auto;
-            overflow-y: auto;
+            grid-template-columns: repeat(3, 1fr) !important;
+            grid-template-rows: repeat(4, 1fr) !important;
+            gap: 0.45rem !important;
+            overflow-y: auto !important;
           }
-        }
-        @media (max-width: 600px) {
-          .year-grid {
-            grid-template-columns: 1fr;
-            grid-template-rows: auto;
-            overflow-y: auto;
+          .year-grid .event-card {
+            padding: 0.5rem 0.25rem !important;
+          }
+          .year-grid .month-title {
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+          }
+          .year-grid .month-badge {
+            font-size: 10px !important;
+            padding: 0.1rem 0.35rem !important;
           }
         }
         .drawer-overlay {
@@ -350,15 +356,54 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           max-width: 100vw;
           background-color: var(--bg-main);
           z-index: 1000;
-          box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+          box-shadow: -4px 0 24px rgba(0,0,0,0.15);
           transform: translateX(100%);
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
           flex-direction: column;
           border-left: 1px solid var(--border-color);
+          overflow-x: hidden;
         }
         .events-drawer.open {
           transform: translateX(0);
+        }
+        @media (max-width: 640px) {
+          .events-drawer {
+            top: 50% !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: calc(100vw - 2rem) !important;
+            max-width: 28rem !important;
+            max-height: 85vh !important;
+            border-radius: 1rem !important;
+            border: 1px solid var(--border-color) !important;
+            transform: translate(-50%, -50%) scale(0.96) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+            overflow-x: hidden !important;
+            margin: 0 auto !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
+          }
+          .events-drawer.open {
+            transform: translate(-50%, -50%) scale(1) !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+          }
+          .events-drawer-header {
+            padding: 1rem 1.25rem !important;
+          }
+          .events-drawer-body {
+            padding: 0.85rem !important;
+            gap: 0.75rem !important;
+            max-height: calc(85vh - 65px) !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+          }
+          .events-drawer-body .event-card {
+            padding: 0.75rem 0.85rem !important;
+          }
         }
         .calendar-toolbar {
           display: flex;
@@ -847,17 +892,11 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
 
           {view === 'Year' && (
             <div
-              className="year-grid"
+              className="year-grid grid grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3 flex-1 min-h-0 h-full overflow-y-auto md:overflow-hidden"
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gridTemplateRows: 'repeat(3, 1fr)',
-                gridAutoRows: '1fr',
-                gap: '0.65rem',
                 flex: 1,
                 minHeight: 0,
-                height: '100%',
-                overflow: 'hidden'
+                height: '100%'
               }}
             >
               {Array.from({ length: 12 }, (_, i) => {
@@ -872,7 +911,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                 return (
                   <div
                     key={`year-month-${i}`}
-                    className="event-card"
+                    className="event-card p-2 sm:p-3 rounded-lg sm:rounded-xl cursor-pointer flex flex-col items-center justify-center gap-1 sm:gap-1.5 transition-all"
                     onClick={() => {
                       setCurrentDate(new Date(currentYear, i, 1));
                       setView('Month');
@@ -880,31 +919,34 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                     style={{
                       cursor: 'pointer',
                       backgroundColor: 'var(--bg-subtle)',
-                      padding: '0.75rem 1rem',
                       borderRadius: 'var(--radius-md)',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.35rem',
                       border: count > 0 ? '1px solid var(--primary)' : '1px solid var(--border-color)',
                       height: '100%',
                       minHeight: 0,
                       boxSizing: 'border-box'
                     }}
                   >
-                    <span style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: 1.2 }}>
+                    <span 
+                      className="month-title text-xs sm:text-sm font-semibold truncate max-w-full"
+                      style={{ color: 'var(--text-main)', lineHeight: 1.2 }}
+                      title={monthName}
+                    >
                       {monthName}
                     </span>
-                    <span style={{ 
-                      fontSize: '0.75rem', 
-                      color: count > 0 ? '#FFF' : 'var(--text-muted)', 
-                      fontWeight: '700',
-                      backgroundColor: count > 0 ? 'var(--primary)' : 'transparent',
-                      padding: count > 0 ? '0.1rem 0.6rem' : '0',
-                      borderRadius: 'var(--radius-full)',
-                      lineHeight: 1.2
-                    }}>
+                    <span 
+                      className="month-badge text-[10px] sm:text-xs font-semibold rounded-full"
+                      style={{ 
+                        color: count > 0 ? '#FFF' : 'var(--text-muted)', 
+                        backgroundColor: count > 0 ? 'var(--primary)' : 'transparent',
+                        padding: count > 0 ? '0.1rem 0.45rem' : '0',
+                        borderRadius: 'var(--radius-full)',
+                        lineHeight: 1.2
+                      }}
+                    >
                       {count} {count === 1 ? 'Event' : 'Events'}
                     </span>
                   </div>
@@ -921,26 +963,41 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
         onClick={() => setIsDrawerOpen(false)}
       />
 
-      {/* Events Drawer */}
-      <div className={`events-drawer ${isDrawerOpen ? 'open' : ''}`}>
-        <div style={{ 
-          padding: '1.5rem', 
-          borderBottom: '1px solid var(--border-color)', 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          backgroundColor: 'var(--bg-main)'
-        }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>All Events</h3>
+      {/* Events Drawer / Modal */}
+      <div 
+        className={`events-drawer ${isDrawerOpen ? 'open' : ''} fixed z-[1000] w-[calc(100vw-2rem)] max-w-md mx-auto max-h-[85vh] overflow-x-hidden sm:w-[420px] sm:max-h-full sm:max-w-none`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="All Events"
+      >
+        <div 
+          className="events-drawer-header p-3.5 sm:p-5"
+          style={{ 
+            borderBottom: '1px solid var(--border-color)', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            backgroundColor: 'var(--bg-main)'
+          }}
+        >
+          <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>All Events</h3>
           <button 
             onClick={() => setIsDrawerOpen(false)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}
+            aria-label="Close All Events"
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', padding: '0.25rem' }}
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
         
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div 
+          className="events-drawer-body flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-5 flex flex-col gap-2.5 sm:gap-3.5 max-h-[calc(85vh-60px)] sm:max-h-none"
+          style={{ 
+            flex: 1, 
+            overflowY: 'auto', 
+            overflowX: 'hidden' 
+          }}
+        >
           {allUpcomingEvents.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: '600' }}>
               No upcoming events found
@@ -959,7 +1016,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
               return (
                 <div
                   key={`side-${idx}`}
-                  className="event-card"
+                  className="event-card p-3 sm:p-4 rounded-lg sm:rounded-xl overflow-hidden"
                   onClick={() => {
                     handleEventClick(evt);
                     setIsDrawerOpen(false);
@@ -968,37 +1025,38 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                     cursor: 'pointer',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '0.6rem',
-                    padding: '1.25rem',
-                    borderRadius: 'var(--radius-md)',
+                    gap: '0.45rem',
                     backgroundColor: 'var(--bg-subtle)',
                     border: '1px solid var(--border-color)',
-                    borderLeftWidth: '5px',
-                    borderLeftColor: borderColor
+                    borderLeftWidth: '4px',
+                    borderLeftColor: borderColor,
+                    boxSizing: 'border-box'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--primary)' }}>
-                      {new Date(evt.date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--primary)' }}>
+                      {new Date(evt.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                     <span style={{ 
-                      fontSize: '0.7rem', 
+                      fontSize: '0.675rem', 
                       fontWeight: '800', 
-                      padding: '0.2rem 0.5rem', 
+                      padding: '0.12rem 0.45rem', 
                       borderRadius: '4px', 
                       backgroundColor: typeBg, 
                       color: typeColor,
-                      textTransform: 'uppercase'
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.02em',
+                      flexShrink: 0
                     }}>
                       {typeLabel}
                     </span>
                   </div>
                   
-                  <span style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)' }}>
+                  <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-main)', lineHeight: '1.25', wordBreak: 'break-word' }}>
                     {evt.title}
                   </span>
                   
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'flex-start', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'flex-start', gap: '0.35rem', flexWrap: 'wrap', wordBreak: 'break-word' }}>
                     <span style={{ fontWeight: '700' }}>Project:</span>
                     <span>{opp.name}</span>
                   </div>

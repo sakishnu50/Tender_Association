@@ -70,7 +70,8 @@
   --radius-2xl: 1rem;     /* 16px – hero cards */
 }
 
-[data-theme="dark"] {
+[data-theme="dark"],
+.dark {
   --bg-main: #0B0F19;
   --bg-card: #151D30;
   --bg-subtle: #1E293B;
@@ -84,6 +85,11 @@
   --border-card: rgba(255, 255, 255, 0.07);
   --sidebar-bg: #070A12;
   --sidebar-border: #1E293B;
+  --sidebar-hover: #1E293B;
+  --sidebar-active: #2563EB;
+  --sidebar-text: #CBD5E1;
+  --sidebar-text-active: #FFFFFF;
+  --sidebar-text-muted: #94A3B8;
 
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
@@ -343,6 +349,96 @@ body {
   color: var(--danger);
 }
 
+/* ─── Sidebar Dark Mode Overrides ─── */
+[data-theme="dark"] .sidebar,
+.dark .sidebar {
+  background-color: var(--sidebar-bg, #070A12);
+  border-right-color: var(--sidebar-border, #1E293B);
+}
+
+[data-theme="dark"] .nav-item,
+.dark .nav-item {
+  color: #CBD5E1; /* slate-300 high contrast */
+}
+
+[data-theme="dark"] .nav-item .nav-icon,
+.dark .nav-item .nav-icon {
+  color: #94A3B8; /* slate-400 */
+}
+
+[data-theme="dark"] .nav-item:hover,
+.dark .nav-item:hover {
+  background-color: #1E293B; /* slate-800 */
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .nav-item:hover .nav-icon,
+.dark .nav-item:hover .nav-icon {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .nav-item.active,
+.dark .nav-item.active {
+  background-color: #2563EB; /* blue-600 */
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+[data-theme="dark"] .nav-item.active .nav-icon,
+.dark .nav-item.active .nav-icon {
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .nav-badge,
+.dark .nav-badge {
+  background-color: rgba(59, 130, 246, 0.2); /* blue-500/20 */
+  color: #BFDBFE; /* blue-200 */
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+[data-theme="dark"] .nav-item.active .nav-badge,
+.dark .nav-item.active .nav-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border: none;
+}
+
+[data-theme="dark"] .sidebar-logout-btn,
+.dark .sidebar-logout-btn {
+  color: #CBD5E1;
+}
+
+[data-theme="dark"] .sidebar-logout-btn .nav-icon,
+.dark .sidebar-logout-btn .nav-icon {
+  color: #94A3B8;
+}
+
+[data-theme="dark"] .sidebar-logout-btn:hover,
+.dark .sidebar-logout-btn:hover {
+  background-color: #1E293B;
+  color: #F87171;
+}
+
+[data-theme="dark"] .sidebar-logout-btn:hover .nav-icon,
+.dark .sidebar-logout-btn:hover .nav-icon {
+  color: #F87171;
+}
+
+[data-theme="dark"] .nav-section-divider,
+.dark .nav-section-divider {
+  border-bottom-color: #1E293B;
+}
+
+[data-theme="dark"] .sidebar-bottom-actions,
+.dark .sidebar-bottom-actions {
+  border-top-color: #1E293B;
+}
+
+[data-theme="dark"] .sidebar-brand-title,
+.dark .sidebar-brand-title {
+  color: #F8FAFC;
+}
+
 /* Main Area */
 .main-content {
   flex: 1;
@@ -376,7 +472,7 @@ body {
   padding: 0 1.75rem;
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 60;
   gap: 1.75rem;
 }
 
@@ -1630,17 +1726,22 @@ textarea {
     padding: 0.75rem 1rem !important;
     gap: 0.65rem !important;
   }
+  .top-header {
+    overflow: visible !important;
+  }
   .top-header-nav-bar {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
     order: 1 !important;
+    overflow: visible !important;
   }
   .header-actions {
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
+    overflow: visible !important;
   }
   .header-search {
     width: 100% !important;
@@ -1658,6 +1759,32 @@ textarea {
   .btn-auth-toggle {
     padding: 0 0.75rem;
     font-size: 0.8rem;
+  }
+  .header-notifications-menu {
+    position: fixed !important;
+    top: 4.5rem !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    width: auto !important;
+    max-width: calc(100vw - 2rem) !important;
+    margin: 0 auto !important;
+    z-index: 100 !important;
+    transform-origin: top center !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (min-width: 641px) {
+  .header-notifications-menu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 320px !important;
+    max-width: 340px !important;
+    margin: 0 !important;
+    transform-origin: top right !important;
   }
 }
 

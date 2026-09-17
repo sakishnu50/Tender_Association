@@ -195,7 +195,7 @@ export default function Header({
           </button>
 
         {/* 2. Notification Bell Icon */}
-        <div style={{ position: 'relative' }} ref={notificationMenuRef}>
+        <div style={{ position: 'relative' }} className="relative" ref={notificationMenuRef}>
           <button
             className="header-circle-btn"
             onClick={() => {
@@ -215,82 +215,83 @@ export default function Header({
           {/* Notifications Dropdown */}
           {showNotifications && (
             <div
-              className="header-dropdown-menu"
+              className="header-dropdown-menu header-notifications-menu fixed top-16 right-4 left-4 sm:absolute sm:top-full sm:right-0 sm:left-auto sm:w-80 z-50 max-w-[calc(100vw-2rem)]"
               role="dialog"
               aria-label="Urgent notifications"
               style={{
-                position: 'absolute',
-                top: 'calc(100% + 8px)',
-                right: 0,
-                width: '330px',
                 backgroundColor: 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
                 borderRadius: '0.85rem',
                 boxShadow: 'var(--shadow-xl)',
                 zIndex: 100,
                 padding: '0.85rem',
-                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)'
+                animation: 'fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+                boxSizing: 'border-box'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.65rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.65rem' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)' }}>Notifications</span>
-                <span style={{ fontSize: '0.7rem', fontWeight: '700', backgroundColor: 'var(--danger-bg)', color: 'var(--danger-text)', padding: '0.15rem 0.5rem', borderRadius: '9999px', border: '1px solid var(--danger-border)' }}>
-                  3 Urgent
-                </span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-                {sampleNotifications.map((n) => (
-                  <div
-                    key={n.id}
-                    onClick={() => {
-                      setShowNotifications(false);
-                      navigate('/alerts');
-                    }}
-                    style={{
-                      padding: '0.6rem 0.75rem',
-                      borderRadius: '0.6rem',
-                      backgroundColor: 'var(--bg-subtle)',
-                      border: '1px solid var(--border-color)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '0.6rem',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    <AlertTriangle size={15} color={n.urgent ? 'var(--danger)' : 'var(--warning)'} style={{ marginTop: 2, flexShrink: 0 }} />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.25' }}>{n.title}</div>
-                      <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{n.time}</div>
+              <div className="max-w-full overflow-hidden" style={{ maxWidth: '100%', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.65rem', borderBottom: '1px solid var(--border-color)', marginBottom: '0.65rem' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)' }}>Notifications</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: '700', backgroundColor: 'var(--danger-bg)', color: 'var(--danger-text)', padding: '0.15rem 0.5rem', borderRadius: '9999px', border: '1px solid var(--danger-border)' }}>
+                    3 Urgent
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', maxWidth: '100%', overflow: 'hidden' }}>
+                  {sampleNotifications.map((n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => {
+                        setShowNotifications(false);
+                        navigate('/alerts');
+                      }}
+                      style={{
+                        padding: '0.6rem 0.75rem',
+                        borderRadius: '0.6rem',
+                        backgroundColor: 'var(--bg-subtle)',
+                        border: '1px solid var(--border-color)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '0.6rem',
+                        transition: 'all 0.15s ease',
+                        minWidth: 0,
+                        maxWidth: '100%'
+                      }}
+                    >
+                      <AlertTriangle size={15} color={n.urgent ? 'var(--danger)' : 'var(--warning)'} style={{ marginTop: 2, flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                        <div style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.25', wordBreak: 'break-word' }}>{n.title}</div>
+                        <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{n.time}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    setShowNotifications(false);
+                    navigate('/alerts');
+                  }}
+                  style={{
+                    width: '100%',
+                    marginTop: '0.75rem',
+                    padding: '0.45rem',
+                    border: 'none',
+                    background: 'var(--primary-light)',
+                    color: 'var(--primary)',
+                    fontWeight: '700',
+                    fontSize: '0.775rem',
+                    borderRadius: '0.5rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  View All Alerts <ExternalLink size={13} />
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  setShowNotifications(false);
-                  navigate('/alerts');
-                }}
-                style={{
-                  width: '100%',
-                  marginTop: '0.75rem',
-                  padding: '0.45rem',
-                  border: 'none',
-                  background: 'var(--primary-light)',
-                  color: 'var(--primary)',
-                  fontWeight: '700',
-                  fontSize: '0.775rem',
-                  borderRadius: '0.5rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.35rem',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                View All Alerts <ExternalLink size={13} />
-              </button>
             </div>
           )}
         </div>
