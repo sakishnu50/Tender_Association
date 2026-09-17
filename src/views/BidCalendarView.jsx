@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { Calendar as CalendarIcon, Search, X, ChevronLeft, ChevronRight, XCircle, Filter } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X, Filter } from 'lucide-react';
 import { mockCalendarEvents } from '../data/mockData';
 import { useCalendar, useOpportunities } from '../hooks/useApiQueries';
 
@@ -22,19 +21,17 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
   });
   const [view, setView] = useState('Month'); // 'Year', 'Month', 'Week', 'List'
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
-  const filterDropdownRef = useRef(null);
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+  const filterMenuRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
-        setIsFilterDropdownOpen(false);
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target)) {
+        setIsFilterMenuOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const filteredEvents = calendarEvents.filter(evt => {
@@ -158,8 +155,9 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
         key={key}
         onClick={cellEvents.length > 0 ? () => handleEventClick(cellEvents[0]) : undefined}
         style={{
-          minHeight: isWeekView ? '120px' : '90px',
-          padding: '0.5rem',
+          height: '100%',
+          minHeight: 0,
+          padding: '0.35rem 0.45rem',
           borderRadius: '8px',
           border: isToday ? '2px solid var(--primary)' : '1px solid var(--border-color)',
           backgroundColor: isToday ? 'var(--bg-subtle)' : 'transparent',
@@ -168,8 +166,10 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           alignItems: 'flex-start',
           justifyContent: 'flex-start',
           cursor: cellEvents.length > 0 ? 'pointer' : 'default',
-          transition: 'all 0.2s',
+          transition: 'all 0.15s ease',
           minWidth: 0,
+          overflow: 'hidden',
+          boxSizing: 'border-box'
         }}
         className="calendar-cell"
       >
@@ -178,21 +178,32 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '0.4rem'
+          marginBottom: '0.2rem',
+          flexShrink: 0
         }}>
           <span style={{ 
-            fontSize: '0.85rem', 
+            fontSize: '0.8rem', 
             fontWeight: isToday ? '800' : '600',
             color: isToday ? 'var(--primary)' : 'var(--text-main)',
             backgroundColor: isToday ? 'var(--bg-hover)' : 'transparent',
-            padding: isToday ? '0.1rem 0.4rem' : '0',
-            borderRadius: '4px'
+            padding: isToday ? '0.05rem 0.35rem' : '0',
+            borderRadius: '4px',
+            lineHeight: 1.2
           }}>
             {cellDate.getDate()}
           </span>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', width: '100%', minWidth: 0 }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '0.2rem', 
+          width: '100%', 
+          minWidth: 0, 
+          flex: 1, 
+          minHeight: 0, 
+          overflowY: 'auto' 
+        }}>
           {cellEvents.map((evt, i) => {
             const isDead = evt.type === 'deadline';
             const isMeet = evt.type === 'meeting';
@@ -203,9 +214,9 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             
             return (
               <div key={i} className="calendar-cell-event" style={{
-                fontSize: '0.7rem',
-                padding: '0.3rem 0.4rem',
-                borderRadius: '4px',
+                fontSize: '0.675rem',
+                padding: '0.2rem 0.35rem',
+                borderRadius: '3px',
                 backgroundColor: bgColor,
                 color: textColor,
                 borderLeft: `3px solid ${borderColor}`,
@@ -213,7 +224,8 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 fontWeight: '600',
-                minWidth: 0
+                minWidth: 0,
+                flexShrink: 0
               }} title={evt.title}>
                 {evt.title}
               </div>
@@ -239,99 +251,8 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
     }
   };
 
-  const headerPortalElement = document.getElementById('header-actions-portal');
-
   return (
-    <div className="page-container" style={{ position: 'relative', overflowX: 'hidden' }}>
-      {headerPortalElement && createPortal(
-        <>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setIsDrawerOpen(true)}
-            style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            <CalendarIcon size={16} /> View Events
-          </button>
-          
-          <div style={{ position: 'relative' }} ref={filterDropdownRef}>
-            <button
-              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              className="btn btn-outline"
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '0.5rem', 
-                padding: '0.4rem 1rem', 
-                fontSize: '0.85rem', 
-                fontWeight: '700',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: isFilterDropdownOpen ? 'var(--bg-subtle)' : 'var(--bg-main)',
-                color: 'var(--text-main)',
-                border: '1px solid var(--border-color)',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <Filter size={16} /> Filter
-            </button>
-            
-            {isFilterDropdownOpen && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '0.5rem',
-                backgroundColor: 'var(--bg-main)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                zIndex: 100,
-                minWidth: '150px',
-                padding: '0.4rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.2rem'
-              }}>
-                {['Year', 'Month', 'Week', 'List'].map(v => (
-                  <button
-                    key={v}
-                    onClick={() => {
-                      setView(v);
-                      setIsFilterDropdownOpen(false);
-                    }}
-                    style={{
-                      padding: '0.6rem 1rem',
-                      fontSize: '0.85rem',
-                      fontWeight: '600',
-                      textAlign: 'left',
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: view === v ? 'var(--bg-subtle)' : 'transparent',
-                      color: view === v ? 'var(--primary)' : 'var(--text-main)',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseOver={(e) => {
-                      if (view !== v) {
-                        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      if (view !== v) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </>,
-        headerPortalElement
-      )}
-
+    <div className="page-container calendar-page-container" style={{ height: 'calc(100vh - 68px)', maxHeight: 'calc(100vh - 68px)', padding: '1rem 1.75rem', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 0, position: 'relative' }}>
       <style>{`
         .calendar-cell:hover {
           background-color: var(--bg-hover) !important;
@@ -346,7 +267,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
         .year-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          gap: 1rem;
         }
         @media (max-width: 900px) {
           .year-grid {
@@ -398,35 +319,191 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             gap: 0.5rem !important;
           }
           .calendar-cell {
-            padding: 0.25rem !important;
-            min-height: 70px !important;
+            padding: 0.2rem !important;
           }
           .calendar-cell > div > span {
-            font-size: 0.75rem !important;
+            font-size: 0.7rem !important;
           }
           .calendar-cell-event {
-            font-size: 0.6rem !important;
-            padding: 0.15rem 0.2rem !important;
+            font-size: 0.55rem !important;
+            padding: 0.1rem 0.2rem !important;
           }
         }
       `}</style>
 
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* Main Calendar View Area */}
-        <div className="card" style={{ flex: 1, minHeight: '600px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>{getCalendarTitle()}</h3>
+        <div className="card" style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column', padding: '1rem 1.25rem', overflow: 'hidden', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.75rem', flexShrink: 0 }}>
+            {/* 1. Left Side: Display ONLY the current month and year title */}
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0 }}>
+              {getCalendarTitle()}
+            </h3>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                <button onClick={handlePrev} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)' }}>
+            {/* 2. Right Side Controls: Strict Left-to-Right Sequence */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+              {/* First: Filter Icon Button ONLY (view switcher: Month, Week, Year, List) */}
+              <div style={{ position: 'relative' }} ref={filterMenuRef}>
+                <button
+                  onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+                  className="btn btn-outline"
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    padding: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: isFilterMenuOpen ? 'var(--bg-subtle)' : 'var(--bg-card)',
+                    borderColor: isFilterMenuOpen ? 'var(--primary)' : 'var(--border-color)',
+                    color: isFilterMenuOpen ? 'var(--primary)' : 'var(--text-main)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title="Switch View"
+                  aria-label="Switch calendar view"
+                  aria-haspopup="true"
+                  aria-expanded={isFilterMenuOpen}
+                >
+                  <Filter size={17} />
+                </button>
+
+                {isFilterMenuOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 6px)',
+                      right: 0,
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      boxShadow: 'var(--shadow-xl)',
+                      zIndex: 100,
+                      minWidth: '145px',
+                      padding: '0.4rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.2rem'
+                    }}
+                  >
+                    {['Year', 'Month', 'Week', 'List'].map((v) => (
+                      <button
+                        key={v}
+                        onClick={() => {
+                          setView(v);
+                          setIsFilterMenuOpen(false);
+                        }}
+                        style={{
+                          padding: '0.5rem 0.75rem',
+                          fontSize: '0.825rem',
+                          fontWeight: view === v ? '700' : '500',
+                          textAlign: 'left',
+                          borderRadius: 'var(--radius-sm)',
+                          backgroundColor: view === v ? 'var(--primary-light)' : 'transparent',
+                          color: view === v ? 'var(--primary)' : 'var(--text-main)',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (view !== v) e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (view !== v) e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
+                      >
+                        <span>{v}</span>
+                        {view === v && <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: '800' }}>✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Second: Calendar Icon Button ONLY (All Events) */}
+              <button
+                onClick={() => setIsDrawerOpen(true)}
+                className="btn btn-outline"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  padding: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'var(--bg-card)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-main)',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                title="All Events"
+                aria-label="View all events"
+              >
+                <CalendarIcon size={17} />
+              </button>
+
+              {/* Third: Today Navigation Group (<, Today, >) */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                <button
+                  onClick={handlePrev}
+                  className="btn btn-outline"
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    padding: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-main)'
+                  }}
+                  title="Previous Period"
+                  aria-label="Previous period"
+                >
                   <ChevronLeft size={18} />
                 </button>
-                <button onClick={handleToday} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700' }}>
+                <button
+                  onClick={handleToday}
+                  className="btn btn-outline"
+                  style={{
+                    height: '38px',
+                    padding: '0 0.95rem',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-main)'
+                  }}
+                >
                   Today
                 </button>
-                <button onClick={handleNext} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)' }}>
+                <button
+                  onClick={handleNext}
+                  className="btn btn-outline"
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    padding: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 'var(--radius-md)',
+                    backgroundColor: 'var(--bg-card)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-main)'
+                  }}
+                  title="Next Period"
+                  aria-label="Next period"
+                >
                   <ChevronRight size={18} />
                 </button>
               </div>
@@ -434,15 +511,15 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           </div>
 
           {view !== 'List' && view !== 'Year' && view !== 'Week' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.35rem', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.35rem', flexShrink: 0 }}>
               {weekDays.map(d => <div key={d}>{d}</div>)}
             </div>
           )}
 
           {view === 'Month' && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'repeat(auto-fit, minmax(0, 1fr))', gridAutoRows: '1fr', gap: '0.35rem', flex: 1, minHeight: 0, height: '100%' }}>
               {[...Array(firstDayOfMonth)].map((_, i) => (
-                <div key={`blank-${i}`} style={{ minHeight: '90px', backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', opacity: 0.3 }} />
+                <div key={`blank-${i}`} style={{ minHeight: 0, height: '100%', backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', opacity: 0.3 }} />
               ))}
               {daysInMonth.map(day => {
                 const cellDate = new Date(currentYear, currentMonth, day);
@@ -452,22 +529,20 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           )}
 
           {view === 'Week' && (
-            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
-              <div style={{ minWidth: '700px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
-                  {weekDays.map(d => <div key={d}>{d}</div>)}
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
-                  {weekDaysArray.map((cellDate, i) => {
-                    return renderCell(cellDate, `week-day-${i}`, true);
-                  })}
-                </div>
+            <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.35rem', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.35rem', flexShrink: 0 }}>
+                {weekDays.map(d => <div key={d}>{d}</div>)}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridAutoRows: '1fr', gap: '0.35rem', flex: 1, minHeight: 0, height: '100%' }}>
+                {weekDaysArray.map((cellDate, i) => {
+                  return renderCell(cellDate, `week-day-${i}`, true);
+                })}
               </div>
             </div>
           )}
 
           {view === 'List' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingRight: '0.25rem' }}>
               {filteredEvents.length === 0 ? (
                 <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '600' }}>
                   No matching events found
@@ -545,7 +620,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
           )}
 
           {view === 'Year' && (
-            <div className="year-grid">
+            <div className="year-grid" style={{ flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '0.25rem' }}>
               {Array.from({ length: 12 }, (_, i) => {
                 const monthDate = new Date(currentYear, i, 1);
                 const monthName = monthDate.toLocaleString('default', { month: 'long' });
@@ -566,7 +641,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                     style={{
                       cursor: 'pointer',
                       backgroundColor: 'var(--bg-subtle)',
-                      padding: '1.5rem',
+                      padding: '1.25rem',
                       borderRadius: 'var(--radius-lg)',
                       display: 'flex',
                       flexDirection: 'column',
@@ -574,18 +649,18 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                       justifyContent: 'center',
                       gap: '0.5rem',
                       border: count > 0 ? '1px solid var(--primary)' : '1px solid var(--border-color)',
-                      minHeight: '120px'
+                      minHeight: '100px'
                     }}
                   >
-                    <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                    <span style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--text-main)' }}>
                       {monthName}
                     </span>
                     <span style={{ 
-                      fontSize: '0.85rem', 
+                      fontSize: '0.8rem', 
                       color: count > 0 ? '#FFF' : 'var(--text-muted)', 
                       fontWeight: '700',
                       backgroundColor: count > 0 ? 'var(--primary)' : 'transparent',
-                      padding: count > 0 ? '0.2rem 0.8rem' : '0',
+                      padding: count > 0 ? '0.15rem 0.75rem' : '0',
                       borderRadius: 'var(--radius-full)'
                     }}>
                       {count} {count === 1 ? 'Event' : 'Events'}

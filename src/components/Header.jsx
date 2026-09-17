@@ -349,8 +349,6 @@ export default function Header({
           {darkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
         </button>
 
-        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }} />
-
         {/* 4. User Profile Section */}
         <div style={{ position: 'relative' }} ref={profileMenuRef}>
           <div
