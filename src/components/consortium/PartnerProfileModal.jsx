@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Sparkles,
   Check,
-  Target,
   TrendingUp
 } from 'lucide-react';
 
@@ -20,18 +19,7 @@ function scoreColor(score) {
   if (score >= 70) return 'var(--warning)';
   return 'var(--text-muted)';
 }
-function scoreBg(score) {
-  if (score >= 90) return 'rgba(16,185,129,0.08)';
-  if (score >= 80) return 'rgba(99,102,241,0.08)';
-  if (score >= 70) return 'rgba(245,158,11,0.08)';
-  return 'rgba(156,163,175,0.08)';
-}
-function scoreBorder(score) {
-  if (score >= 90) return 'rgba(16,185,129,0.3)';
-  if (score >= 80) return 'rgba(99,102,241,0.3)';
-  if (score >= 70) return 'rgba(245,158,11,0.3)';
-  return 'rgba(156,163,175,0.3)';
-}
+
 
 /* ── section heading ── */
 function SectionTitle({ children }) {
@@ -202,40 +190,6 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
             </div>
           )}
 
-          {/* ── Match Information ── */}
-          <div>
-            <SectionTitle>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                <Target size={12} /> Match Information
-              </span>
-            </SectionTitle>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '10px',
-            }}>
-              {[
-                { label: 'Technical Match',  value: partner.technicalMatch  || `${techScore}%`,    color: scoreColor(techScore),    bg: scoreBg(techScore),    border: scoreBorder(techScore) },
-                { label: 'Geographic Match', value: partner.geographicMatch || `${geoScore}%`,     color: scoreColor(geoScore),     bg: scoreBg(geoScore),     border: scoreBorder(geoScore) },
-                { label: 'Overall Score',    value: `${overallScore}%`,                             color: scoreColor(overallScore), bg: scoreBg(overallScore), border: scoreBorder(overallScore) },
-              ].map(m => (
-                <div key={m.label} style={{
-                  padding: '12px',
-                  backgroundColor: m.bg,
-                  border: `1px solid ${m.border}`,
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                }}>
-                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    {m.label}
-                  </div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: '800', color: m.color }}>
-                    {m.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
 
           {/* ── Bridges Gaps ── */}
           {partner.capabilitiesCovered?.length > 0 && (
