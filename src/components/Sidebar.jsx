@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard,
+  LayoutGrid,
   Layers,
   Calendar,
   Users2,
@@ -11,16 +11,14 @@ import {
   Building2,
   History,
   Settings,
-  ShieldCheck,
-  LogOut,
-  User
+  LogOut
 } from 'lucide-react';
 
 const navSections = [
   {
     items: [
-      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/' },
-      { id: 'opportunities', label: 'Opportunities', icon: Layers, path: '/opportunities', count: 150, urgent: true },
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, path: '/' },
+      { id: 'opportunities', label: 'Opportunities', icon: Layers, path: '/opportunities', count: 150, urgent: false },
       { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' }
     ]
   },
@@ -92,10 +90,10 @@ export default function Sidebar({ activeTab, setActiveTab, onRequestLogout, acti
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
           <span className="sidebar-brand-title">
-            Tender Hub
+            TENDER HUB
           </span>
-          <span style={{ fontSize: '0.675rem', color: 'var(--sidebar-text-muted)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <ShieldCheck size={11} color="#10B981" /> Enterprise SaaS
+          <span style={{ fontSize: '0.675rem', color: 'var(--sidebar-text-muted)', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10B981', display: 'inline-block' }}></span> Enterprise SaaS
           </span>
         </div>
       </div>

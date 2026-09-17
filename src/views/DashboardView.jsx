@@ -173,7 +173,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       changeText: periodMetrics.totalText,
       icon: TrendingUp,
       color: '#2563EB',
-      bg: 'rgba(37, 99, 235, 0.1)',
+      bg: '#EFF6FF',
       borderAccent: '#2563EB'
     },
     {
@@ -185,7 +185,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       changeText: periodMetrics.highMatchText,
       icon: Award,
       color: '#10B981',
-      bg: 'rgba(16, 185, 129, 0.1)',
+      bg: '#ECFDF5',
       borderAccent: '#10B981'
     },
     {
@@ -197,7 +197,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       changeText: periodMetrics.urgentText,
       icon: AlertTriangle,
       color: '#EF4444',
-      bg: 'rgba(239, 68, 68, 0.1)',
+      bg: '#FEF2F2',
       borderAccent: '#EF4444'
     },
     {
@@ -209,7 +209,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       changeText: periodMetrics.closingText,
       icon: Clock,
       color: '#F59E0B',
-      bg: 'rgba(245, 158, 11, 0.1)',
+      bg: '#FFFBEB',
       borderAccent: '#F59E0B'
     },
     {
@@ -221,7 +221,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       changeText: periodMetrics.pursuedText,
       icon: CheckCircle,
       color: '#0284C7',
-      bg: 'rgba(2, 132, 199, 0.1)',
+      bg: '#F0F9FF',
       borderAccent: '#0284C7'
     }
   ];
@@ -397,36 +397,39 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
               title={`Click to filter list by ${kpi.title}`}
               style={{
                 border: isActive ? `2px solid ${kpi.borderAccent}` : '1px solid var(--border-color)',
-                boxShadow: isActive ? 'var(--shadow-card-hover)' : 'var(--shadow-sm)',
-                transform: isActive ? 'translateY(-2px)' : undefined
+                boxShadow: isActive ? '0 4px 14px rgba(37, 99, 235, 0.12)' : 'var(--shadow-xs)',
+                borderRadius: '10px',
+                padding: '16px 18px',
+                backgroundColor: 'var(--bg-card)',
+                transform: isActive ? 'translateY(-2px)' : undefined,
+                cursor: 'pointer'
               }}
             >
               {/* Top Row: Title & Icon Box */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.85rem' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <span style={{
-                  fontSize: '0.725rem',
+                  fontSize: '0.7rem',
                   fontWeight: '700',
                   color: 'var(--text-muted)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.03em',
+                  letterSpacing: '0.04em',
                   lineHeight: '1.25'
                 }}>
                   {kpi.title}
                 </span>
 
                 <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '0.6rem',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '0.5rem',
                   backgroundColor: kpi.bg,
                   color: kpi.color,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: `0 3px 8px ${kpi.bg}`,
                   flexShrink: 0
                 }}>
-                  <Icon size={18} />
+                  <Icon size={16} />
                 </div>
               </div>
 
@@ -439,14 +442,14 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 <div style={{
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.2rem',
+                  gap: '0.25rem',
                   fontSize: '0.7rem',
                   fontWeight: '700',
                   padding: '0.15rem 0.45rem',
                   borderRadius: '9999px',
-                  backgroundColor: kpi.isPositive ? 'var(--success-bg)' : 'var(--danger-bg)',
-                  color: kpi.isPositive ? 'var(--success-text)' : 'var(--danger-text)',
-                  border: `1px solid ${kpi.isPositive ? 'var(--success-border)' : 'var(--danger-border)'}`,
+                  backgroundColor: kpi.isPositive ? '#DCFCE7' : '#FEE2E2',
+                  color: kpi.isPositive ? '#15803D' : '#DC2626',
+                  border: `1px solid ${kpi.isPositive ? '#BBF7D0' : '#FECACA'}`,
                   whiteSpace: 'nowrap'
                 }}>
                   <TrendIcon size={11} />
@@ -460,12 +463,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '0.35rem',
-                paddingTop: '0.65rem',
-                borderTop: '1px solid var(--border-color)',
+                paddingTop: '0.4rem',
                 marginTop: 'auto'
               }}>
                 <span style={{
-                  fontSize: '0.7rem',
+                  fontSize: '0.725rem',
                   color: 'var(--text-muted)',
                   fontWeight: '500',
                   overflow: 'hidden',
@@ -478,7 +480,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 <span style={{
                   fontSize: '0.725rem',
                   color: kpi.color,
-                  fontWeight: '700',
+                  fontWeight: '600',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.15rem',
@@ -489,34 +491,40 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                   View List <ChevronRight size={12} />
                 </span>
               </div>
-
-              {isActive && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  bottom: 0,
-                  width: '4px',
-                  backgroundColor: kpi.borderAccent
-                }} />
-              )}
             </div>
           );
         })}
       </div>
 
       {/* 3. Action Required & Urgent Tenders Feed */}
-      <div className="card" style={{ padding: '28px', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div style={{ padding: '0.4rem', borderRadius: '0.5rem', backgroundColor: 'var(--danger-bg)', color: 'var(--danger)' }}>
-              <Zap size={20} />
+      <div style={{
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: '12px',
+        padding: '22px',
+        marginBottom: '24px',
+        boxShadow: 'var(--shadow-xs)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
+              backgroundColor: '#FEE2E2',
+              color: '#EF4444',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Zap size={18} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--text-main)', marginTop: '0' }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>
                 Urgent Attention & High-Match Feed
               </h3>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '2px 0 0 0' }}>
                 Tenders matching primary credentials closing within 7 days
               </p>
             </div>
@@ -524,85 +532,123 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
 
           <button
             onClick={onViewAll}
-            className="btn btn-outline"
-            style={{ fontSize: '0.75rem', padding: '0.35rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+            style={{
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'transparent',
+              borderRadius: '6px',
+              padding: '0.35rem 0.75rem',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              color: 'var(--text-main)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              cursor: 'pointer'
+            }}
           >
-            View All ({opportunities.length}) <ArrowUpRight size={12} />
+            View All ({opportunities.length}) <ArrowUpRight size={13} />
           </button>
         </div>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '24px'
+          gap: '16px',
+          marginTop: '16px'
         }}>
           {timeFilteredOpportunities.slice(0, 3).map((opp) => (
             <div
               key={opp.id}
               style={{
-                borderRadius: '0.75rem',
+                borderRadius: '10px',
                 border: '1px solid var(--border-color)',
-                padding: '20px',
-                backgroundColor: 'var(--bg-subtle)',
+                padding: '16px 18px',
+                backgroundColor: '#F8FAFC',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                gap: '1rem',
+                gap: '0.75rem',
                 transition: 'all 0.15s ease'
               }}
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                   <span style={{
-                    fontSize: '0.7rem',
-                    fontWeight: '700',
-                    padding: '0.15rem 0.45rem',
-                    borderRadius: '0.25rem',
-                    backgroundColor: 'var(--danger-bg)',
-                    color: 'var(--danger-text)',
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    color: '#EF4444',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.2rem'
+                    gap: '0.35rem'
                   }}>
-                    <Clock size={10} /> 3 Days Left
+                    <Clock size={13} /> 3 Days Left
                   </span>
 
                   <span style={{
                     fontSize: '0.75rem',
-                    fontWeight: '800',
-                    color: '#065F46',
-                    backgroundColor: '#D1FAE5',
-                    padding: '0.15rem 0.5rem',
-                    borderRadius: '9999px'
+                    fontWeight: '700',
+                    color: '#15803D',
+                    backgroundColor: '#DCFCE7',
+                    padding: '0.15rem 0.55rem',
+                    borderRadius: '6px'
                   }}>
                     Score: {opp.aiScore}
                   </span>
                 </div>
 
-                <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.35rem', lineHeight: '1.3' }}>
+                <h4 style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)', margin: '8px 0 6px 0', lineHeight: '1.3' }}>
                   {opp.name}
                 </h4>
 
-                <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  <span><Building2 size={12} style={{ display: 'inline', marginRight: 2 }} /> {opp.source}</span>
-                  <span><MapPin size={12} style={{ display: 'inline', marginRight: 2 }} /> {opp.location}</span>
+                <div style={{ display: 'flex', gap: '0.85rem', fontSize: '0.75rem', color: 'var(--text-muted)', alignItems: 'center' }}>
+                  <span><Building2 size={12} style={{ display: 'inline', marginRight: 3 }} /> {opp.source}</span>
+                  <span><MapPin size={12} style={{ display: 'inline', marginRight: 3 }} /> {opp.location}</span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.6rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: 'auto', paddingTop: '0.5rem' }}>
                 <button
-                  className="btn btn-outline"
-                  style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                  className="btn"
+                  style={{
+                    flex: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    padding: '0.45rem 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #CBD5E1',
+                    color: '#0F172A',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
                   onClick={() => handleOpenQuickView(opp)}
                 >
-                  <Eye size={12} /> Inspect
+                  <Eye size={13} /> Inspect
                 </button>
                 <button
                   className="btn btn-primary"
-                  style={{ flex: 1, fontSize: '0.75rem', padding: '0.3rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}
+                  style={{
+                    flex: 1,
+                    fontSize: '0.75rem',
+                    fontWeight: '600',
+                    padding: '0.45rem 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    backgroundColor: '#2563EB',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 2px rgba(37, 99, 235, 0.2)'
+                  }}
                   onClick={() => handlePursue(opp)}
                 >
-                  <CheckCircle size={12} /> Pursue
+                  <CheckCircle size={13} /> Pursue
                 </button>
               </div>
             </div>
