@@ -28,6 +28,8 @@ import { mockOpportunities } from '../data/mockData';
 import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '../hooks/useApiQueries';
 import DashboardQuickViewModal from '../components/dashboard/DashboardQuickViewModal';
 import KpiDetailModal from '../components/dashboard/KpiDetailModal';
+import RecentActivityFeed from '../components/dashboard/RecentActivityFeed';
+import { exportService } from '../services/exportService';
 
 export default function DashboardView({ onSelectOpportunity, onViewAll, searchVal = '', setSearchVal }) {
   const queryClient = useQueryClient();
@@ -58,6 +60,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshedTime, setLastRefreshedTime] = useState(null);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   // KPI Card Modal State
   const [isKpiModalOpen, setIsKpiModalOpen] = useState(false);
@@ -224,7 +227,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
   ];
 
   return (
-    <div className="page-container" style={{ padding: '32px', gap: '32px' }}>
+    <div className="page-container">
       {/* Time Period Filter Bar (Positioned above Metric Cards Grid) */}
       <div style={{
         display: 'flex',
@@ -232,8 +235,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '1rem',
-        marginTop: '4px',
-        marginBottom: '-8px'
+        marginBottom: '0'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <h2 style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, letterSpacing: '-0.01em' }}>
@@ -246,40 +248,137 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
           )}
         </div>
 
-        {/* Single Unified Time Period Filter Control */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          backgroundColor: 'var(--bg-card)',
-          padding: '0.35rem 0.85rem',
-          borderRadius: '9999px',
-          border: '1px solid var(--border-color)',
-          boxShadow: 'var(--shadow-xs)'
-        }}>
-          <Calendar size={14} color="var(--primary)" />
-          <span style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-            Time Period:
-          </span>
-          <select
-            value={timeRange}
-            onChange={(e) => handleTimeRangeChange(e.target.value)}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: 'var(--primary)',
-              fontSize: '0.8rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              outline: 'none',
-              padding: '0.1rem 0.25rem'
-            }}
-          >
-            <option value="all">All Time</option>
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="quarter">This Quarter</option>
-          </select>
+        {/* Controls: Download Option & Time Period Filter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Download Options Button */}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => setShowDownloadMenu(prev => !prev)}
+              className="btn btn-outline"
+              style={{
+                fontSize: '0.775rem',
+                padding: '0.35rem 0.85rem',
+                borderRadius: '9999px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                fontWeight: '600',
+                backgroundColor: 'var(--bg-card)',
+                boxShadow: 'var(--shadow-xs)'
+              }}
+              title="Download Dashboard Report"
+            >
+              <Download size={14} color="var(--primary)" />
+              <span>Download</span>
+              <ChevronRight size={12} style={{ transform: showDownloadMenu ? 'rotate(90deg)' : 'none', transition: 'transform 0.15s ease' }} />
+            </button>
+
+            {showDownloadMenu && (
+              <div style={{
+                position: 'absolute',
+                top: '115%',
+                right: 0,
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '0.5rem',
+                boxShadow: 'var(--shadow-md)',
+                zIndex: 40,
+                minWidth: '170px',
+                padding: '0.35rem 0',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <button
+                  onClick={() => {
+                    exportService.exportToPDF('Tender_Dashboard_Report.pdf');
+                    setShowDownloadMenu(false);
+                  }}
+                  style={{
+                    padding: '0.5rem 0.85rem',
+                    textAlign: 'left',
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '0.775rem',
+                    fontWeight: '600',
+                    color: 'var(--text-main)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    width: '100%',
+                    transition: 'background 0.15s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <span style={{ color: 'var(--danger)', fontWeight: '700' }}>PDF</span>
+                  Export as PDF
+                </button>
+                <button
+                  onClick={() => {
+                    exportService.exportToExcel('Tender_Dashboard_Report.csv');
+                    setShowDownloadMenu(false);
+                  }}
+                  style={{
+                    padding: '0.5rem 0.85rem',
+                    textAlign: 'left',
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '0.775rem',
+                    fontWeight: '600',
+                    color: 'var(--text-main)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    width: '100%',
+                    transition: 'background 0.15s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <span style={{ color: 'var(--success)', fontWeight: '700' }}>CSV</span>
+                  Export as Excel (CSV)
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Single Unified Time Period Filter Control */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            backgroundColor: 'var(--bg-card)',
+            padding: '0.35rem 0.85rem',
+            borderRadius: '9999px',
+            border: '1px solid var(--border-color)',
+            boxShadow: 'var(--shadow-xs)'
+          }}>
+            <Calendar size={14} color="var(--primary)" />
+            <span style={{ fontSize: '0.775rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+              Time Period:
+            </span>
+            <select
+              value={timeRange}
+              onChange={(e) => handleTimeRangeChange(e.target.value)}
+              style={{
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--primary)',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                outline: 'none',
+                padding: '0.1rem 0.25rem'
+              }}
+            >
+              <option value="all">All Time</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="quarter">This Quarter</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -511,10 +610,10 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
         </div>
       </div>
 
+      {/* Recent Activity Feed */}
+      <RecentActivityFeed />
 
-
-
-        {/* 6. Quick View Detail Modal */}
+      {/* 6. Quick View Detail Modal */}
         <DashboardQuickViewModal
           opportunity={selectedQuickViewOpp}
           isOpen={isQuickViewOpen}

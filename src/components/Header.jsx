@@ -16,7 +16,8 @@ import {
   LogIn,
   User,
   AlertTriangle,
-  ExternalLink
+  ExternalLink,
+  Menu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { exportService } from '../services/exportService';
@@ -34,7 +35,8 @@ export default function Header({
   onDownloadPDF,
   opportunities = mockOpportunities,
   filteredOpportunities = null,
-  onRequestLogout
+  onRequestLogout,
+  onMenuClick
 }) {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -165,16 +167,36 @@ export default function Header({
         {ariaAnnouncement}
       </div>
 
-      {/* 1. Real-Time Search Bar */}
+      {/* 1. Real-Time Search Bar - Positioned at the Left Corner */}
       <div className="header-search" role="search">
         <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search projects, tenders, sector, location..."
+          placeholder={
+            activeTab === 'opportunities' || activeTab === 'opp_details'
+              ? 'Search opportunities, sectors, values...'
+              : activeTab === 'calendar'
+              ? 'Search events, submission deadlines...'
+              : activeTab === 'consortium'
+              ? 'Search partners, expertise, credentials...'
+              : activeTab === 'sources'
+              ? 'Search monitored portals, agencies...'
+              : activeTab === 'offices'
+              ? 'Search regional offices, locations...'
+              : activeTab === 'users'
+              ? 'Search users, roles, email accounts...'
+              : activeTab === 'audit'
+              ? 'Search audit logs, actions, records...'
+              : activeTab === 'client_profile'
+              ? 'Search client profile, past projects...'
+              : activeTab === 'reports'
+              ? 'Search analytics, export reports...'
+              : 'Search tenders, projects, locations, sectors...'
+          }
           value={searchVal || ''}
           onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
-          aria-label="Search projects, tenders, sector, location"
+          aria-label="Search content"
         />
         {searchVal ? (
           <button
@@ -205,7 +227,7 @@ export default function Header({
       <div className="header-actions" role="toolbar" aria-label="Global header actions">
         {/* Refresh Button - immediately to the LEFT of the notification bell */}
         <button
-          className="header-refresh-btn"
+          className="btn-header-refresh"
           onClick={handleRefreshClick}
           title="Refresh Dashboard Data"
           aria-label={isRefreshing ? 'Refreshing data...' : 'Refresh dashboard data'}
@@ -218,7 +240,7 @@ export default function Header({
         {/* 2. Notification Bell Icon */}
         <div style={{ position: 'relative' }} ref={notificationMenuRef}>
           <button
-            className="header-icon-btn"
+            className="header-circle-btn"
             onClick={() => {
               setShowNotifications(!showNotifications);
               setShowProfileMenu(false);
@@ -318,7 +340,7 @@ export default function Header({
 
         {/* 3. Light/Dark Mode Toggle */}
         <button
-          className="header-icon-btn"
+          className="header-circle-btn"
           onClick={toggleTheme}
           title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
@@ -326,6 +348,8 @@ export default function Header({
         >
           {darkMode ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
         </button>
+
+        <div id="header-actions-portal" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }} />
 
         {/* 4. User Profile Section */}
         <div style={{ position: 'relative' }} ref={profileMenuRef}>
