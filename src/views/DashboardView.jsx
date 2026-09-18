@@ -657,7 +657,12 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
       </div>
 
       {/* Recent Activity Feed */}
-      <RecentActivityFeed />
+      <RecentActivityFeed
+        onView={(item) => {
+          const opp = opportunities.find((o) => o.id === item.oppId) || opportunities[0];
+          if (opp && onSelectOpportunity) onSelectOpportunity(opp);
+        }}
+      />
 
       {/* 6. Quick View Detail Modal */}
         <DashboardQuickViewModal
