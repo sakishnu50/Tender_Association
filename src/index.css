@@ -1271,8 +1271,8 @@ body {
 }
 .btn-pursue  { background: #059669; color: #fff; border: none; }
 .btn-pursue:hover  { background: #047857; box-shadow: 0 4px 12px rgba(5,150,105,0.25); }
-.btn-reject  { background: transparent; border: 1px solid #DC2626; color: #DC2626; }
-.btn-reject:hover  { background: #FEE2E2; }
+.btn-reject, .btn-delete  { background: transparent; border: 1px solid #DC2626; color: #DC2626; }
+.btn-reject:hover, .btn-delete:hover  { background: #FEE2E2; }
 .btn-review  { background: transparent; border: 1px solid #D97706; color: #D97706; }
 .btn-review:hover  { background: #FEF3C7; }
 .btn-note    { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }

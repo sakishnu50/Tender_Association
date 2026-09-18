@@ -1,6 +1,11 @@
 import React, { useState, useCallback, useMemo } from 'react';
+<<<<<<< HEAD
 import { ArrowLeft, ChevronRight } from 'lucide-react';
+=======
+import { ArrowLeft, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
+>>>>>>> 861c39d (Upadate opportunitydetail page)
 import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 
 import OpportunityHeader from '../components/ui/OpportunityHeader';
 import ScoreBreakdown    from '../components/ui/ScoreBreakdown';
@@ -22,7 +27,14 @@ let _seq = 100;
 function uid() { return `DYN-${++_seq}`; }
 
 /* ─── Inner Content Component (re-keyed per opportunity) ─── */
+<<<<<<< HEAD
 function OpportunityDetailsContent({ opportunity, onBack }) {
+=======
+function OpportunityDetailsContent({ opportunity, onBack, calendarDate }) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+>>>>>>> 861c39d (Upadate opportunitydetail page)
   // Local status state (decoupled from global list)
   const [status, setStatus] = useState(opportunity?.status || 'New');
 
@@ -73,16 +85,60 @@ function OpportunityDetailsContent({ opportunity, onBack }) {
     });
   }, [pushEntry]);
 
+  const handleDelete = useCallback(() => {
+    const oppId = opportunity?.id;
+    if (!oppId) return;
+
+    // 1. Remove from in-memory mockOpportunities if present
+    const mockIdx = mockOpportunities.findIndex((item) => item.id === oppId);
+    if (mockIdx !== -1) {
+      mockOpportunities.splice(mockIdx, 1);
+    }
+
+    // 2. Remove from persistent localStorage stores
+    ['iot_all_opportunities', 'iot_opportunities'].forEach((storageKey) => {
+      try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+          const list = JSON.parse(stored);
+          if (Array.isArray(list)) {
+            const updated = list.filter((item) => item.id !== oppId);
+            localStorage.setItem(storageKey, JSON.stringify(updated));
+          }
+        }
+      } catch (e) {
+        console.error(`Error deleting opportunity from ${storageKey}:`, e);
+      }
+    });
+
+    // 3. Invalidate & update React Query cache for immediate list refresh
+    try {
+      queryClient.setQueriesData({ queryKey: ['opportunities'] }, (old) => {
+        if (!Array.isArray(old)) return [];
+        return old.filter((item) => item.id !== oppId);
+      });
+      queryClient.invalidateQueries({ queryKey: ['opportunities'] });
+    } catch (e) {
+      console.error('Error updating React Query cache:', e);
+    }
+
+    // 4. Navigate back to Opportunities list page
+    navigate('/opportunities');
+  }, [opportunity?.id, queryClient, navigate]);
+
   return (
     <div className="page-container">
-      {/* ── 1. Breadcrumb + Back ── */}
+      {/* ── 1. Back button ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+<<<<<<< HEAD
         <nav className="breadcrumb" aria-label="Breadcrumb">
           <span>Opportunities</span>
           <ChevronRight size={13} className="breadcrumb-sep" />
           <span className="breadcrumb-current">Opportunity Details</span>
         </nav>
 
+=======
+>>>>>>> 861c39d (Upadate opportunitydetail page)
         <button
           id="btn-back-to-opportunities"
           onClick={onBack}
@@ -115,6 +171,7 @@ function OpportunityDetailsContent({ opportunity, onBack }) {
         onPursue={handlePursue}
         onReject={handleReject}
         onReview={handleReview}
+        onDelete={handleDelete}
         onAddNote={() => setNoteOpen(true)}
       />
 
