@@ -9,7 +9,8 @@ import {
   XCircle,
   Clock3,
   StickyNote,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from 'lucide-react';
 import PriorityBadge from './PriorityBadge';
 import ScoreRing from './ScoreRing';
@@ -43,6 +44,7 @@ export default function OpportunityHeader({
   onPursue,
   onReject,
   onReview,
+  onDelete,
   onAddNote
 }) {
   if (!opportunity) return null;
@@ -65,9 +67,6 @@ export default function OpportunityHeader({
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', flexWrap: 'wrap' }}>
             <PriorityBadge priority={opportunity.priority} />
             <StatusBadge status={status} />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-              #{opportunity.id}
-            </span>
           </div>
         </div>
 
@@ -187,6 +186,9 @@ export default function OpportunityHeader({
           </button>
           <button className="btn btn-review" onClick={onReview} id="btn-review-opp">
             <Clock3 size={15} /> Mark for Review
+          </button>
+          <button className="btn btn-delete" onClick={onDelete} id="btn-delete-opp">
+            <Trash2 size={15} /> Delete
           </button>
           <button className="btn btn-note" onClick={onAddNote} id="btn-add-note-opp">
             <StickyNote size={15} /> Add Note
