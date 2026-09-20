@@ -29,6 +29,7 @@ import { useOpportunities, usePursueOpportunity, useDeclineOpportunity } from '.
 import DashboardQuickViewModal from '../components/dashboard/DashboardQuickViewModal';
 import KpiDetailModal from '../components/dashboard/KpiDetailModal';
 import RecentActivityFeed from '../components/dashboard/RecentActivityFeed';
+import { PursueModal, DeclineModal } from './PursueModal';
 import { exportService } from '../services/exportService';
 
 export default function DashboardView({ onSelectOpportunity, onViewAll, searchVal = '', setSearchVal }) {
@@ -61,6 +62,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshedTime, setLastRefreshedTime] = useState(null);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+
+  // Pursue / Decline Modal State
+  const [isPursueModalOpen, setIsPursueModalOpen] = useState(false);
+  const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
+  const [selectedPursueOpp, setSelectedPursueOpp] = useState(null);
 
   // KPI Card Modal State
   const [isKpiModalOpen, setIsKpiModalOpen] = useState(false);
@@ -106,6 +112,28 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     });
   }, [opportunities, timeRange]);
 
+  // Filter opportunities by search query (name, id, source, sector, location, description)
+  const searchedOpportunities = useMemo(() => {
+    if (!searchVal || !searchVal.trim()) return timeFilteredOpportunities;
+    const q = searchVal.trim().toLowerCase();
+    return timeFilteredOpportunities.filter((opp) => {
+      const name = (opp.name || opp.title || '').toLowerCase();
+      const id = (opp.id || '').toLowerCase();
+      const source = (opp.source || '').toLowerCase();
+      const sector = (opp.sector || '').toLowerCase();
+      const location = (opp.location || opp.country || '').toLowerCase();
+      const desc = (opp.description || '').toLowerCase();
+      return (
+        name.includes(q) ||
+        id.includes(q) ||
+        source.includes(q) ||
+        sector.includes(q) ||
+        location.includes(q) ||
+        desc.includes(q)
+      );
+    });
+  }, [timeFilteredOpportunities, searchVal]);
+
   const handleOpenQuickView = (opp) => {
     setSelectedQuickViewOpp(opp);
     setIsQuickViewOpen(true);
@@ -118,14 +146,35 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     setIsKpiModalOpen(true);
   };
 
-  const handlePursue = async (opp) => {
-    await pursueMutation.mutateAsync({ id: opp.id, details: { priority: 'High' } });
-    alert(`Opportunity "${opp.name}" marked as PURSUED!`);
+  // Opens PursueModal for a given opportunity
+  const handlePursue = (opp) => {
+    setSelectedPursueOpp(opp);
+    setIsPursueModalOpen(true);
+    // Close quick-view modal if open so pursue modal sits on top
+    setIsQuickViewOpen(false);
   };
 
-  const handleDecline = async (opp) => {
-    await declineMutation.mutateAsync({ id: opp.id, details: { reason: 'Budget Constraints' } });
-    alert(`Opportunity "${opp.name}" DECLINED.`);
+  // Fires the actual mutation after user confirms in PursueModal
+  const handleConfirmPursue = async () => {
+    if (!selectedPursueOpp) return;
+    await pursueMutation.mutateAsync({ id: selectedPursueOpp.id, details: { priority: 'High' } });
+    setIsPursueModalOpen(false);
+    setSelectedPursueOpp(null);
+  };
+
+  // Opens DeclineModal for a given opportunity
+  const handleDecline = (opp) => {
+    setSelectedPursueOpp(opp);
+    setIsDeclineModalOpen(true);
+    setIsQuickViewOpen(false);
+  };
+
+  // Fires the actual mutation after user confirms in DeclineModal
+  const handleConfirmDecline = async () => {
+    if (!selectedPursueOpp) return;
+    await declineMutation.mutateAsync({ id: selectedPursueOpp.id, details: { reason: 'Budget Constraints' } });
+    setIsDeclineModalOpen(false);
+    setSelectedPursueOpp(null);
   };
 
   // Metric trend and text mapping per time range
@@ -167,7 +216,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     {
       key: 'all',
       title: 'Total Opportunities',
-      value: timeFilteredOpportunities.length,
+      value: searchedOpportunities.length,
       percentage: periodMetrics.totalPct,
       isPositive: periodMetrics.totalIsPos,
       changeText: periodMetrics.totalText,
@@ -179,7 +228,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     {
       key: 'highMatch',
       title: 'High AI Match (8.5+)',
-      value: timeFilteredOpportunities.filter(o => (o.aiScore || 0) >= 8.5).length,
+      value: searchedOpportunities.filter(o => (o.aiScore || 0) >= 8.5).length,
       percentage: periodMetrics.highMatchPct,
       isPositive: periodMetrics.highMatchIsPos,
       changeText: periodMetrics.highMatchText,
@@ -191,7 +240,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     {
       key: 'highPriority',
       title: 'Urgent & High Priority',
-      value: timeFilteredOpportunities.filter(o => o.status === 'High Priority' || (o.aiScore || 0) >= 9.0).length,
+      value: searchedOpportunities.filter(o => o.status === 'High Priority' || (o.aiScore || 0) >= 9.0).length,
       percentage: periodMetrics.urgentPct,
       isPositive: periodMetrics.urgentIsPos,
       changeText: periodMetrics.urgentText,
@@ -203,7 +252,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     {
       key: 'closingSoon',
       title: 'Closing Soon (< 7 Days)',
-      value: timeFilteredOpportunities.filter(o => o.deadline?.includes('15 Sep') || o.deadline?.includes('20 Sep') || (o.aiScore || 0) >= 8.5).length,
+      value: searchedOpportunities.filter(o => o.deadline?.includes('15 Sep') || o.deadline?.includes('20 Sep') || (o.aiScore || 0) >= 8.5).length,
       percentage: periodMetrics.closingPct,
       isPositive: periodMetrics.closingIsPos,
       changeText: periodMetrics.closingText,
@@ -215,7 +264,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
     {
       key: 'pursued',
       title: 'Pursued Tenders',
-      value: timeFilteredOpportunities.filter(o => o.status === 'Pursued').length,
+      value: searchedOpportunities.filter(o => o.status === 'Pursued').length,
       percentage: periodMetrics.pursuedPct,
       isPositive: periodMetrics.pursuedIsPos,
       changeText: periodMetrics.pursuedText,
@@ -382,6 +431,67 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
         </div>
       </div>
 
+      {/* Real-time Search Filter Indicator Banner */}
+      {searchVal && searchVal.trim() && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            padding: '0.65rem 1rem',
+            borderRadius: '10px',
+            backgroundColor: 'var(--primary-light)',
+            border: '1px solid var(--primary-border)',
+            marginBottom: '1rem',
+            flexWrap: 'wrap',
+            animation: 'fadeIn 0.2s ease'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+            <Search size={15} color="var(--primary)" />
+            <span style={{ fontSize: '0.825rem', color: 'var(--text-main)' }}>
+              Filtering dashboard by <strong>"{searchVal}"</strong> —{' '}
+              <strong style={{ color: 'var(--primary)' }}>{searchedOpportunities.length}</strong> matching tenders
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {onViewAll && (
+              <button
+                type="button"
+                onClick={onViewAll}
+                className="btn btn-primary"
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '0.25rem 0.65rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}
+              >
+                View in Opportunities List <ArrowUpRight size={12} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setSearchVal && setSearchVal('')}
+              className="btn btn-outline"
+              style={{
+                fontSize: '0.75rem',
+                padding: '0.25rem 0.65rem',
+                backgroundColor: 'var(--bg-card)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.25rem'
+              }}
+            >
+              Clear Filter <X size={12} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 2. Enterprise Metric KPI Cards Grid */}
       <div className="kpi-cards-grid">
         {kpis.map((kpi) => {
@@ -419,10 +529,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 </span>
 
                 <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '0.5rem',
-                  backgroundColor: kpi.bg,
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '8px',
+                  backgroundColor: `${kpi.color}1A`,
+                  border: `1px solid ${kpi.color}33`,
                   color: kpi.color,
                   display: 'flex',
                   alignItems: 'center',
@@ -445,11 +556,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                   gap: '0.25rem',
                   fontSize: '0.7rem',
                   fontWeight: '700',
-                  padding: '0.15rem 0.45rem',
+                  padding: '0.15rem 0.5rem',
                   borderRadius: '9999px',
-                  backgroundColor: kpi.isPositive ? '#DCFCE7' : '#FEE2E2',
-                  color: kpi.isPositive ? '#15803D' : '#DC2626',
-                  border: `1px solid ${kpi.isPositive ? '#BBF7D0' : '#FECACA'}`,
+                  backgroundColor: kpi.isPositive ? 'var(--success-bg)' : 'var(--danger-bg)',
+                  color: kpi.isPositive ? 'var(--success-text)' : 'var(--danger-text)',
+                  border: `1px solid ${kpi.isPositive ? 'var(--success-border)' : 'var(--danger-border)'}`,
                   whiteSpace: 'nowrap'
                 }}>
                   <TrendIcon size={11} />
@@ -556,108 +667,151 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
           gap: '16px',
           marginTop: '16px'
         }}>
-          {timeFilteredOpportunities.slice(0, 3).map((opp) => (
+          {searchedOpportunities.length === 0 ? (
             <div
-              key={opp.id}
               style={{
-                borderRadius: '10px',
-                border: '1px solid var(--border-color)',
-                padding: '16px 18px',
-                backgroundColor: '#F8FAFC',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: '0.75rem',
-                transition: 'all 0.15s ease'
+                gridColumn: '1 / -1',
+                padding: '2.5rem 1rem',
+                textAlign: 'center',
+                backgroundColor: 'var(--bg-card-nested)',
+                borderRadius: '8px',
+                border: '1px dashed var(--border-color)',
+                color: 'var(--text-muted)'
               }}
             >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                  <span style={{
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                    color: '#EF4444',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem'
-                  }}>
-                    <Clock size={13} /> 3 Days Left
-                  </span>
-
-                  <span style={{
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    color: '#15803D',
-                    backgroundColor: '#DCFCE7',
-                    padding: '0.15rem 0.55rem',
-                    borderRadius: '6px'
-                  }}>
-                    Score: {opp.aiScore}
-                  </span>
-                </div>
-
-                <h4 style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)', margin: '8px 0 6px 0', lineHeight: '1.3' }}>
-                  {opp.name}
-                </h4>
-
-                <div style={{ display: 'flex', gap: '0.85rem', fontSize: '0.75rem', color: 'var(--text-muted)', alignItems: 'center' }}>
-                  <span><Building2 size={12} style={{ display: 'inline', marginRight: 3 }} /> {opp.source}</span>
-                  <span><MapPin size={12} style={{ display: 'inline', marginRight: 3 }} /> {opp.location}</span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: 'auto', paddingTop: '0.5rem' }}>
-                <button
-                  className="btn"
-                  style={{
-                    flex: 1,
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                    padding: '0.45rem 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.35rem',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #CBD5E1',
-                    color: '#0F172A',
-                    borderRadius: '6px',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => handleOpenQuickView(opp)}
-                >
-                  <Eye size={13} /> Inspect
-                </button>
-                <button
-                  className="btn btn-primary"
-                  style={{
-                    flex: 1,
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                    padding: '0.45rem 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.35rem',
-                    backgroundColor: '#2563EB',
-                    border: 'none',
-                    color: '#FFFFFF',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    boxShadow: '0 1px 2px rgba(37, 99, 235, 0.2)'
-                  }}
-                  onClick={() => handlePursue(opp)}
-                >
-                  <CheckCircle size={13} /> Pursue
-                </button>
-              </div>
+              <p style={{ margin: 0, fontWeight: '600', color: 'var(--text-main)', fontSize: '0.875rem' }}>
+                No opportunities found matching "{searchVal}"
+              </p>
+              <p style={{ margin: '4px 0 12px 0', fontSize: '0.75rem' }}>
+                Try searching by sector, location, agency, or resetting search filter.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSearchVal && setSearchVal('')}
+                className="btn btn-outline"
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem' }}
+              >
+                Clear Search Filter
+              </button>
             </div>
-          ))}
+          ) : (
+            searchedOpportunities.slice(0, 3).map((opp) => (
+              <div
+                key={opp.id}
+                style={{
+                  borderRadius: '10px',
+                  border: '1px solid var(--border-color)',
+                  padding: '16px 18px',
+                  backgroundColor: 'var(--bg-card-nested)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '0.75rem',
+                  boxShadow: 'var(--shadow-xs)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      color: 'var(--danger-text)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}>
+                      <Clock size={13} /> 3 Days Left
+                    </span>
+
+                    <span style={{
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      color: 'var(--success-text)',
+                      backgroundColor: 'var(--success-bg)',
+                      border: '1px solid var(--success-border)',
+                      padding: '0.15rem 0.55rem',
+                      borderRadius: '6px'
+                    }}>
+                      Score: {opp.aiScore}
+                    </span>
+                  </div>
+
+                  <h4 style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)', margin: '8px 0 6px 0', lineHeight: '1.3' }}>
+                    {opp.name}
+                  </h4>
+
+                  <div style={{ display: 'flex', gap: '0.85rem', fontSize: '0.75rem', color: 'var(--text-muted)', alignItems: 'center' }}>
+                    <span><Building2 size={12} style={{ display: 'inline', marginRight: 3 }} /> {opp.source}</span>
+                    <span><MapPin size={12} style={{ display: 'inline', marginRight: 3 }} /> {opp.location}</span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: 'auto', paddingTop: '0.5rem' }}>
+                  <button
+                    className="btn"
+                    style={{
+                      flex: 1,
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      padding: '0.45rem 0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-main)',
+                      borderRadius: '6px',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => handleOpenQuickView(opp)}
+                  >
+                    <Eye size={13} /> Inspect
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    style={{
+                      flex: 1,
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      padding: '0.45rem 0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      backgroundColor: 'var(--primary)',
+                      border: 'none',
+                      color: '#FFFFFF',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.25)'
+                    }}
+                    onClick={() => handlePursue(opp)}
+                  >
+                    <CheckCircle size={13} /> Pursue
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
       {/* Recent Activity Feed */}
-      <RecentActivityFeed />
+      <RecentActivityFeed
+        searchVal={searchVal}
+        opportunities={searchedOpportunities}
+        onInspectOpportunity={handleOpenQuickView}
+        onPursueOpportunity={handlePursue}
+        onView={(item) => {
+          const opp = opportunities.find((o) => o.id === item.oppId) || opportunities[0];
+          if (opp) {
+            handleOpenQuickView(opp);
+            if (onSelectOpportunity) onSelectOpportunity(opp);
+          }
+        }}
+      />
 
       {/* 6. Quick View Detail Modal */}
         <DashboardQuickViewModal
@@ -668,13 +822,27 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
           onDecline={handleDecline}
         />
 
+        {/* 8. Pursue Confirmation Modal */}
+        <PursueModal
+          isOpen={isPursueModalOpen}
+          onClose={() => { setIsPursueModalOpen(false); setSelectedPursueOpp(null); }}
+          onConfirm={handleConfirmPursue}
+        />
+
+        {/* 9. Decline Confirmation Modal */}
+        <DeclineModal
+          isOpen={isDeclineModalOpen}
+          onClose={() => { setIsDeclineModalOpen(false); setSelectedPursueOpp(null); }}
+          onConfirm={handleConfirmDecline}
+        />
+
         {/* 7. KPI Stat Cards Detail Modal (Opens when any stat card is clicked) */}
         <KpiDetailModal
           isOpen={isKpiModalOpen}
           onClose={() => setIsKpiModalOpen(false)}
           kpiKey={activeKpiModalKey}
           kpiTitle={activeKpiModalTitle}
-          opportunities={timeFilteredOpportunities}
+          opportunities={searchedOpportunities}
           onInspect={(opp) => {
             handleOpenQuickView(opp);
           }}
