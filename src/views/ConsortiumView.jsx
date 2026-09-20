@@ -428,6 +428,7 @@ export default function ConsortiumView({ searchVal = '' }) {
         isOpen={isProfileOpen}
         onClose={() => { setIsProfileOpen(false); setSelectedPartner(null); }}
         onUpdateStatus={handleUpdateStatus}
+        requirements={requirements}
       />
     </div>
   );

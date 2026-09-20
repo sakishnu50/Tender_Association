@@ -16,7 +16,7 @@ function statusBadge(status) {
     case 'accepted':
       return { label: 'Accepted', color: '#16A34A' };
     case 'shortlisted':
-      return { label: 'Shortlisted', color: '#7E22CE' };
+      return { label: 'Shortlisted', color: '#2563EB' };
     case 'contacted':
       return { label: 'Contacted', color: '#7E22CE' };
     default:
