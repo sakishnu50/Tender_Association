@@ -107,7 +107,8 @@ export default function RecentActivityFeed({
   opportunities = [],
   onInspectOpportunity,
   onPursueOpportunity,
-  onView
+  onView,
+  searchVal = ''
 }) {
   const navigate = useNavigate();
   const [items, setItems] = useState(propActivities ?? defaultActivities);
@@ -139,9 +140,21 @@ export default function RecentActivityFeed({
     }
   };
 
-  const filtered = items.filter((item) =>
-    filter === 'All' ? true : item.category.toLowerCase() === filter.toLowerCase()
-  );
+  const filtered = React.useMemo(() => {
+    return items.filter((item) => {
+      const matchesCategory =
+        filter === 'All' ? true : item.category.toLowerCase() === filter.toLowerCase();
+      if (!matchesCategory) return false;
+      if (!searchVal || !searchVal.trim()) return true;
+      const q = searchVal.trim().toLowerCase();
+      return (
+        item.message?.toLowerCase().includes(q) ||
+        item.detail?.toLowerCase().includes(q) ||
+        item.actor?.toLowerCase().includes(q) ||
+        item.oppId?.toLowerCase().includes(q)
+      );
+    });
+  }, [items, filter, searchVal]);
 
   const unreadCount = items.filter((i) => !read.has(i.id)).length;
 

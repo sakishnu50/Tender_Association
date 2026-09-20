@@ -185,6 +185,7 @@ export default function App() {
           toggleTheme={toggleTheme}
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
+          onSelectOpportunity={handleSelectOpportunity}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
           onRefresh={handleGlobalRefresh}
           onMenuClick={() => setIsMobileSidebarOpen(true)}
