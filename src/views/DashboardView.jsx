@@ -446,10 +446,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 </span>
 
                 <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '0.5rem',
-                  backgroundColor: kpi.bg,
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '8px',
+                  backgroundColor: `${kpi.color}1A`,
+                  border: `1px solid ${kpi.color}33`,
                   color: kpi.color,
                   display: 'flex',
                   alignItems: 'center',
@@ -472,11 +473,11 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                   gap: '0.25rem',
                   fontSize: '0.7rem',
                   fontWeight: '700',
-                  padding: '0.15rem 0.45rem',
+                  padding: '0.15rem 0.5rem',
                   borderRadius: '9999px',
-                  backgroundColor: kpi.isPositive ? '#DCFCE7' : '#FEE2E2',
-                  color: kpi.isPositive ? '#15803D' : '#DC2626',
-                  border: `1px solid ${kpi.isPositive ? '#BBF7D0' : '#FECACA'}`,
+                  backgroundColor: kpi.isPositive ? 'var(--success-bg)' : 'var(--danger-bg)',
+                  color: kpi.isPositive ? 'var(--success-text)' : 'var(--danger-text)',
+                  border: `1px solid ${kpi.isPositive ? 'var(--success-border)' : 'var(--danger-border)'}`,
                   whiteSpace: 'nowrap'
                 }}>
                   <TrendIcon size={11} />
@@ -590,11 +591,12 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                 borderRadius: '10px',
                 border: '1px solid var(--border-color)',
                 padding: '16px 18px',
-                backgroundColor: '#F8FAFC',
+                backgroundColor: 'var(--bg-card-nested)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '0.75rem',
+                boxShadow: 'var(--shadow-xs)',
                 transition: 'all 0.15s ease'
               }}
             >
@@ -603,7 +605,7 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                   <span style={{
                     fontSize: '0.75rem',
                     fontWeight: '600',
-                    color: '#EF4444',
+                    color: 'var(--danger-text)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.35rem'
@@ -614,8 +616,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                   <span style={{
                     fontSize: '0.75rem',
                     fontWeight: '700',
-                    color: '#15803D',
-                    backgroundColor: '#DCFCE7',
+                    color: 'var(--success-text)',
+                    backgroundColor: 'var(--success-bg)',
+                    border: '1px solid var(--success-border)',
                     padding: '0.15rem 0.55rem',
                     borderRadius: '6px'
                   }}>
@@ -645,9 +648,9 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.35rem',
-                    backgroundColor: '#FFFFFF',
-                    border: '1px solid #CBD5E1',
-                    color: '#0F172A',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-color)',
+                    color: 'var(--text-main)',
                     borderRadius: '6px',
                     cursor: 'pointer'
                   }}
@@ -666,12 +669,12 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.35rem',
-                    backgroundColor: '#2563EB',
+                    backgroundColor: 'var(--primary)',
                     border: 'none',
                     color: '#FFFFFF',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    boxShadow: '0 1px 2px rgba(37, 99, 235, 0.2)'
+                    boxShadow: '0 1px 3px rgba(37, 99, 235, 0.25)'
                   }}
                   onClick={() => handlePursue(opp)}
                 >
@@ -688,6 +691,13 @@ export default function DashboardView({ onSelectOpportunity, onViewAll, searchVa
         opportunities={timeFilteredOpportunities}
         onInspectOpportunity={handleOpenQuickView}
         onPursueOpportunity={handlePursue}
+        onView={(item) => {
+          const opp = opportunities.find((o) => o.id === item.oppId) || opportunities[0];
+          if (opp) {
+            handleOpenQuickView(opp);
+            if (onSelectOpportunity) onSelectOpportunity(opp);
+          }
+        }}
       />
 
       {/* 6. Quick View Detail Modal */}
