@@ -16,7 +16,6 @@ import {
   LogIn,
   User,
   AlertTriangle,
-  ExternalLink,
   Menu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -56,7 +55,6 @@ export default function Header({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadingLabel, setDownloadingLabel] = useState('');
@@ -65,38 +63,18 @@ export default function Header({
   const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
   const userInitial = displayName.charAt(0).toUpperCase() || 'U';
 
-  // Real-time matched opportunities for quick search dropdown
-  const matchingOpportunities = React.useMemo(() => {
-    if (!searchVal || !searchVal.trim()) return [];
-    const q = searchVal.trim().toLowerCase();
-    const list = opportunities && opportunities.length > 0 ? opportunities : mockOpportunities;
-    return list.filter((o) => {
-      const name = (o.name || o.title || '').toLowerCase();
-      const id = (o.id || '').toLowerCase();
-      const sector = (o.sector || '').toLowerCase();
-      const location = (o.location || o.country || '').toLowerCase();
-      const source = (o.source || '').toLowerCase();
-      return (
-        name.includes(q) ||
-        id.includes(q) ||
-        sector.includes(q) ||
-        location.includes(q) ||
-        source.includes(q)
-      );
-    }).slice(0, 6);
-  }, [searchVal, opportunities]);
+  // (no dropdown suggestions — search filters the current view)
 
-  // Keyboard shortcut listener (Cmd+K / Ctrl+K focus, Escape clear)
+  // Keyboard shortcut: Ctrl+K focuses search, Escape clears it
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         inputRef.current?.focus();
-        setIsSearchOpen(true);
       }
       if (e.key === 'Escape' && document.activeElement === inputRef.current) {
         if (setSearchVal) setSearchVal('');
-        setIsSearchOpen(false);
+        inputRef.current?.blur();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -114,9 +92,6 @@ export default function Header({
       }
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
         setShowProfileMenu(false);
-      }
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
-        setIsSearchOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -494,7 +469,7 @@ export default function Header({
       </div>
     </div>
 
-      {/* Real-Time Interactive Search Bar with Live Suggestions Dropdown */}
+      {/* Normal Search Bar — filters the current view in real-time */}
       <div
         ref={searchContainerRef}
         style={{
@@ -504,19 +479,8 @@ export default function Header({
           maxWidth: '100%'
         }}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setIsSearchOpen(false);
-            if (searchVal?.trim()) {
-              navigate('/opportunities');
-            }
-          }}
-          className="header-search"
-          role="search"
-          style={{ width: '100%', margin: 0 }}
-        >
-          <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
+        <div className="header-search" role="search">
+          <Search size={16} className="header-search-icon" style={{ flexShrink: 0, color: 'var(--text-muted)' }} aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
@@ -544,19 +508,6 @@ export default function Header({
             value={searchVal || ''}
             onChange={(e) => {
               if (setSearchVal) setSearchVal(e.target.value);
-              setIsSearchOpen(true);
-            }}
-            onFocus={() => setIsSearchOpen(true)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                setIsSearchOpen(false);
-                if (matchingOpportunities.length === 1 && onSelectOpportunity) {
-                  onSelectOpportunity(matchingOpportunities[0]);
-                } else if (searchVal?.trim()) {
-                  navigate('/opportunities');
-                }
-              }
             }}
             aria-label="Search content"
           />
@@ -565,7 +516,6 @@ export default function Header({
               type="button"
               onClick={() => {
                 if (setSearchVal) setSearchVal('');
-                setIsSearchOpen(false);
                 inputRef.current?.focus();
               }}
               className="header-search-clear-btn"
@@ -589,225 +539,7 @@ export default function Header({
               ⌘K
             </span>
           )}
-        </form>
-
-        {/* Live Search Suggestions & Matching Results Popover */}
-        {isSearchOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 8px)',
-              left: 0,
-              right: 0,
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '10px',
-              boxShadow: 'var(--shadow-xl)',
-              zIndex: 100,
-              overflow: 'hidden',
-              animation: 'fadeIn 0.15s ease',
-              maxHeight: '400px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            {searchVal && searchVal.trim() ? (
-              <>
-                <div
-                  style={{
-                    padding: '0.65rem 0.85rem',
-                    borderBottom: '1px solid var(--border-color)',
-                    fontSize: '0.725rem',
-                    fontWeight: '700',
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: 'var(--bg-subtle)'
-                  }}
-                >
-                  <span>Matching Tenders &amp; Opportunities</span>
-                  <span style={{ color: 'var(--primary)' }}>{matchingOpportunities.length} found</span>
-                </div>
-
-                <div style={{ overflowY: 'auto', maxHeight: '280px' }}>
-                  {matchingOpportunities.length === 0 ? (
-                    <div style={{ padding: '1.5rem 1rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-main)' }}>
-                        No opportunities matching "{searchVal}"
-                      </p>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '0.75rem' }}>
-                        Try searching by tender name, state (e.g. Karnataka), sector, or ID
-                      </p>
-                    </div>
-                  ) : (
-                    matchingOpportunities.map((opp) => (
-                      <div
-                        key={opp.id}
-                        onClick={() => {
-                          setIsSearchOpen(false);
-                          if (onSelectOpportunity) {
-                            onSelectOpportunity(opp);
-                          } else {
-                            navigate(`/opportunities/details?id=${opp.id}`);
-                          }
-                        }}
-                        style={{
-                          padding: '0.65rem 0.85rem',
-                          borderBottom: '1px solid var(--border-color)',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          gap: '0.75rem',
-                          transition: 'background-color 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                      >
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '2px' }}>
-                            <span
-                              style={{
-                                fontSize: '0.675rem',
-                                fontWeight: '700',
-                                color: 'var(--primary)',
-                                backgroundColor: 'var(--primary-light)',
-                                padding: '0.1rem 0.35rem',
-                                borderRadius: '4px'
-                              }}
-                            >
-                              {opp.id}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: '0.825rem',
-                                fontWeight: '600',
-                                color: 'var(--text-main)',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              {opp.name}
-                            </span>
-                          </div>
-                          <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', display: 'flex', gap: '0.6rem' }}>
-                            <span>{opp.source || 'Govt Portal'}</span>
-                            <span>•</span>
-                            <span>{opp.location || 'India'}</span>
-                            <span>•</span>
-                            <span>{opp.value || 'Value TBD'}</span>
-                          </div>
-                        </div>
-
-                        {opp.aiScore && (
-                          <div
-                            style={{
-                              fontSize: '0.7rem',
-                              fontWeight: '700',
-                              color: 'var(--success-text)',
-                              backgroundColor: 'var(--success-bg)',
-                              border: '1px solid var(--success-border)',
-                              padding: '0.15rem 0.45rem',
-                              borderRadius: '6px',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {opp.aiScore} Match
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                <div
-                  onClick={() => {
-                    setIsSearchOpen(false);
-                    navigate('/opportunities');
-                  }}
-                  style={{
-                    padding: '0.6rem 0.85rem',
-                    borderTop: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-subtle)',
-                    fontSize: '0.75rem',
-                    fontWeight: '600',
-                    color: 'var(--primary)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer'
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--primary-light)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-subtle)')}
-                >
-                  <span>View all results in Opportunities List</span>
-                  <span>↵ Press Enter</span>
-                </div>
-              </>
-            ) : (
-              <div style={{ padding: '0.85rem' }}>
-                <div
-                  style={{
-                    fontSize: '0.725rem',
-                    fontWeight: '700',
-                    color: 'var(--text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    marginBottom: '0.5rem'
-                  }}
-                >
-                  Popular Quick Searches
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                  {[
-                    'Smart Grid',
-                    'Highway',
-                    'Water Supply',
-                    'Metro Rail',
-                    'Urban Infra',
-                    'ADB',
-                    'Karnataka',
-                    'World Bank'
-                  ].map((chip) => (
-                    <button
-                      key={chip}
-                      type="button"
-                      onClick={() => {
-                        if (setSearchVal) setSearchVal(chip);
-                        inputRef.current?.focus();
-                      }}
-                      style={{
-                        fontSize: '0.75rem',
-                        fontWeight: '600',
-                        color: 'var(--text-main)',
-                        backgroundColor: 'var(--bg-subtle)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '9999px',
-                        padding: '0.25rem 0.65rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--primary)';
-                        e.currentTarget.style.color = 'var(--primary)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border-color)';
-                        e.currentTarget.style.color = 'var(--text-main)';
-                      }}
-                    >
-                      {chip}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        </div>
       </div>
     </header>
   );
