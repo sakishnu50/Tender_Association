@@ -1,4 +1,25 @@
-// src/components/AuditTrail/AuditTable.jsx
+Update the “Back to Audit Trail” link / button in the Audit Trail details page.
+
+Remove the border / outline box completely.
+
+Remove the button background and box shadow.
+
+Change the text to blue, matching the “Back to Opportunities” link style.
+
+Keep the left arrow icon in blue.
+
+It should look like a simple clickable text link, not a button.
+
+Use the same font size, weight, spacing, and alignment style as “Back to Opportunities” shown in the reference image.
+
+Keep the existing navigation / click functionality unchanged.
+
+Do not change any other Audit Trail UI, table, filters, dark / light mode, or layout.
+
+Target appearance:
+← Back to Audit Trail
+
+Blue text + blue arrow, no border, no box, no background.// src/components/AuditTrail/AuditTable.jsx
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Pencil, Eye, MoreVertical } from 'lucide-react';
@@ -107,16 +128,17 @@ export default function AuditTable({
   onPageChange,
 }) {
   const getPriorityBadgeClass = (priority) => {
-    switch (priority) {
-      case 'High':   return styles.priorityHigh;
-      case 'Low':    return styles.priorityLow;
-      case 'Medium':
-      default:       return styles.priorityMedium;
+    const p = String(priority || '').trim().toUpperCase();
+    switch (p) {
+      case 'HIGH': return styles.priorityHigh;
+      case 'LOW': return styles.priorityLow;
+      case 'MEDIUM':
+      default: return styles.priorityMedium;
     }
   };
 
   const firstRecord = totalRecords === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
-  const lastRecord  = Math.min(currentPage * rowsPerPage, totalRecords);
+  const lastRecord = Math.min(currentPage * rowsPerPage, totalRecords);
 
   const getPageNumbers = () => {
     if (totalPages <= 5) {

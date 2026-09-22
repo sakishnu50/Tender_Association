@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, X } from 'lucide-react';
 import { useAuditTrail, useOpportunities, useUpdateOpportunityPriority } from '../../hooks/useApiQueries';
 import { useAuth } from '../../context/AuthContext';
@@ -20,6 +21,7 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
   const updatePriorityMutation = useUpdateOpportunityPriority();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [localLogs, setLocalLogs] = useState([]);
   const [selectedUser, setSelectedUser] = useState('All Users');
@@ -187,7 +189,7 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         (item) => item.id === log.opportunityId || item.name === log.opportunity
       );
       const normalizedPriority = normalizePriorityCase(
-        opportunity?.priority || log.priority || log.newPriority || 'Medium'
+        log.newPriority || log.priority || opportunity?.priority || 'Medium'
       );
       let resolvedAiScore = log.aiScore ?? log.score ?? opportunity?.aiScore ?? opportunity?.overallScore;
       if (resolvedAiScore === undefined || resolvedAiScore === null) {
@@ -245,12 +247,13 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
       (o) => o.id === log.opportunityId || o.name === log.opportunity
     );
 
-    const currentPri = matchedOpp?.priority || log.newPriority || log.priority || 'Medium';
+    const currentPri = log.currentPriority || log.newPriority || log.priority || matchedOpp?.priority || 'Medium';
 
     setEditingOpportunity({
       id: log.opportunityId || matchedOpp?.id || 'OPP-001',
       name: log.opportunity || matchedOpp?.name || 'Opportunity',
-      currentPriority: normalizePriorityCase(currentPri)
+      currentPriority: normalizePriorityCase(currentPri),
+      aiScore: log.aiScore ?? matchedOpp?.aiScore ?? matchedOpp?.overallScore ?? 8.5
     });
     setIsEditModalOpen(true);
   }, [opportunitiesList]);
@@ -271,6 +274,14 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         priority: newPriority
       });
 
+      // Update TanStack Query cache for opportunities immediately
+      queryClient.setQueriesData({ queryKey: ['opportunities'] }, (old) => {
+        if (!Array.isArray(old)) return old;
+        return old.map((opp) =>
+          opp.id === opportunityId ? { ...opp, priority: newPriority.toUpperCase() } : opp
+        );
+      });
+
       // 2. Record new audit log entry
       const actorName = user?.name || 'Admin';
       const actorRole = user?.role || 'Admin';
@@ -280,16 +291,22 @@ export default function AuditTrail({ searchVal = '', setSearchVal = () => {} }) 
         opportunityName,
         previousPriority,
         newPriority,
+        aiScore: editingOpportunity?.aiScore,
         user: actorName,
         userRole: actorRole
       });
 
-      // 3. Refresh audit logs
+      // 3. Immediately update local state so table updates with 0 delay and no refresh
+      if (newRecord) {
+        setLocalLogs((prev) => [newRecord, ...prev.filter((l) => l.id !== newRecord.id)]);
+      }
+
+      // 4. Refresh audit logs query
       if (refetchAuditLogs) {
         await refetchAuditLogs();
       }
 
-      // 4. Show success notification
+      // 5. Show success notification
       setNotification({
         type: 'success',
         message: `Priority updated for ${opportunityId}: ${previousPriority} → ${newPriority}`,

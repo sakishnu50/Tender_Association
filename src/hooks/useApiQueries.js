@@ -129,7 +129,7 @@ export function useAuditTrail() {
 
   return useQuery({
     queryKey: ['auditTrail', userId],
-    queryFn: apiFacade.fetchAuditTrail,
+    queryFn: () => apiFacade.fetchAuditTrail(userId),
     staleTime: 1000 * 60 * 5
   });
 }
@@ -141,7 +141,7 @@ export function useAuditLogs(filters = {}) {
 
   return useQuery({
     queryKey: ['auditLogs', userId, filters],
-    queryFn: apiFacade.fetchAuditTrail,
+    queryFn: () => apiFacade.fetchAuditTrail(userId),
     staleTime: 1000 * 60 * 5
   });
 }

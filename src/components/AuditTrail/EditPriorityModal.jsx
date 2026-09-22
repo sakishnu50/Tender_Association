@@ -85,8 +85,8 @@ export default function EditPriorityModal({
           <div className={styles.contextRow}>
             <span className={styles.contextLabel}>Current Priority:</span>
             <span className={`${styles.priorityBadge} ${
-              normalizedCurrent === 'High' ? styles.priorityHigh :
-              normalizedCurrent === 'Medium' ? styles.priorityMedium : styles.priorityLow
+              normalizedCurrent.toLowerCase() === 'high' ? styles.priorityHigh :
+              normalizedCurrent.toLowerCase() === 'medium' ? styles.priorityMedium : styles.priorityLow
             }`}>
               {normalizedCurrent}
             </span>
