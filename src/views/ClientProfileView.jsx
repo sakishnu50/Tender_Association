@@ -229,9 +229,9 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
       >
         {/* Projects Table */}
         <div className="table-container" style={{ border: 'none', overflowX: 'auto', overflowY: 'visible' }}>
-          <table className="data-table" style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse' }}>
+          <table className="data-table" style={{ width: '100%', tableLayout: 'fixed' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color, #E2E8F0)' }}>
+              <tr>
                 <th style={{ width: '28%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>PROJECT NAME</th>
                 <th style={{ width: '16%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>SECTOR</th>
                 <th style={{ width: '8%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>COUNTRY</th>

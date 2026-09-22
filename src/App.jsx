@@ -38,6 +38,7 @@ export default function App() {
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [activeProject, setActiveProject] = useState(mockClientProfile.pastProjects[0]);
   const [darkMode, setDarkMode] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const [isPursueOpen, setIsPursueOpen] = useState(false);
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
@@ -84,17 +85,19 @@ export default function App() {
     setDarkMode(nextMode);
     if (nextMode) {
       document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
     } else {
       document.documentElement.removeAttribute('data-theme');
+      document.documentElement.classList.remove('dark');
     }
   };
 
-  const handleSelectOpportunity = (opp) => {
+  const handleSelectOpportunity = (opp, calendarDate) => {
     const selected = opp || userOpportunities[0] || null;
     setSelectedOpp(selected);
     setActiveTab('opp_details');
     if (selected) {
-      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id } });
+      navigate(`/opportunities/details?id=${selected.id}`, { state: { id: selected.id, calendarDate } });
     }
   };
 
@@ -166,6 +169,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         onRequestLogout={() => setIsLogoutModalOpen(true)}
         activeProject={activeProject}
+        isOpen={isMobileSidebarOpen} 
+        setIsOpen={setIsMobileSidebarOpen} 
       />
 
       {/* Main Workspace Area */}
@@ -180,8 +185,10 @@ export default function App() {
           toggleTheme={toggleTheme}
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
+          onSelectOpportunity={handleSelectOpportunity}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
           onRefresh={handleGlobalRefresh}
+          onMenuClick={() => setIsMobileSidebarOpen(true)}
         />
 
         {/* Declarative View Router */}
@@ -214,9 +221,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp || userOpportunities[0]}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -226,9 +238,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
@@ -238,9 +255,14 @@ export default function App() {
             element={
               <OpportunityDetailsView
                 opportunity={selectedOpp}
-                onBack={() => {
-                  setActiveTab('opportunities');
-                  navigate('/opportunities');
+                onBack={(calendarDate) => {
+                  if (calendarDate) {
+                    setActiveTab('calendar');
+                    navigate('/calendar', { state: { targetDate: calendarDate } });
+                  } else {
+                    setActiveTab('opportunities');
+                    navigate('/opportunities');
+                  }
                 }}
               />
             }
