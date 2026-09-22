@@ -22,7 +22,8 @@ function nowTime() {
 let _seq = 100;
 function uid() { return `DYN-${++_seq}`; }
 
-/* Inner Content Component (re-keyed per opportunity) */`r`nfunction OpportunityDetailsContent({ opportunity, onBack, calendarDate }) {
+/* Inner Content Component (re-keyed per opportunity) */
+function OpportunityDetailsContent({ opportunity, onBack, calendarDate }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   // Local status state (decoupled from global list)
