@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';`r`nimport { ArrowLeft, ChevronRight, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
+import React, { useState, useCallback, useMemo } from 'react';
+import { ArrowLeft, ChevronRight, CheckCircle2, FileText, Download, Check, X } from 'lucide-react';
 import { useParams, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -21,7 +22,8 @@ function nowTime() {
 let _seq = 100;
 function uid() { return `DYN-${++_seq}`; }
 
-/* Inner Content Component (re-keyed per opportunity) */`r`nfunction OpportunityDetailsContent({ opportunity, onBack, calendarDate }) {
+/* Inner Content Component (re-keyed per opportunity) */
+function OpportunityDetailsContent({ opportunity, onBack, calendarDate }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   // Local status state (decoupled from global list)

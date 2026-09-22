@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+OneDrive/
+Tender_Association/
+fix_conflicts.cjs
+
