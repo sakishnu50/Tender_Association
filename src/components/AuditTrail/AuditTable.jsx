@@ -1,26 +1,3 @@
-Update the “Back to Audit Trail” link / button in the Audit Trail details page.
-
-Remove the border / outline box completely.
-
-Remove the button background and box shadow.
-
-Change the text to blue, matching the “Back to Opportunities” link style.
-
-Keep the left arrow icon in blue.
-
-It should look like a simple clickable text link, not a button.
-
-Use the same font size, weight, spacing, and alignment style as “Back to Opportunities” shown in the reference image.
-
-Keep the existing navigation / click functionality unchanged.
-
-Do not change any other Audit Trail UI, table, filters, dark / light mode, or layout.
-
-Target appearance:
-← Back to Audit Trail
-
-Blue text + blue arrow, no border, no box, no background.// src/components/AuditTrail/AuditTable.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Pencil, Eye, MoreVertical } from 'lucide-react';
 import styles from './AuditTrail.module.css';
