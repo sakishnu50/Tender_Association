@@ -4,7 +4,78 @@ import { mockOpportunities } from '../data/mockData';
 const STORAGE_KEY = 'auditLogs';
 const eventTarget = new EventTarget();
 
-export const INITIAL_AUDIT_LOGS = [];
+export const INITIAL_AUDIT_LOGS = [
+  {
+    id: 'AUD-001',
+    opportunityId: 'OPP-001',
+    opportunity: 'Highway Connectivity Improvement Project',
+    user: 'Admin',
+    userRole: 'Admin',
+    action: 'Priority Assigned',
+    timestamp: '12:30 PM',
+    date: '01-Sep-2026',
+    change: 'HIGH',
+    priority: 'HIGH',
+    aiScore: 8.5,
+    details: 'Opportunity detected and classified as HIGH priority.'
+  },
+  {
+    id: 'AUD-002',
+    opportunityId: 'OPP-001',
+    opportunity: 'Highway Connectivity Improvement Project',
+    user: 'Arun Kumar',
+    userRole: 'Manager',
+    action: 'Proposal Preparation Started',
+    timestamp: '11:35 AM',
+    date: '01-Sep-2026',
+    change: 'HIGH',
+    priority: 'HIGH',
+    aiScore: 7.2,
+    details: 'Initial proposal work initiated.'
+  },
+  {
+    id: 'AUD-003',
+    opportunityId: 'MA-26-0102',
+    opportunity: 'Urban Water Resilience Program',
+    user: 'AI Engine',
+    userRole: 'System',
+    action: 'Score Generated',
+    timestamp: '10:45 AM',
+    date: '01-Sep-2026',
+    change: 'HIGH',
+    priority: 'HIGH',
+    aiScore: 9.1,
+    details: 'High relevance tender scored 9.1 / 10.'
+  },
+  {
+    id: 'AUD-004',
+    opportunityId: 'OPP-003',
+    opportunity: 'Rail Network Modernization',
+    user: 'Rajesh Kumar',
+    userRole: 'Manager',
+    action: 'Decision Updated',
+    timestamp: '10:15 AM',
+    date: '01-Sep-2026',
+    change: 'HIGH',
+    priority: 'HIGH',
+    aiScore: 6.8,
+    details: 'Management decision recorded - PURSUE.'
+  },
+  {
+    id: 'AUD-005',
+    opportunityId: 'OPP-001',
+    opportunity: 'Highway Connectivity Improvement Project',
+    user: 'Priya Sharma',
+    userRole: 'Researcher',
+    action: 'Status Updated',
+    timestamp: '09:42 AM',
+    date: '01-Sep-2026',
+    change: 'HIGH',
+    priority: 'HIGH',
+    aiScore: 8.0,
+    details: 'Opportunity status moved to Under Review.'
+  }
+];
 
 export function normalizePriorityCase(val) {
   if (!val) return 'Medium';
@@ -97,6 +168,9 @@ export function normalizeAuditRecord(record) {
   }
 
   const priority = (record.priority || record.newPriority || (change.includes('→') ? change.split('→')[1] : change) || 'MEDIUM').toString().trim().toUpperCase();
+  const aiScore = record.aiScore !== undefined && record.aiScore !== null
+    ? record.aiScore
+    : (record.score !== undefined && record.score !== null ? record.score : null);
 
   return {
     ...record,
@@ -113,6 +187,7 @@ export function normalizeAuditRecord(record) {
     recordId: opportunityId,
     change,
     priority,
+    aiScore,
     previousPriority: record.previousPriority || record.previousValue || null,
     newPriority: record.newPriority || record.newValue || (change.includes('→') ? change.split('→')[1].trim() : change),
     previousValue: record.previousValue || record.previousPriority || null,
@@ -155,6 +230,7 @@ function generateInitialOpportunityLogs() {
       priority: p.toUpperCase(),
       previousPriority: null,
       newPriority: p,
+      aiScore: opp.aiScore || opp.overallScore || 8.5,
       details: `Initial system prediction: ${p}`,
       createdAt: new Date(2026, 8, 8, 10, 30 + index * 15).toISOString()
     });
@@ -271,6 +347,7 @@ export function recordPriorityChange({
     newValue: newNorm,
     change: `${prevNorm} → ${newNorm}`,
     priority: newNorm.toUpperCase(),
+    aiScore: opps.find(o => o.id === opportunityId)?.aiScore ?? 8.5,
     date: dateStr,
     timestamp: timeStr,
     createdAt: now.toISOString(),
@@ -315,14 +392,15 @@ export function subscribe(listener) {
 
 export function exportAuditLogs(logs = null) {
   const data = Array.isArray(logs) ? logs : getAuditLogs();
-  const header = ['Opportunity ID', 'Opportunity', 'User', 'Timestamp', 'Date', 'Change', 'Action', 'Details'];
+  const header = ['Opportunity ID', 'Opportunity', 'User', 'Timestamp', 'Date', 'AI Score', 'Priority', 'Action', 'Details'];
   const rows = data.map((entry) => [
     entry.opportunityId || '',
     entry.opportunity || '',
     entry.user || '',
     entry.timestamp || '',
     entry.date || '',
-    entry.change || '',
+    entry.aiScore ? `${Number(entry.aiScore).toFixed(1)} / 10` : '',
+    entry.change || entry.priority || '',
     entry.action || '',
     entry.details || ''
   ].map((value) => `"${String(value ?? '').replace(/"/g, '""')}"`));

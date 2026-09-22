@@ -26,6 +26,7 @@ export default function AuditFilters({
   const sortOptions = [
     { value: 'newest', label: 'Newest first' },
     { value: 'oldest', label: 'Oldest first' },
+    { value: 'aiScore', label: 'AI Score' },
     { value: 'user', label: 'User' },
     { value: 'action', label: 'Action' },
     { value: 'opportunity', label: 'Opportunity' },
