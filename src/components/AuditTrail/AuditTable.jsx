@@ -1,5 +1,3 @@
-// src/components/AuditTrail/AuditTable.jsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Pencil, Eye, MoreVertical } from 'lucide-react';
 import styles from './AuditTrail.module.css';
@@ -107,16 +105,17 @@ export default function AuditTable({
   onPageChange,
 }) {
   const getPriorityBadgeClass = (priority) => {
-    switch (priority) {
-      case 'High':   return styles.priorityHigh;
-      case 'Low':    return styles.priorityLow;
-      case 'Medium':
-      default:       return styles.priorityMedium;
+    const p = String(priority || '').trim().toUpperCase();
+    switch (p) {
+      case 'HIGH': return styles.priorityHigh;
+      case 'LOW': return styles.priorityLow;
+      case 'MEDIUM':
+      default: return styles.priorityMedium;
     }
   };
 
   const firstRecord = totalRecords === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
-  const lastRecord  = Math.min(currentPage * rowsPerPage, totalRecords);
+  const lastRecord = Math.min(currentPage * rowsPerPage, totalRecords);
 
   const getPageNumbers = () => {
     if (totalPages <= 5) {

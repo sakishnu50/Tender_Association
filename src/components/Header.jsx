@@ -16,7 +16,6 @@ import {
   LogIn,
   User,
   AlertTriangle,
-  ExternalLink,
   Menu
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -36,7 +35,8 @@ export default function Header({
   opportunities = mockOpportunities,
   filteredOpportunities = null,
   onRequestLogout,
-  onMenuClick
+  onMenuClick,
+  onSelectOpportunity
 }) {
   const navigate = useNavigate();
   const auth = useAuth();
@@ -46,6 +46,7 @@ export default function Header({
   const displayRole = user?.role && user.role !== 'Super Admin' ? user.role : 'Admin';
 
   const inputRef = useRef(null);
+  const searchContainerRef = useRef(null);
   const downloadMenuRef = useRef(null);
   const notificationMenuRef = useRef(null);
   const profileMenuRef = useRef(null);
@@ -62,7 +63,9 @@ export default function Header({
   const effectiveData = filteredOpportunities || opportunities || mockOpportunities;
   const userInitial = displayName.charAt(0).toUpperCase() || 'U';
 
-  // Keyboard shortcut listener (Cmd+K / Ctrl+K focus, Escape clear)
+  // (no dropdown suggestions — search filters the current view)
+
+  // Keyboard shortcut: Ctrl+K focuses search, Escape clears it
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -71,6 +74,7 @@ export default function Header({
       }
       if (e.key === 'Escape' && document.activeElement === inputRef.current) {
         if (setSearchVal) setSearchVal('');
+        inputRef.current?.blur();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -465,60 +469,77 @@ export default function Header({
       </div>
     </div>
 
-      {/* Real-Time Search Bar */}
-      <div className="header-search" role="search">
-        <Search size={16} className="header-search-icon" style={{ flexShrink: 0 }} aria-hidden="true" />
-        <input
-          ref={inputRef}
-          type="text"
-          placeholder={
-            activeTab === 'opportunities' || activeTab === 'opp_details'
-              ? 'Search opportunities, sectors, values...'
-              : activeTab === 'calendar'
-              ? 'Search events, submission deadlines...'
-              : activeTab === 'consortium'
-              ? 'Search partners, expertise, credentials...'
-              : activeTab === 'sources'
-              ? 'Search monitored portals, agencies...'
-              : activeTab === 'offices'
-              ? 'Search regional offices, locations...'
-              : activeTab === 'users'
-              ? 'Search users, roles, email accounts...'
-              : activeTab === 'audit'
-              ? 'Search audit logs, actions, records...'
-              : activeTab === 'client_profile'
-              ? 'Search client profile, past projects...'
-              : activeTab === 'reports'
-              ? 'Search analytics, export reports...'
-              : 'Search tenders, projects, locations, sectors...'
-          }
-          value={searchVal || ''}
-          onChange={(e) => setSearchVal && setSearchVal(e.target.value)}
-          aria-label="Search content"
-        />
-        {searchVal ? (
-          <button
-            onClick={() => setSearchVal && setSearchVal('')}
-            className="header-search-clear-btn"
-            style={{
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '2px',
-              flexShrink: 0
+      {/* Normal Search Bar — filters the current view in real-time */}
+      <div
+        ref={searchContainerRef}
+        style={{
+          position: 'relative',
+          order: 1,
+          width: '440px',
+          maxWidth: '100%'
+        }}
+      >
+        <div className="header-search" role="search">
+          <Search size={16} className="header-search-icon" style={{ flexShrink: 0, color: 'var(--text-muted)' }} aria-hidden="true" />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder={
+              activeTab === 'opportunities' || activeTab === 'opp_details'
+                ? 'Search opportunities, sectors, values...'
+                : activeTab === 'calendar'
+                ? 'Search events, submission deadlines...'
+                : activeTab === 'consortium'
+                ? 'Search partners, expertise, credentials...'
+                : activeTab === 'sources'
+                ? 'Search monitored portals, agencies...'
+                : activeTab === 'offices'
+                ? 'Search regional offices, locations...'
+                : activeTab === 'users'
+                ? 'Search users, roles, email accounts...'
+                : activeTab === 'audit'
+                ? 'Search audit logs, actions, records...'
+                : activeTab === 'client_profile'
+                ? 'Search client profile, past projects...'
+                : activeTab === 'reports'
+                ? 'Search analytics, export reports...'
+                : 'Search tenders, projects, locations, sectors...'
+            }
+            value={searchVal || ''}
+            onChange={(e) => {
+              if (setSearchVal) setSearchVal(e.target.value);
             }}
-            title="Clear search (Esc)"
-            aria-label="Clear search input"
-          >
-            <X size={14} />
-          </button>
-        ) : (
-          <span className="header-search-badge" aria-hidden="true">
-            ⌘K
-          </span>
-        )}
+            aria-label="Search content"
+          />
+          {searchVal ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (setSearchVal) setSearchVal('');
+                inputRef.current?.focus();
+              }}
+              className="header-search-clear-btn"
+              style={{
+                border: 'none',
+                background: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                padding: '2px',
+                flexShrink: 0,
+                color: 'var(--text-muted)'
+              }}
+              title="Clear search (Esc)"
+              aria-label="Clear search input"
+            >
+              <X size={14} />
+            </button>
+          ) : (
+            <span className="header-search-badge" aria-hidden="true">
+              ⌘K
+            </span>
+          )}
+        </div>
       </div>
     </header>
   );
