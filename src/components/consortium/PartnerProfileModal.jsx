@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Users,
@@ -12,7 +12,7 @@ import {
   Target,
   Mail,
   Phone,
-  StickyNote,
+
 } from 'lucide-react';
 
 /* ── score helpers ── */
@@ -50,21 +50,7 @@ function SectionDivider() {
   );
 }
 
-/* ── Persistent notes storage per partner ── */
-const NOTES_STORAGE_KEY = 'consortium_partner_notes';
-function getSavedNotes(partnerId) {
-  try {
-    const all = JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY) || '{}');
-    return all[partnerId] || '';
-  } catch { return ''; }
-}
-function saveNotesToStorage(partnerId, notes) {
-  try {
-    const all = JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY) || '{}');
-    all[partnerId] = notes;
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(all));
-  } catch { /* noop */ }
-}
+
 
 /* ── Document helper — generate a downloadable blob for demo ── */
 function generateDocBlob(docName, partner) {
@@ -81,16 +67,7 @@ function getFileType(docName) {
 
 
 export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdateStatus, requirements }) {
-  const [internalNotes, setInternalNotes] = useState('');
-  const [notesSaved, setNotesSaved] = useState(false);
 
-  // Load saved notes when partner changes
-  useEffect(() => {
-    if (partner?.id) {
-      setInternalNotes(getSavedNotes(partner.id));
-      setNotesSaved(false);
-    }
-  }, [partner?.id]);
 
   if (!isOpen || !partner) return null;
 
@@ -114,13 +91,7 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
   const contactPhone  = partner.contactPhone || '+91 XX XXXX XXXX';
 
 
-  /* ── Save notes handler ── */
-  const handleSaveNotes = () => {
-    if (!internalNotes.trim()) return;
-    saveNotesToStorage(partner.id, internalNotes);
-    setNotesSaved(true);
-    setTimeout(() => setNotesSaved(false), 2000);
-  };
+
 
   /* ── Small action button helper ── */
   const SmallBtn = ({ children, onClick, bg, color, border }) => (
@@ -504,66 +475,6 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
           </div>
 
 
-
-          <SectionDivider />
-
-          {/* ═══ 9. INTERNAL NOTES ═══ */}
-          <div>
-            <SectionTitle>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                <StickyNote size={12} /> Internal Notes
-              </span>
-            </SectionTitle>
-
-            <div style={{
-              padding: '14px 16px',
-              backgroundColor: 'var(--bg-subtle)',
-              borderRadius: '10px',
-              border: '1px solid var(--border-color)',
-            }}>
-              <textarea
-                value={internalNotes}
-                onChange={e => { setInternalNotes(e.target.value); setNotesSaved(false); }}
-                placeholder="Add internal notes about this partner for your team…"
-                rows={3}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  fontSize: '0.82rem',
-                  fontFamily: 'inherit',
-                  color: 'var(--text-main)',
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  resize: 'vertical',
-                  outline: 'none',
-                  lineHeight: '1.5',
-                  boxSizing: 'border-box',
-                }}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                <span style={{ fontSize: '0.7rem', color: notesSaved ? 'var(--success)' : 'var(--text-muted)' }}>
-                  {notesSaved ? '✓ Notes saved successfully' : 'Notes are visible to team members only'}
-                </span>
-                <button
-                  onClick={handleSaveNotes}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '4px',
-                    padding: '5px 14px', fontSize: '0.75rem', fontWeight: '700',
-                    border: '1px solid var(--primary)',
-                    borderRadius: 'var(--radius-md, 6px)',
-                    backgroundColor: 'var(--primary)',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    opacity: internalNotes.trim() ? 1 : 0.5,
-                  }}
-                  disabled={!internalNotes.trim()}
-                >
-                  Save Notes
-                </button>
-              </div>
-            </div>
-          </div>
 
           <SectionDivider />
 
