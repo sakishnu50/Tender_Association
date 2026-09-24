@@ -49,7 +49,7 @@ function saveAllOpportunities(opportunities) {
 // Generates initial seed opportunities for a new user account upon first login
 function seedNewUserOpportunities(userId) {
   const userPrefix = userId.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6) || 'USR';
-  return mockOpportunities.slice(0, 5).map((opp, idx) => ({
+  return mockOpportunities.slice(0, 9).map((opp, idx) => ({
     ...opp,
     id: `OPP-${userPrefix}-${String(idx + 1).padStart(3, '0')}`,
     userId: userId,
@@ -69,8 +69,30 @@ export const apiFacade = {
       return owner === normalizedUserId;
     });
 
-    // If this user already has saved opportunities, load and return them
+    // If this user already has saved opportunities, load and return them (ensuring 9 seed items)
     if (userExisting.length > 0) {
+      if (userExisting.length < 9) {
+        const existingNames = new Set(userExisting.map((o) => (o.name || o.title || '').trim().toLowerCase()));
+        const userPrefix = normalizedUserId.split('@')[0].replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6) || 'USR';
+        const missing = mockOpportunities.slice(0, 9)
+          .filter((opp) => !existingNames.has((opp.name || opp.title || '').trim().toLowerCase()))
+          .slice(0, 9 - userExisting.length)
+          .map((opp, idx) => ({
+            ...opp,
+            id: `OPP-${userPrefix}-${String(userExisting.length + idx + 1).padStart(3, '0')}`,
+            userId: normalizedUserId,
+            status: opp.status || 'New'
+          }));
+        if (missing.length > 0) {
+          const updatedUserOpps = [...userExisting, ...missing];
+          const otherOpps = all.filter((item) => {
+            const owner = (item.userId || item.owner || '').trim().toLowerCase();
+            return owner !== normalizedUserId;
+          });
+          saveAllOpportunities([...updatedUserOpps, ...otherOpps]);
+          return updatedUserOpps;
+        }
+      }
       return userExisting;
     }
 

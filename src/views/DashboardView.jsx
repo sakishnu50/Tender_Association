@@ -35,7 +35,7 @@ import { exportService } from '../services/exportService';
 export default function DashboardView({ onSelectOpportunity, onViewAll, searchVal = '', setSearchVal }) {
   const queryClient = useQueryClient();
   const { data: fetchedOpps, refetch } = useOpportunities();
-  const opportunities = fetchedOpps || [];
+  const opportunities = fetchedOpps && fetchedOpps.length > 0 ? fetchedOpps : mockOpportunities.slice(0, 9);
 
   // Decision mutations
   const pursueMutation = usePursueOpportunity();

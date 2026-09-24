@@ -18,7 +18,7 @@ const navSections = [
   {
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid, path: '/' },
-      { id: 'opportunities', label: 'Opportunities', icon: Layers, path: '/opportunities', count: 150, urgent: false },
+      { id: 'opportunities', label: 'Opportunities', icon: Layers, path: '/opportunities' },
       { id: 'calendar', label: 'Bid Calendar', icon: Calendar, path: '/calendar' }
     ]
   },
