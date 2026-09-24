@@ -1134,7 +1134,12 @@ body {
 }
 
 .data-table tr:hover {
-  background-color: rgba(241, 245, 249, 0.6);
+  background-color: var(--bg-subtle);
+}
+
+[data-theme="dark"] .data-table tr:hover,
+.dark .data-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Modal Overlay */
