@@ -511,7 +511,7 @@ export default function Header({
             }}
             aria-label="Search content"
           />
-          {searchVal ? (
+          {searchVal && (
             <button
               type="button"
               onClick={() => {
@@ -534,10 +534,6 @@ export default function Header({
             >
               <X size={14} />
             </button>
-          ) : (
-            <span className="header-search-badge" aria-hidden="true">
-              ⌘K
-            </span>
           )}
         </div>
       </div>
