@@ -146,9 +146,9 @@ export default function OpportunityTable({
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: '5px',
-              backgroundColor: '#FFFFFF',
-              border: '1px solid #E2E8F0',
-              color: '#2563EB',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              color: 'var(--primary)',
               cursor: 'pointer',
               boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
               transition: 'all 0.15s ease',
@@ -159,7 +159,7 @@ export default function OpportunityTable({
             title={`View ${row.original.name || row.original.title || 'opportunity'}`}
             aria-label={`View ${row.original.name || row.original.title || 'opportunity'}`}
           >
-            <Eye size={13} color="#2563EB" />
+            <Eye size={13} color="var(--primary)" />
           </button>
         )
       }

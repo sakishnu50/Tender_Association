@@ -33,7 +33,6 @@ const navSections = [
   {
     items: [
       { id: 'offices', label: 'Offices', icon: Building2, path: '/offices' },
-      { id: 'users', label: 'Users & Roles', icon: UserCheck, path: '/users' },
       { id: 'audit', label: 'Audit Trail', icon: History, path: '/audit' },
       { id: 'settings', label: 'Settings', icon: Settings, path: '/settings' }
     ]
