@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Users,
@@ -8,9 +8,11 @@ import {
   Star,
   MessageSquare,
   Sparkles,
-  Check,
+  TrendingUp,
   Target,
-  TrendingUp
+  Mail,
+  Phone,
+
 } from 'lucide-react';
 
 /* ── score helpers ── */
@@ -19,18 +21,6 @@ function scoreColor(score) {
   if (score >= 80) return 'var(--primary)';
   if (score >= 70) return 'var(--warning)';
   return 'var(--text-muted)';
-}
-function scoreBg(score) {
-  if (score >= 90) return 'rgba(16,185,129,0.08)';
-  if (score >= 80) return 'rgba(99,102,241,0.08)';
-  if (score >= 70) return 'rgba(245,158,11,0.08)';
-  return 'rgba(156,163,175,0.08)';
-}
-function scoreBorder(score) {
-  if (score >= 90) return 'rgba(16,185,129,0.3)';
-  if (score >= 80) return 'rgba(99,102,241,0.3)';
-  if (score >= 70) return 'rgba(245,158,11,0.3)';
-  return 'rgba(156,163,175,0.3)';
 }
 
 /* ── section heading ── */
@@ -49,7 +39,36 @@ function SectionTitle({ children }) {
   );
 }
 
-export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdateStatus }) {
+/* ── thin horizontal divider ── */
+function SectionDivider() {
+  return (
+    <div style={{
+      height: '1px',
+      backgroundColor: 'var(--border-color, #E2E8F0)',
+      margin: '4px 0',
+    }} />
+  );
+}
+
+
+
+/* ── Document helper — generate a downloadable blob for demo ── */
+function generateDocBlob(docName, partner) {
+  const content = `${docName}\n\nPartner: ${partner.name}\nExpertise: ${partner.expertise || ''}\nGenerated for demonstration purposes.`;
+  return new Blob([content], { type: 'text/plain' });
+}
+
+function getFileType(docName) {
+  if (docName.toLowerCase().includes('certification')) return 'PDF';
+  if (docName.toLowerCase().includes('profile')) return 'PDF';
+  if (docName.toLowerCase().includes('experience')) return 'PDF';
+  return 'PDF';
+}
+
+
+export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdateStatus, requirements }) {
+
+
   if (!isOpen || !partner) return null;
 
   const isRecommended = partner.status === 'recommended';
@@ -65,6 +84,33 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
     { label: 'Geographic Match', value: partner.geographicMatch || `${geoScore}%`,     num: geoScore,     color: scoreColor(geoScore) },
     { label: 'Overall Score',    value: `${overallScore}%`,                             num: overallScore, color: scoreColor(overallScore) },
   ];
+
+  /* ── Contact info ── */
+  const contactPerson = partner.representative || 'Managing Director';
+  const contactEmail  = partner.contactEmail || 'contact@partner.com';
+  const contactPhone  = partner.contactPhone || '+91 XX XXXX XXXX';
+
+
+
+
+  /* ── Small action button helper ── */
+  const SmallBtn = ({ children, onClick, bg, color, border }) => (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: '5px',
+        padding: '0.35rem 0.75rem', fontSize: '0.78rem', fontWeight: '600',
+        border: `1px solid ${border || 'var(--border-color)'}`,
+        borderRadius: 'var(--radius-md, 6px)',
+        backgroundColor: bg || 'transparent',
+        color: color || 'var(--text-main)',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+      }}
+    >
+      {children}
+    </button>
+  );
 
   return (
     <div
@@ -94,7 +140,7 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
           overflow: 'hidden',
         }}
       >
-        {/* ── Header ── */}
+        {/* ── Header (fixed) ── */}
         <div style={{
           display: 'flex',
           alignItems: 'flex-start',
@@ -148,11 +194,11 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
           </button>
         </div>
 
-        {/* ── Scrollable body — no horizontal scroll ── */}
+        {/* ── Scrollable body ── */}
         <div style={{ overflowY: 'auto', overflowX: 'hidden', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
 
-          {/* ── Partner Details grid ── */}
+          {/* ═══ 1. PARTNER DETAILS ═══ */}
           <div>
             <SectionTitle>Partner Details</SectionTitle>
             <div style={{
@@ -161,12 +207,13 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
               gap: '10px',
             }}>
               {[
-                { label: 'Expertise',   value: partner.expertise  },
-                { label: 'Experience',  value: partner.experience },
-                { label: 'Location',    value: partner.headquarters || partner.location },
-                { label: 'Team Size',   value: partner.teamSize || '200+ Personnel' },
-                { label: 'Contact',     value: partner.representative || 'Managing Director' },
-                { label: 'Email',       value: partner.contactEmail || 'contact@partner.com' },
+                { label: 'Company Name', value: partner.name },
+                { label: 'Expertise',    value: partner.expertise },
+                { label: 'Experience',   value: partner.experience },
+                { label: 'Location',     value: partner.headquarters || partner.location },
+                { label: 'Team Size',    value: partner.teamSize || '200+ Personnel' },
+                { label: 'Contact Person', value: partner.representative || 'Managing Director' },
+                { label: 'Email',        value: partner.contactEmail || 'contact@partner.com' },
               ].filter(d => d.value).map(d => (
                 <div key={d.label} style={{
                   padding: '10px 12px',
@@ -185,7 +232,9 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
             </div>
           </div>
 
-          {/* ── Why Recommended ── */}
+          <SectionDivider />
+
+          {/* ═══ 2. WHY RECOMMENDED ═══ */}
           {partner.whyRecommended && (
             <div style={{
               padding: '14px 16px',
@@ -202,42 +251,9 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
             </div>
           )}
 
-          {/* ── Match Information ── */}
-          <div>
-            <SectionTitle>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                <Target size={12} /> Match Information
-              </span>
-            </SectionTitle>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '10px',
-            }}>
-              {[
-                { label: 'Technical Match',  value: partner.technicalMatch  || `${techScore}%`,    color: scoreColor(techScore),    bg: scoreBg(techScore),    border: scoreBorder(techScore) },
-                { label: 'Geographic Match', value: partner.geographicMatch || `${geoScore}%`,     color: scoreColor(geoScore),     bg: scoreBg(geoScore),     border: scoreBorder(geoScore) },
-                { label: 'Overall Score',    value: `${overallScore}%`,                             color: scoreColor(overallScore), bg: scoreBg(overallScore), border: scoreBorder(overallScore) },
-              ].map(m => (
-                <div key={m.label} style={{
-                  padding: '12px',
-                  backgroundColor: m.bg,
-                  border: `1px solid ${m.border}`,
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                }}>
-                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    {m.label}
-                  </div>
-                  <div style={{ fontSize: '1.2rem', fontWeight: '800', color: m.color }}>
-                    {m.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <SectionDivider />
 
-          {/* ── Bridges Gaps ── */}
+          {/* ═══ 3. BRIDGES CAPABILITY GAPS ═══ */}
           {partner.capabilitiesCovered?.length > 0 && (
             <div>
               <SectionTitle>Bridges Capability Gaps</SectionTitle>
@@ -257,7 +273,9 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
             </div>
           )}
 
-          {/* ── Match Breakdown (vertical bars) ── */}
+          <SectionDivider />
+
+          {/* ═══ 4. MATCH BREAKDOWN ═══ */}
           <div>
             <SectionTitle>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
@@ -289,7 +307,9 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
             </div>
           </div>
 
-          {/* ── Past Projects ── */}
+          <SectionDivider />
+
+          {/* ═══ 5. KEY BENCHMARK PROJECTS ═══ */}
           {partner.pastProjects?.length > 0 && (
             <div>
               <SectionTitle>Key Benchmark Projects</SectionTitle>
@@ -326,7 +346,139 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
             </div>
           )}
 
-          {/* ── Partner Status / actions (at bottom) ── */}
+          <SectionDivider />
+
+          {/* ═══ 6. TENDER RELEVANCE ═══ */}
+          <div>
+            <SectionTitle>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <Target size={12} /> Tender Relevance
+              </span>
+            </SectionTitle>
+
+            {/* Relevance callout */}
+            <div style={{
+              padding: '14px 16px',
+              backgroundColor: 'rgba(99,102,241,0.04)',
+              borderLeft: '4px solid var(--primary)',
+              borderRadius: '0 8px 8px 0',
+              marginBottom: '12px',
+            }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-main)', lineHeight: '1.55', marginBottom: '8px' }}>
+                {partner.whyRecommended
+                  ? `${partner.name} is relevant to this tender due to their specialization in ${partner.expertise} and proven track record in the ${requirements?.location || 'target'} region.`
+                  : `${partner.name} has capabilities that align with the tender requirements.`
+                }
+              </div>
+              {requirements?.opportunityName && (
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  Tender: <strong style={{ color: 'var(--text-main)' }}>{requirements.opportunityName}</strong>
+                  {requirements.tenderCode && <> · {requirements.tenderCode}</>}
+                </div>
+              )}
+            </div>
+
+            {/* Relevant sector / experience tags */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {(partner.allCapabilities || []).map((cap, i) => (
+                <span key={i} style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  fontSize: '0.75rem', fontWeight: '600',
+                  padding: '4px 10px', borderRadius: '9999px',
+                  backgroundColor: 'var(--bg-subtle)',
+                  color: 'var(--text-main)',
+                  border: '1px solid var(--border-color)',
+                }}>
+                  {cap}
+                </span>
+              ))}
+              {partner.experience && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '4px',
+                  fontSize: '0.75rem', fontWeight: '700',
+                  padding: '4px 10px', borderRadius: '9999px',
+                  backgroundColor: 'rgba(16,185,129,0.08)',
+                  color: 'var(--success)',
+                  border: '1px solid rgba(16,185,129,0.25)',
+                }}>
+                  {partner.experience} Experience
+                </span>
+              )}
+            </div>
+          </div>
+
+          <SectionDivider />
+
+          {/* ═══ 7. CONTACT ═══ */}
+          <div>
+            <SectionTitle>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <Phone size={12} /> Contact
+              </span>
+            </SectionTitle>
+
+            <div style={{
+              padding: '14px 16px',
+              backgroundColor: 'var(--bg-subtle)',
+              borderRadius: '10px',
+              border: '1px solid var(--border-color)',
+              display: 'flex', flexDirection: 'column', gap: '12px',
+            }}>
+              {/* Contact details grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px' }}>
+                <div>
+                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    Contact Person
+                  </div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                    {contactPerson}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    Email
+                  </div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--primary)', wordBreak: 'break-all' }}>
+                    {contactEmail}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.67rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '3px' }}>
+                    Phone
+                  </div>
+                  <div style={{ fontSize: '0.82rem', fontWeight: '600', color: 'var(--text-main)' }}>
+                    {contactPhone}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <SmallBtn
+                  onClick={() => window.open(`mailto:${contactEmail}`, '_blank')}
+                  bg="rgba(29,78,216,0.06)"
+                  color="var(--primary)"
+                  border="rgba(29,78,216,0.2)"
+                >
+                  <Mail size={13} /> Send Email
+                </SmallBtn>
+                <SmallBtn
+                  onClick={() => window.open(`tel:${contactPhone.replace(/\s/g, '')}`, '_blank')}
+                  bg="rgba(16,185,129,0.06)"
+                  color="var(--success)"
+                  border="rgba(16,185,129,0.2)"
+                >
+                  <Phone size={13} /> Call
+                </SmallBtn>
+              </div>
+            </div>
+          </div>
+
+
+
+          <SectionDivider />
+
+          {/* ═══ 10. PARTNER STATUS (LAST) ═══ */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap',
             padding: '14px 16px',
@@ -344,10 +496,10 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: '5px',
                 padding: '0.35rem 0.75rem', fontSize: '0.78rem', fontWeight: '600',
-                border: `1px solid ${isShortlisted ? 'var(--primary)' : 'var(--border-color)'}`,
+                border: `1px solid ${isShortlisted ? '#2563EB' : 'var(--border-color)'}`,
                 borderRadius: 'var(--radius-md)',
-                backgroundColor: isShortlisted ? 'var(--primary-light)' : 'transparent',
-                color: isShortlisted ? 'var(--primary)' : 'var(--text-main)',
+                backgroundColor: isShortlisted ? '#2563EB' : 'transparent',
+                color: isShortlisted ? '#ffffff' : 'var(--text-main)',
                 cursor: 'pointer',
               }}
             >
@@ -372,7 +524,7 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
               {isContacted ? 'Contacted ✓' : 'Mark Contacted'}
             </button>
 
-            {/* Recommend — turns green when active */}
+            {/* Recommend */}
             <button
               onClick={() => onUpdateStatus(partner.id, isRecommended ? 'none' : 'recommended')}
               style={{
@@ -397,4 +549,3 @@ export default function PartnerProfileModal({ partner, isOpen, onClose, onUpdate
     </div>
   );
 }
-

@@ -8,21 +8,19 @@ function scoreColor(score) {
   return 'var(--text-muted)';
 }
 
-/* ── Status badge colors — mirrors Client Profile status pill ── */
+/* ── Status text colors ── */
 function statusBadge(status) {
   switch (status) {
     case 'recommended':
-      return { label: 'Recommended', bg: '#DCFCE7', color: '#166534' };
+      return { label: 'Recommended', color: '#16A34A' };
     case 'accepted':
-      return { label: 'Accepted', bg: '#DCFCE7', color: '#166534' };
+      return { label: 'Accepted', color: '#16A34A' };
     case 'shortlisted':
-      return { label: 'Shortlisted', bg: '#DBEAFE', color: '#1E40AF' };
+      return { label: 'Shortlisted', color: '#2563EB' };
     case 'contacted':
-      return { label: 'Contacted', bg: '#F3E8FF', color: '#7E22CE' };
-    case 'invited':
-      return { label: 'Invited', bg: '#FEF3C7', color: '#92400E' };
+      return { label: 'Contacted', color: '#7E22CE' };
     default:
-      return { label: 'Not Actioned', bg: '#F1F5F9', color: '#64748B' };
+      return { label: 'Not Actioned', color: '#94A3B8' };
   }
 }
 
@@ -136,7 +134,7 @@ export default function PartnerTable({
                       </span>
                     </td>
                     <td style={{ ...tdBase, textAlign: 'center', padding: '1rem 1rem' }}>
-                      <span style={{ fontWeight: '700', fontSize: '0.875rem', color: scoreColor(techScore) }}>
+                      <span style={{ fontWeight: '700', fontSize: '0.875rem', color: 'var(--text-secondary, #334155)' }}>
                         {partner.technicalMatch || `${techScore}%`}
                       </span>
                     </td>
@@ -149,13 +147,8 @@ export default function PartnerTable({
                         return (
                           <span
                             style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              padding: '0.25rem 0.65rem',
-                              borderRadius: '9999px',
                               fontSize: '0.75rem',
                               fontWeight: '700',
-                              backgroundColor: badge.bg,
                               color: badge.color,
                             }}
                           >

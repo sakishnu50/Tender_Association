@@ -42,15 +42,16 @@ export default function AlertsView({ onSelectProject }) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justify: 'space-between',
+              justifyContent: 'space-between',
+              gap: '1rem',
               borderLeft: `4px solid ${
                 alert.type === 'High Priority' ? 'var(--danger)' :
                 alert.type === 'Deadline' ? 'var(--warning)' : 'var(--primary)'
               }`
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <span className={`badge ${
                   alert.type === 'High Priority' ? 'badge-priority' :
                   alert.type === 'Deadline' ? 'badge-warning' : 'badge-info'
@@ -61,7 +62,7 @@ export default function AlertsView({ onSelectProject }) {
                   {alert.project}
                 </span>
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '1rem' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 <span>AI Score: <strong>{alert.aiScore}</strong></span>
                 <span>Source: <strong>{alert.source}</strong></span>
                 <span style={{ color: alert.urgent ? 'var(--danger)' : 'var(--text-muted)', fontWeight: alert.urgent ? '700' : '500' }}>
@@ -70,7 +71,18 @@ export default function AlertsView({ onSelectProject }) {
               </div>
             </div>
 
-            <button className="btn btn-outline" style={{ fontSize: '0.75rem' }} onClick={onSelectProject}>
+            <button
+              className="btn btn-primary"
+              style={{
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                padding: '0.45rem 1rem',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                marginLeft: 'auto'
+              }}
+              onClick={onSelectProject}
+            >
               View Details
             </button>
           </div>

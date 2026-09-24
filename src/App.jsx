@@ -85,8 +85,10 @@ export default function App() {
     setDarkMode(nextMode);
     if (nextMode) {
       document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.classList.add('dark');
     } else {
       document.documentElement.removeAttribute('data-theme');
+      document.documentElement.classList.remove('dark');
     }
   };
 
@@ -183,6 +185,7 @@ export default function App() {
           toggleTheme={toggleTheme}
           opportunities={userOpportunities}
           filteredOpportunities={filteredOpportunities}
+          onSelectOpportunity={handleSelectOpportunity}
           onRequestLogout={() => setIsLogoutModalOpen(true)}
           onRefresh={handleGlobalRefresh}
           onMenuClick={() => setIsMobileSidebarOpen(true)}

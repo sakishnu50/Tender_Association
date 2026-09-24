@@ -98,7 +98,7 @@ export default function AuditDetailsDrawer({ log, onClose }) {
       <div className={styles.fullscreenView} onClick={(event) => event.stopPropagation()}>
         <header className={styles.fullscreenHeader}>
           <button className={styles.backLink} onClick={onClose} type="button">
-            <ArrowLeft size={16} />
+            <ArrowLeft size={15} />
             <span>Back to Audit Trail</span>
           </button>
 

@@ -32,7 +32,6 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
 
   const pastProjects = useMemo(() => mockClientProfile.pastProjects || [], []);
 
@@ -69,16 +68,17 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
     });
   }, [pastProjects, searchTerm, statusFilter, sectorFilter]);
 
-  // Reset to page 1 on filter or page size changes
+  // Reset to page 1 on filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, sectorFilter, pageSize]);
+  }, [searchTerm, statusFilter, sectorFilter]);
 
-  // Pagination calculations
+  // Pagination calculations: 9 rows maximum per page across all pages
+  const ITEMS_PER_PAGE = 9;
   const totalProjects = filteredProjects.length;
-  const totalPages = Math.min(2, Math.max(1, Math.ceil(totalProjects / pageSize)));
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalProjects);
+  const totalPages = Math.max(1, Math.ceil(totalProjects / ITEMS_PER_PAGE));
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalProjects);
   const displayedProjects = filteredProjects.slice(startIndex, endIndex);
 
   const handleOpenProject = (project) => {
@@ -89,6 +89,7 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
   };
 
   return (
+<<<<<<< HEAD
     <div className="page-container" style={{ padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
       {/* Single Control Row: Heading on Left, Search + Filters on Right */}
       <div
@@ -216,17 +217,21 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
       </div>
 
       {/* Projects Table Card */}
+=======
+    <div className="page-container" style={{ padding: '1rem 1.5rem', gap: '0.875rem', width: '100%', boxSizing: 'border-box' }}>
+      {/* Top Header & Controls Row */}
+>>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
       <div
-        className="card"
         style={{
-          backgroundColor: 'var(--bg-card, #FFFFFF)',
-          borderRadius: '0.75rem',
-          border: '1px solid var(--border-color, #E2E8F0)',
-          overflow: 'hidden',
-          boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.04)',
-          padding: 0
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          width: '100%',
+          gap: '1rem',
+          flexWrap: 'wrap'
         }}
       >
+<<<<<<< HEAD
         <div className="table-container" style={{ border: 'none', overflowX: 'auto' }}>
           <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -239,6 +244,147 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                 <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>STATUS</th>
                 <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VALUE</th>
                 <th style={{ textAlign: 'center', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VIEW</th>
+=======
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(37, 99, 235, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary, #2563EB)'
+            }}
+          >
+            <TrendingUp size={18} />
+          </div>
+          <h1
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              color: 'var(--text-main)',
+              margin: 0,
+              letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Past Project Experience
+          </h1>
+        </div>
+
+        {/* Quick Filter & Search Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            flexShrink: 0,
+            flexWrap: 'wrap'
+          }}
+        >
+          {/* Search Input */}
+          <div style={{ position: 'relative', width: '260px', maxWidth: '100%' }}>
+            <Search
+              size={15}
+              color="var(--text-muted)"
+              style={{
+                position: 'absolute',
+                left: '0.75rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none'
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                height: '36px',
+                padding: '0 0.75rem 0 2.2rem',
+                borderRadius: 'var(--radius-md, 6px)',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-card)',
+                color: 'var(--text-main)',
+                fontSize: '0.875rem',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+
+          {/* Sector Filter */}
+          <select
+            value={sectorFilter}
+            onChange={(e) => setSectorFilter(e.target.value)}
+            style={{
+              height: '36px',
+              padding: '0 0.75rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)',
+              fontSize: '0.875rem',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="ALL">All Sectors</option>
+            {sectorOptions.map((sec) => (
+              <option key={sec} value={sec}>
+                {sec}
+              </option>
+            ))}
+          </select>
+
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              height: '36px',
+              padding: '0 0.75rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              border: '1px solid var(--border-color)',
+              backgroundColor: 'var(--bg-card)',
+              color: 'var(--text-main)',
+              fontSize: '0.875rem',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="Completed">Completed</option>
+            <option value="Ongoing">Ongoing</option>
+          </select>
+        </div>
+      </div>
+
+      <div
+        className="card"
+        style={{
+          padding: 0,
+          overflow: 'hidden'
+        }}
+      >
+        {/* Projects Table */}
+        <div className="table-container" style={{ border: 'none', overflowX: 'auto', overflowY: 'visible' }}>
+          <table className="data-table" style={{ width: '100%', tableLayout: 'fixed' }}>
+            <thead>
+              <tr>
+                <th style={{ width: '28%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>PROJECT NAME</th>
+                <th style={{ width: '16%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>SECTOR</th>
+                <th style={{ width: '8%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>COUNTRY</th>
+                <th style={{ width: '7%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>YEAR</th>
+                <th style={{ width: '18%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>CLIENT / AGENCY</th>
+                <th style={{ width: '9%', textAlign: 'center', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>STATUS</th>
+                <th style={{ width: '9%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>VALUE</th>
+                <th style={{ width: '5%', textAlign: 'center', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>VIEW</th>
+>>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
               </tr>
             </thead>
             <tbody>
@@ -246,7 +392,7 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                 <tr>
                   <td
                     colSpan={8}
-                    style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-muted, #64748B)', fontSize: '0.9rem' }}
+                    style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}
                   >
                     No projects found matching your criteria.
                   </td>
@@ -258,13 +404,14 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                     <tr
                       key={project.id || idx}
                       style={{
-                        borderBottom: '1px solid var(--border-color, #E2E8F0)',
-                        transition: 'background-color 0.15s'
+                        height: '48px',
+                        borderBottom: '1px solid var(--border-color, #E2E8F0)'
                       }}
                     >
-                      <td style={{ padding: '1rem 1.25rem', fontWeight: '700', color: 'var(--text-main, #0F172A)', fontSize: '0.875rem' }}>
+                      <td style={{ padding: '0.68rem 0.875rem', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={project.name}>
                         {project.name}
                       </td>
+<<<<<<< HEAD
                       <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
                         {project.sector}
                       </td>
@@ -275,58 +422,64 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                         {project.year}
                       </td>
                       <td style={{ padding: '1rem 1rem', color: 'var(--text-muted, #64748B)', fontSize: '0.875rem' }}>
+=======
+                      <td style={{ padding: '0.68rem 0.875rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={project.sector}>
+                        {project.sector}
+                      </td>
+                      <td style={{ padding: '0.68rem 0.875rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {project.country}
+                      </td>
+                      <td style={{ padding: '0.68rem 0.875rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
+                        {project.year}
+                      </td>
+                      <td style={{ padding: '0.68rem 0.875rem', color: 'var(--text-muted)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={project.client}>
+>>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
                         {project.client}
                       </td>
-                      <td style={{ padding: '1rem 1rem' }}>
+                      <td style={{ padding: '0.68rem 0.875rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                         <span
+                          className={`badge ${isCompleted ? 'badge-new' : 'badge-priority'}`}
                           style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            padding: '0.25rem 0.65rem',
-                            borderRadius: '9999px',
+                            padding: '0.2rem 0.55rem',
                             fontSize: '0.75rem',
-                            fontWeight: '700',
+                            lineHeight: '1.2',
+                            borderRadius: '9999px',
+                            fontWeight: '600',
                             backgroundColor: isCompleted ? '#DCFCE7' : '#FEF3C7',
-                            color: isCompleted ? '#166534' : '#92400E'
+                            color: isCompleted ? '#166534' : '#92400E',
+                            display: 'inline-block'
                           }}
                         >
                           {project.status}
                         </span>
                       </td>
-                      <td style={{ padding: '1rem 1.25rem', fontWeight: '700', color: 'var(--primary, #1D4ED8)', fontSize: '0.875rem' }}>
+                      <td style={{ padding: '0.68rem 0.875rem', fontWeight: '600', color: 'var(--primary, #2563EB)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                         {project.value}
                       </td>
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
+                      <td style={{ padding: '0.68rem 0.875rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                         <button
                           type="button"
                           onClick={() => handleOpenProject(project)}
-                          title="View Complete Project Details"
+                          title={`View details for ${project.name}`}
                           aria-label={`View details for ${project.name}`}
                           style={{
+                            padding: '0.25rem 0.5rem',
+                            fontSize: '0.75rem',
                             display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            width: '34px',
-                            height: '34px',
-                            borderRadius: '8px',
-                            border: '1px solid var(--border-color, #E2E8F0)',
-                            backgroundColor: 'var(--bg-subtle, #F8FAFC)',
-                            color: 'var(--primary, #2563EB)',
+                            borderRadius: '5px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #E2E8F0',
+                            color: '#2563EB',
                             cursor: 'pointer',
-                            transition: 'all 0.15s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(37, 99, 235, 0.12)';
-                            e.currentTarget.style.borderColor = 'var(--primary, #2563EB)';
-                            e.currentTarget.style.transform = 'scale(1.06)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'var(--bg-subtle, #F8FAFC)';
-                            e.currentTarget.style.borderColor = 'var(--border-color, #E2E8F0)';
-                            e.currentTarget.style.transform = 'scale(1)';
+                            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+                            transition: 'all 0.15s ease',
+                            height: '28px',
+                            width: '30px'
                           }}
                         >
-                          <Eye size={17} />
+                          <Eye size={13} color="#2563EB" />
                         </button>
                       </td>
                     </tr>
@@ -336,7 +489,6 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
             </tbody>
           </table>
         </div>
-
 
         {/* ── Page Navigation Footer ────────────────────────────────────────── */}
         <div
@@ -356,15 +508,26 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
             Showing {totalProjects === 0 ? 0 : startIndex + 1} to {endIndex} of {totalProjects} entries
           </div>
 
-          <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.375rem', alignItems: 'center' }}>
             <button
               type="button"
               className="btn btn-outline"
               style={{
-                padding: '0.2rem 0.5rem',
-                fontSize: '0.75rem',
-                opacity: currentPage <= 1 ? 0.4 : 1,
-                cursor: currentPage <= 1 ? 'not-allowed' : 'pointer'
+                width: '30px',
+                height: '30px',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.8125rem',
+                fontWeight: '600',
+                borderRadius: '6px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid var(--border-color, #E2E8F0)',
+                color: currentPage <= 1 ? '#CBD5E1' : '#64748B',
+                opacity: currentPage <= 1 ? 0.5 : 1,
+                cursor: currentPage <= 1 ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s ease'
               }}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
@@ -376,7 +539,21 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
             <button
               type="button"
               className="btn btn-primary"
-              style={{ padding: '0.2rem 0.55rem', fontSize: '0.75rem', minWidth: '1.75rem' }}
+              style={{
+                width: '30px',
+                height: '30px',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.875rem',
+                fontWeight: '700',
+                borderRadius: '6px',
+                backgroundColor: '#2563EB',
+                color: '#FFFFFF',
+                border: 'none',
+                cursor: 'default'
+              }}
               aria-label={`Page ${currentPage}`}
               aria-current="page"
             >
@@ -387,10 +564,21 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
               type="button"
               className="btn btn-outline"
               style={{
-                padding: '0.2rem 0.5rem',
-                fontSize: '0.75rem',
-                opacity: currentPage >= totalPages ? 0.4 : 1,
-                cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer'
+                width: '30px',
+                height: '30px',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.8125rem',
+                fontWeight: '600',
+                borderRadius: '6px',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid var(--border-color, #E2E8F0)',
+                color: currentPage >= totalPages ? '#CBD5E1' : '#64748B',
+                opacity: currentPage >= totalPages ? 0.5 : 1,
+                cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s ease'
               }}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
@@ -400,8 +588,7 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
             </button>
           </div>
         </div>
-
-      </div >
+      </div>
 
     {/* ── Project Details Modal ────────────────────────────────────────── */ }
   {

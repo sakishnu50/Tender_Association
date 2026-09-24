@@ -118,9 +118,25 @@ export const apiFacade = {
   fetchUsers: async () => mockUsers,
 
   fetchAuditTrail: async (userId) => {
-    const key = userId ? `iot_audit_trail_${String(userId).trim().toLowerCase()}` : 'iot_audit_trail';
-    const logs = getStorage(key, mockAuditTrail);
-    return logs;
+    const cleanId = typeof userId === 'string' ? userId.trim().toLowerCase() : '';
+    const userKey = cleanId ? `iot_audit_trail_${cleanId}` : null;
+    if (userKey) {
+      const userLogs = getStorage(userKey, null);
+      if (userLogs && Array.isArray(userLogs) && userLogs.length > 0) {
+        return userLogs;
+      }
+    }
+    const globalLogs = getStorage('iot_audit_trail', null);
+    if (globalLogs && Array.isArray(globalLogs) && globalLogs.length > 0) {
+      return globalLogs;
+    }
+    const auditLogs = getStorage('auditLogs', null);
+    if (auditLogs && Array.isArray(auditLogs) && auditLogs.length > 0) {
+      return auditLogs;
+    }
+    setStorage('iot_audit_trail', mockAuditTrail);
+    setStorage('auditLogs', mockAuditTrail);
+    return mockAuditTrail;
   },
 
   fetchSettings: async (userId) => {
@@ -261,8 +277,10 @@ export const apiFacade = {
   updateOpportunityPriority: async (id, priority, userId) => {
     const all = getAllOpportunities();
     const normalizedPriority = String(priority).toUpperCase();
+    let found = false;
     const updated = all.map((opp) => {
       if (opp.id === id) {
+        found = true;
         return {
           ...opp,
           priority: normalizedPriority
@@ -270,7 +288,27 @@ export const apiFacade = {
       }
       return opp;
     });
+    if (!found) {
+      const mock = mockOpportunities.find((m) => m.id === id);
+      updated.push({
+        ...(mock || { id, name: id, title: id }),
+        priority: normalizedPriority,
+        userId: userId || 'anonymous'
+      });
+    }
     saveAllOpportunities(updated);
+
+    try {
+      const raw = localStorage.getItem('iot_opportunities');
+      if (raw) {
+        const opps = JSON.parse(raw);
+        if (Array.isArray(opps)) {
+          const uOpps = opps.map((o) => (o.id === id ? { ...o, priority: normalizedPriority } : o));
+          localStorage.setItem('iot_opportunities', JSON.stringify(uOpps));
+        }
+      }
+    } catch {}
+
     return { success: true, id, priority: normalizedPriority };
   },
 

@@ -240,15 +240,17 @@ export default function PartnerCard({
                     width: '100%',
                     padding: '0.5rem 0.75rem',
                     border: 'none',
-                    background: isShortlisted ? 'var(--bg-subtle)' : 'transparent',
-                    color: 'var(--text-main)',
+                    background: isShortlisted ? '#2563EB' : 'transparent',
+                    color: isShortlisted ? '#ffffff' : 'var(--text-main)',
                     fontSize: '0.8rem',
+                    fontWeight: isShortlisted ? '600' : '400',
                     cursor: 'pointer',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    borderRadius: '4px',
                   }}
                 >
-                  <Star size={14} color="var(--primary)" />
-                  <span>Shortlist</span>
+                  <Star size={14} color={isShortlisted ? '#ffffff' : 'var(--primary)'} />
+                  <span>{isShortlisted ? 'Shortlisted ✓' : 'Shortlist'}</span>
                 </button>
                 <button
                   onClick={(e) => handleSelectStatus(e, 'contacted')}

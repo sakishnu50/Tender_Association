@@ -296,7 +296,6 @@ export default function ConsortiumView({ searchVal = '' }) {
               <select value={draftStatus} onChange={e => setDraftStatus(e.target.value)} style={selectStyle(draftStatus)}>
                 <option value="">All Statuses</option>
                 <option value="accepted">Accepted</option>
-                <option value="invited">Invited</option>
                 <option value="recommended">Recommended</option>
                 <option value="shortlisted">Shortlisted</option>
                 <option value="contacted">Contacted</option>
@@ -429,6 +428,7 @@ export default function ConsortiumView({ searchVal = '' }) {
         isOpen={isProfileOpen}
         onClose={() => { setIsProfileOpen(false); setSelectedPartner(null); }}
         onUpdateStatus={handleUpdateStatus}
+        requirements={requirements}
       />
     </div>
   );
