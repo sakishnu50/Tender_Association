@@ -379,6 +379,204 @@ export const mockClientProfile = {
         'Landfill diversion rate exceeded 82% across residential and commercial sectors.'
       ],
       standards: 'Estidama Pearl Building Rating System, ASHRAE 90.1, Abu Dhabi Urban Planning Council (UPC)'
+    },
+    {
+      id: 'PP-011',
+      name: 'Hyderabad Outer Ring Road Intelligent Traffic Management',
+      sector: 'Transportation',
+      country: 'India',
+      location: 'Hyderabad Metropolitan Region, Telangana',
+      year: '2023',
+      duration: '2022 – 2023 (18 Months)',
+      client: 'JICA / HMDA',
+      contractRef: 'HMDA/JICA/ORR-ITS/2022-07',
+      status: 'Completed',
+      value: '₹64 Crore',
+      projectLead: 'V. Ramakrishna (ITS Senior Consultant)',
+      teamSize: '34 Intelligent Transport & Traffic Engineers',
+      overview: 'Deployment of high-speed automatic number plate recognition (ANPR), incident detection cameras, and dynamic speed modulation along 158 km of express ring road.',
+      scope: '158 km optical fiber backbone, 96 dynamic message signs, automated toll plazas, and central incident response center.',
+      objectives: [
+        'Enhance expressway safety and reduce incident response time under 10 minutes.',
+        'Automate vehicle classification and dynamic toll auditing.',
+        'Streamline heavy commercial transit around Hyderabad.'
+      ],
+      keyActivities: [
+        'LiDAR corridor survey and optical fiber ducting.',
+        'Integration of high-definition PTZ surveillance cameras.',
+        'Commissioning of unified incident command and control center.'
+      ],
+      outcomes: [
+        'Emergency incident response time reduced from 28 to 8 minutes.',
+        'Fatal collision rate reduced by 41% across expressway stretch.',
+        'Annual toll revenue leakage reduced by 98.5%.'
+      ],
+      standards: 'IRC:SP:84, JICA Transport Safeguards, IEEE 802.3 Ethernet Standards'
+    },
+    {
+      id: 'PP-012',
+      name: 'Kisumu Lakefront Stormwater & Wetland Rehabilitation',
+      sector: 'Water Infrastructure',
+      country: 'Kenya',
+      location: 'Kisumu Bay & Lake Victoria Basin',
+      year: '2024',
+      duration: '2023 – 2025 (Ongoing · 20 Months)',
+      client: 'World Bank / LVBC',
+      contractRef: 'LVBC/WB/KIS-WETLAND/2023-05',
+      status: 'Ongoing',
+      value: '$11.5M',
+      projectLead: 'Grace Odhiambo (Hydrological Systems Lead)',
+      teamSize: '26 Aquatic & Environmental Engineers',
+      overview: 'Ecological restoration of natural urban wetland channels, constructed bio-filtration swales, and silt trap basins discharging into Lake Victoria.',
+      scope: '32 km reconstructed urban swales, 4 bio-filtration sedimentation lagoons, riparian buffer zones, and water quality telemetry stations.',
+      objectives: [
+        'Prevent urban siltation and eutrophication into Lake Victoria.',
+        'Alleviate seasonal stormwater flooding in Kisumu business district.',
+        'Restore coastal aquatic biodiversity and wetland bird habitats.'
+      ],
+      keyActivities: [
+        'Hydrologic watershed modeling with SWAT software.',
+        'Bio-engineered vegetative revetments and sediment traps.',
+        'Community water stewardship and plastic trap barrier installation.'
+      ],
+      outcomes: [
+        'Sediment load into Lake Victoria reduced by 62% in pilot catchment.',
+        'Commercial center flood inundation incidents decreased to zero.',
+        'Over 45 hectares of wetland riparian habitat successfully rehabilitated.'
+      ],
+      standards: 'World Bank ESF, UNEP Wetland Conservation Guidelines, NEMA Kenya Standards'
+    },
+    {
+      id: 'PP-013',
+      name: 'Sharjah Sustainable Urban Heritage Mobility DPR',
+      sector: 'Urban Development',
+      country: 'UAE',
+      location: 'Heart of Sharjah & Historic Waterfront',
+      year: '2022',
+      duration: '2021 – 2022 (15 Months)',
+      client: 'Sharjah RTA / Shurooq',
+      contractRef: 'SRTA/SHQ/HERIT-MOB/2021-08',
+      status: 'Completed',
+      value: 'AED 16M',
+      projectLead: 'Farah Al-Qasimi (Urban Heritage Planner)',
+      teamSize: '20 Heritage Architects & Micro-Mobility Specialists',
+      overview: 'Comprehensive master plan and engineering DPR for pedestrianization, electric tram connectivity, and micro-mobility hubs in historic cultural quarters.',
+      scope: '18 km pedestrian priority boulevards, vintage-electric tram alignment DPR, 24 EV micro-mobility charging docks, and permeable heritage paving.',
+      objectives: [
+        'Preserve historic architecture while providing zero-emission local transit.',
+        'Encourage walking and tourism mobility through climate-shaded colonnades.',
+        'Eliminate vehicular through-traffic across cultural preservation zones.'
+      ],
+      keyActivities: [
+        'Pedestrian flow simulation and thermal comfort modeling.',
+        'Structural vibration analysis of historic coral-stone buildings along tram routes.',
+        'Design of solar-canopy shaded walkways and evaporative cooling misters.'
+      ],
+      outcomes: [
+        'Tourist pedestrian footfall increased by 54% post-implementation.',
+        'Localized ambient urban heat island temperature reduced by 3.2°C.',
+        'Design awarded Sharjah Sustainable Architecture Prize 2023.'
+      ],
+      standards: 'UNESCO Historic Urban Landscape (HUL), ICOMOS Conservation Charters, UAE Green Building Regulations'
+    },
+    {
+      id: 'PP-014',
+      name: 'Pokhara Regional Water Treatment & Distribution Network',
+      sector: 'Water Infrastructure',
+      country: 'Nepal',
+      location: 'Pokhara Valley & Kaski District',
+      year: '2023',
+      duration: '2021 – 2023 (28 Months)',
+      client: 'ADB / NWSC',
+      contractRef: 'NWSC/ADB/POKH-WTR/2021-12',
+      status: 'Completed',
+      value: '$8.6M',
+      projectLead: 'B. K. Shrestha (Water Treatment Specialist)',
+      teamSize: '30 Hydraulic & Geotechnical Engineers',
+      overview: 'Design and commissioning of 35 MLD gravity-fed water treatment plant and 78 km mountain pipeline network supplying pristine Himalayan meltwater.',
+      scope: '35 MLD rapid sand filtration plant, gravity conveyance steel pipelines, 6 mountain break pressure tanks (BPTs), and 16,000 smart household connections.',
+      objectives: [
+        'Provide 24x7 safe drinking water access to Pokhara tourism hub and local communities.',
+        'Harness natural gravitational head to achieve zero-energy water distribution.',
+        'Eliminate waterborne seasonal disease outbreaks in urban wards.'
+      ],
+      keyActivities: [
+        'High-altitude pipeline route geotechnical stabilization.',
+        'Rapid sand gravity filter and coagulation-flocculation plant design.',
+        'Installation of solar-powered chlorine residual monitoring stations.'
+      ],
+      outcomes: [
+        'Delivered clean potable water to over 240,000 residents and 400+ hotels.',
+        '100% gravity operation eliminated over $350,000 in annual electricity costs.',
+        'Waterborne disease incidence fell by 82% across Pokhara valley.'
+      ],
+      standards: 'ADB Safeguards, Nepal Drinking Water Quality Standards (NDWQS), WHO Water Guidelines'
+    },
+    {
+      id: 'PP-015',
+      name: 'Penang Coastal Expressway & Viaduct Design',
+      sector: 'Transportation',
+      country: 'Malaysia',
+      location: 'George Town & Bayan Lepas, Penang',
+      year: '2024',
+      duration: '2023 – 2025 (Ongoing · 24 Months)',
+      client: 'World Bank / JKR',
+      contractRef: 'JKR/PNG/EXPWY-VIAD/2023-02',
+      status: 'Ongoing',
+      value: '$22.8M',
+      projectLead: 'Tan Sri Dr. Lim Eng Guan (Chief Bridge Engineer)',
+      teamSize: '38 Marine Structural & Transport Engineers',
+      overview: 'Engineering design and geotechnical offshore piling oversight for a 14 km coastal elevated viaduct connecting industrial free-trade zones.',
+      scope: 'Detailed design of 14 km 6-lane elevated expressway, 4 interchanges with seismic isolators, marine pile foundation engineering, and acoustic noise barriers.',
+      objectives: [
+        'Relieve chronic gridlock connecting Penang International Airport and industrial corridors.',
+        'Engineer marine viaduct structures resilient to saline corrosion and tidal forces.',
+        'Maintain maritime navigation channels beneath main span viaducts.'
+      ],
+      keyActivities: [
+        'Marine geotechnical boreholes and pile load testing in marine clay.',
+        'Wind tunnel aerodynamic testing of long-span viaduct box girders.',
+        'Continuous marine turbidity and water quality sensor monitoring during piling.'
+      ],
+      outcomes: [
+        'Phase-1 superstructure engineering design successfully cleared by JKR.',
+        'Travel time along southern industrial corridor projected to drop by 45 minutes.',
+        'Corrosion-resistant epoxy-coated rebar specifications adopted nationwide.'
+      ],
+      standards: 'BS EN 1992-2 (Eurocode 2 for Bridges), AASHTO LRFD, CIDB Malaysia'
+    },
+    {
+      id: 'PP-016',
+      name: 'Pune Municipal Green Hydrogen Bus Depot & Charging Infrastructure',
+      sector: 'Infrastructure',
+      country: 'India',
+      location: 'Pune Metropolitan Area, Maharashtra',
+      year: '2023',
+      duration: '2022 – 2023 (16 Months)',
+      client: 'World Bank / PMPML',
+      contractRef: 'PMPML/WB/H2-DEPOT/2022-10',
+      status: 'Completed',
+      value: '₹52 Crore',
+      projectLead: 'Anand Joshi (Clean Energy Transport Lead)',
+      teamSize: '25 Hydrogen Systems & Electrical Engineers',
+      overview: 'Engineering, procurement, and safety design for India’s pioneering green hydrogen municipal bus dispensing depot and 50-bus fleet service facility.',
+      scope: '350-bar hydrogen dispenser systems, 2 MW on-site solar electrolysis unit, cryogenic storage buffer tanks, and comprehensive ATEX explosion safety zoning.',
+      objectives: [
+        'Establish zero-emission public transit infrastructure powered by renewable hydrogen.',
+        'Demonstrate commercial viability of hydrogen fuel cell buses in urban transit.',
+        'Set national benchmark safety protocols for municipal hydrogen storage and dispensing.'
+      ],
+      keyActivities: [
+        'Hazard and Operability (HAZOP) study and CFD gas dispersion modeling.',
+        'Electrical balance of plant design connecting 2 MW rooftop solar array.',
+        'Training 120 technicians on high-pressure gas safety and cryogenic equipment.'
+      ],
+      outcomes: [
+        'Depot successfully commissioned fueling 50 zero-emission fuel cell buses daily.',
+        'Displaced 4,200 metric tons of CO2 emissions in first year of operation.',
+        'Adopted by Ministry of New and Renewable Energy (MNRE) as national model standard.'
+      ],
+      standards: 'ISO 19880-1 Gaseous Hydrogen Fuelling Stations, NFPA 2 Hydrogen Technologies Code, PESO India'
     }
   ]
 };

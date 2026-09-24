@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, Plus, RotateCcw, Check } from 'lucide-react';
+import { Search, Filter, Plus, RotateCcw, Check, ChevronDown } from 'lucide-react';
 import { mockOpportunities, mockOffices } from '../data/mockData';
 import { useOpportunities, useCreateOpportunity } from '../hooks/useApiQueries';
 
@@ -14,34 +14,45 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [expandedFilter, setExpandedFilter] = useState(null);
+  const [activeDropdown, setActiveDropdown] = useState(null);
 
-  const filterDropdownRef = useRef(null);
+  const filterBarRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Close open dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
-        setShowFilters(false);
+      if (filterBarRef.current && !filterBarRef.current.contains(event.target)) {
+        setActiveDropdown(null);
       }
     };
-    if (showFilters) {
+    if (activeDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showFilters]);
+  }, [activeDropdown]);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // Helper to parse multi-select filter values from searchParams
+  const getMultiFilter = (key) => {
+    const all = searchParams.getAll(key);
+    if (all.length > 1) {
+      return all.flatMap((v) => v.split(',').map((s) => s.trim()).filter(Boolean));
+    }
+    const single = searchParams.get(key) || '';
+    if (!single) return [];
+    return single.split(',').map((s) => s.trim()).filter(Boolean);
+  };
+
   // Read URL query parameters
-  const sourceFilter = searchParams.get('source') || '';
-  const sectorFilter = searchParams.get('sector') || '';
-  const locationFilter = searchParams.get('location') || '';
-  const priorityFilter = searchParams.get('priority') || '';
-  const statusFilter = searchParams.get('status') || '';
-  const officeFilter = searchParams.get('office') || '';
+  const sourceFilters = getMultiFilter('source');
+  const sectorFilters = getMultiFilter('sector');
+  const locationFilters = getMultiFilter('location');
+  const priorityFilter = searchParams.get('priority') || ''; // Priority remains SINGLE-SELECT
+  const statusFilters = getMultiFilter('status');
+  const officeFilters = getMultiFilter('office');
   const searchTerm = searchParams.get('search') || searchParams.get('q') || '';
 
   const handleSearchChange = (val) => {
@@ -60,34 +71,72 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
   const handleFilterSelect = (key, val) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      const currentVal = next.get(key) || '';
-      if (currentVal.toLowerCase() === val.toLowerCase()) {
-        next.delete(key);
+      if (key === 'priority') {
+        // Priority is SINGLE-SELECT: selecting another replaces previous; clicking same toggles off
+        const currentVal = next.get('priority') || '';
+        if (currentVal.toLowerCase() === val.toLowerCase()) {
+          next.delete('priority');
+        } else {
+          next.set('priority', val);
+        }
       } else {
-        next.set(key, val);
+        // Multi-select categories: Sources, Sector, Country / Location, Status, Office
+        const existingValues = (next.get(key) || '')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        const existsIndex = existingValues.findIndex(
+          (v) => v.toLowerCase() === val.toLowerCase()
+        );
+
+        let newValues;
+        if (existsIndex >= 0) {
+          newValues = existingValues.filter((_, i) => i !== existsIndex);
+        } else {
+          newValues = [...existingValues, val];
+        }
+
+        if (newValues.length > 0) {
+          next.set(key, newValues.join(','));
+        } else {
+          next.delete(key);
+        }
       }
       return next;
     });
   };
 
   const resetFilters = () => {
-    setSearchParams(new URLSearchParams());
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      ['source', 'sector', 'location', 'priority', 'status', 'office'].forEach((k) => {
+        next.delete(k);
+      });
+      return next;
+    });
   };
 
   // Dynamic Options derived from data
   const sourceOptions = useMemo(() => {
     const set = new Set();
     opportunitiesList.forEach((item) => {
-      if (item.source) set.add(item.source);
+      if (item.source && typeof item.source === 'string' && item.source.trim()) {
+        set.add(item.source.trim());
+      }
     });
+    ['World Bank', 'ADB', 'GeM', 'CPPP', 'UNGM', 'Tenders Karnataka'].forEach((s) => set.add(s));
     return Array.from(set);
   }, [opportunitiesList]);
 
   const sectorOptions = useMemo(() => {
     const set = new Set();
     opportunitiesList.forEach((item) => {
-      if (item.sector) set.add(item.sector);
+      if (item.sector && typeof item.sector === 'string' && item.sector.trim()) {
+        set.add(item.sector.trim());
+      }
     });
+    ['Infrastructure', 'Healthcare', 'Information Technology', 'Water & Sanitation', 'Renewable Energy', 'Education', 'Transport'].forEach((s) => set.add(s));
     return Array.from(set);
   }, [opportunitiesList]);
 
@@ -98,10 +147,11 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
         const primaryLoc = item.location.split(',')[0].trim();
         if (primaryLoc) set.add(primaryLoc);
       }
-      if (item.country) {
-        set.add(item.country);
+      if (item.country && typeof item.country === 'string' && item.country.trim()) {
+        set.add(item.country.trim());
       }
     });
+    ['India', 'Tamil Nadu', 'Karnataka', 'Maharashtra', 'Delhi', 'Gujarat', 'Bangladesh', 'Sri Lanka', 'Vietnam'].forEach((l) => set.add(l));
     return Array.from(set);
   }, [opportunitiesList]);
 
@@ -136,26 +186,26 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
         if (off.name) set.add(off.name);
       });
     }
+    ['Chennai', 'Bangalore', 'Mumbai', 'Delhi', 'Kolkata'].forEach((o) => set.add(o));
     return Array.from(set);
   }, [opportunitiesList]);
 
   const filterCategories = [
-    { id: 'source', label: 'Sources', options: sourceOptions, selected: sourceFilter },
-    { id: 'sector', label: 'Sector', options: sectorOptions, selected: sectorFilter },
-    { id: 'location', label: 'Country / Location', options: locationOptions, selected: locationFilter },
-    { id: 'priority', label: 'Priority', options: priorityOptions, selected: priorityFilter },
-    { id: 'status', label: 'Status', options: statusOptions, selected: statusFilter },
-    { id: 'office', label: 'Office', options: officeOptions, selected: officeFilter }
+    { id: 'source', label: 'Sources', options: sourceOptions, selected: sourceFilters, isMulti: true },
+    { id: 'sector', label: 'Sector', options: sectorOptions, selected: sectorFilters, isMulti: true },
+    { id: 'location', label: 'Country / Location', options: locationOptions, selected: locationFilters, isMulti: true },
+    { id: 'priority', label: 'Priority', options: priorityOptions, selected: priorityFilter ? [priorityFilter] : [], isMulti: false },
+    { id: 'status', label: 'Status', options: statusOptions, selected: statusFilters, isMulti: true },
+    { id: 'office', label: 'Office', options: officeOptions, selected: officeFilters, isMulti: true }
   ];
 
-  const activeFilterCount = [
-    sourceFilter,
-    sectorFilter,
-    locationFilter,
-    priorityFilter,
-    statusFilter,
-    officeFilter
-  ].filter(Boolean).length;
+  const activeFilterCount =
+    sourceFilters.length +
+    sectorFilters.length +
+    locationFilters.length +
+    (priorityFilter ? 1 : 0) +
+    statusFilters.length +
+    officeFilters.length;
 
   const handleAddOpportunity = async (newOpportunity) => {
     await createMutation.mutateAsync(newOpportunity);
@@ -175,40 +225,59 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
       }
     }
 
-    if (sourceFilter && (item.source || '').toLowerCase() !== sourceFilter.toLowerCase()) {
-      return false;
-    }
-
-    if (sectorFilter && (item.sector || '').toLowerCase() !== sectorFilter.toLowerCase()) {
-      return false;
-    }
-
-    if (locationFilter) {
-      const itemLoc = (item.location || '').toLowerCase();
-      const itemCountry = (item.country || '').toLowerCase();
-      const filterLoc = locationFilter.toLowerCase();
-      if (!itemLoc.includes(filterLoc) && !itemCountry.includes(filterLoc)) {
+    // Sources (MULTI-SELECT: match any selected source)
+    if (sourceFilters.length > 0) {
+      const itemSource = (item.source || '').toLowerCase();
+      if (!sourceFilters.some((s) => itemSource === s.toLowerCase())) {
         return false;
       }
     }
 
+    // Sector (MULTI-SELECT: match any selected sector)
+    if (sectorFilters.length > 0) {
+      const itemSector = (item.sector || '').toLowerCase();
+      if (!sectorFilters.some((s) => itemSector === s.toLowerCase())) {
+        return false;
+      }
+    }
+
+    // Country / Location (MULTI-SELECT: match any selected location/country)
+    if (locationFilters.length > 0) {
+      const itemLoc = (item.location || '').toLowerCase();
+      const itemCountry = (item.country || '').toLowerCase();
+      const matches = locationFilters.some((loc) => {
+        const l = loc.toLowerCase();
+        return itemLoc.includes(l) || itemCountry.includes(l);
+      });
+      if (!matches) {
+        return false;
+      }
+    }
+
+    // Priority (SINGLE-SELECT: match exact priority)
     if (priorityFilter && (item.priority || '').toLowerCase() !== priorityFilter.toLowerCase()) {
       return false;
     }
 
-    if (statusFilter && (item.status || '').toLowerCase() !== statusFilter.toLowerCase()) {
-      return false;
+    // Status (MULTI-SELECT: match any selected status)
+    if (statusFilters.length > 0) {
+      const itemStatus = (item.status || '').toLowerCase();
+      if (!statusFilters.some((s) => itemStatus === s.toLowerCase())) {
+        return false;
+      }
     }
 
-    if (officeFilter) {
-      const derivedOffice = item.office || (
+    // Office (MULTI-SELECT: match any selected office)
+    if (officeFilters.length > 0) {
+      const derivedOffice = (item.office || (
         item.location?.includes('Tamil Nadu') ? 'Chennai' :
         item.location?.includes('Karnataka') ? 'Bangalore' :
         item.location?.includes('Maharashtra') ? 'Mumbai' :
         item.location?.includes('Delhi') ? 'Delhi' :
         item.location?.includes('Gujarat') ? 'Kolkata' : ''
-      );
-      if (derivedOffice.toLowerCase() !== officeFilter.toLowerCase()) {
+      )).toLowerCase();
+
+      if (!officeFilters.some((off) => derivedOffice === off.toLowerCase())) {
         return false;
       }
     }
@@ -284,189 +353,55 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
             />
           </div>
 
-          {/* Filter Button & Floating Dropdown Container */}
-          <div ref={filterDropdownRef} style={{ position: 'relative', display: 'inline-flex' }}>
-            {/* Filter Icon Button */}
-            <button
-              type="button"
-              className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
-              style={{
-                height: '36px',
-                width: activeFilterCount > 0 ? 'auto' : '36px',
-                minWidth: '36px',
-                padding: activeFilterCount > 0 ? '0 0.5rem' : '0',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.35rem',
-                borderRadius: 'var(--radius-md, 6px)',
-                flexShrink: 0
-              }}
-              onClick={() => setShowFilters((prev) => !prev)}
-              title="Filter options"
-              aria-label="Filter options"
-              aria-expanded={showFilters}
-            >
-              <Filter size={15} />
-              {activeFilterCount > 0 && (
-                <span style={{ fontSize: '0.75rem', fontWeight: '700', lineHeight: 1 }}>
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-
-            {/* Floating Dropdown Filter Panel */}
-            {showFilters && (
-              <div
-                className="card"
+          {/* Filter Button */}
+          <button
+            type="button"
+            className={`btn ${showFilters || activeFilterCount > 0 ? 'btn-primary' : 'btn-outline'}`}
+            style={{
+              height: '36px',
+              minWidth: '36px',
+              padding: activeFilterCount > 0 ? '0 0.625rem' : '0',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+              borderRadius: 'var(--radius-md, 6px)',
+              flexShrink: 0,
+              cursor: 'pointer'
+            }}
+            onClick={() => {
+              setShowFilters((prev) => {
+                const next = !prev;
+                if (!next) setActiveDropdown(null);
+                return next;
+              });
+            }}
+            title="Filter opportunities"
+            aria-label="Filter opportunities"
+            aria-expanded={showFilters}
+          >
+            <Filter size={15} />
+            {activeFilterCount > 0 && (
+              <span
                 style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 6px)',
-                  right: 0,
-                  zIndex: 1000,
-                  width: '280px',
-                  padding: '0.625rem 0.75rem',
-                  borderRadius: 'var(--radius-md, 8px)',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-card)',
-                  boxShadow: 'var(--shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.2))',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.2rem'
+                  minWidth: '17px',
+                  height: '17px',
+                  padding: '0 4px',
+                  borderRadius: '9999px',
+                  backgroundColor: showFilters || activeFilterCount > 0 ? '#FFFFFF' : 'var(--primary)',
+                  color: showFilters || activeFilterCount > 0 ? 'var(--primary)' : '#FFFFFF',
+                  fontSize: '0.72rem',
+                  fontWeight: '700',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1
                 }}
               >
-                {filterCategories.map((cat, idx) => {
-                  const isExpanded = expandedFilter === cat.id;
-                  const isSelected = Boolean(cat.selected);
-
-                  return (
-                    <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                      {/* Filter Item Row */}
-                      <div
-                        onClick={() => setExpandedFilter(isExpanded ? null : cat.id)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          padding: '0.45rem 0.5rem',
-                          borderRadius: 'var(--radius-sm, 6px)',
-                          cursor: 'pointer',
-                          fontWeight: isSelected ? '600' : '500',
-                          fontSize: '0.875rem',
-                          color: isSelected ? 'var(--primary)' : 'var(--text-main)',
-                          backgroundColor: isExpanded
-                            ? 'var(--bg-subtle)'
-                            : 'transparent',
-                          userSelect: 'none',
-                          transition: 'background-color 0.15s ease'
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span>{cat.label}</span>
-                          {isSelected && (
-                            <span
-                              style={{
-                                fontSize: '0.75rem',
-                                color: 'var(--primary)',
-                                fontWeight: '600'
-                              }}
-                            >
-                              ({cat.selected})
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Reset/Refresh icon inside first row as per reference sketch */}
-                        {idx === 0 ? (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              resetFilters();
-                            }}
-                            title="Reset all filters"
-                            aria-label="Reset all filters"
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              cursor: 'pointer',
-                              padding: '0.2rem',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: activeFilterCount > 0 ? 'var(--primary)' : 'var(--text-muted)',
-                              borderRadius: '4px'
-                            }}
-                          >
-                            <RotateCcw size={14} />
-                          </button>
-                        ) : null}
-                      </div>
-
-                      {/* Expandable Filter Options Box directly below filter item */}
-                      {isExpanded && (
-                        <div
-                          style={{
-                            margin: '0.25rem 0 0.4rem 0',
-                            padding: '0.25rem',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 'var(--radius-sm, 6px)',
-                            backgroundColor: 'var(--bg-subtle)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.15rem',
-                            maxHeight: '170px',
-                            overflowY: 'auto'
-                          }}
-                        >
-                          {cat.options.map((opt) => {
-                            const optSelected =
-                              cat.selected &&
-                              (cat.selected.toLowerCase() === opt.toLowerCase() ||
-                               (cat.id === 'location' && opt.toLowerCase().includes(cat.selected.toLowerCase())));
-
-                            return (
-                              <div
-                                key={opt}
-                                onClick={() => handleFilterSelect(cat.id, opt)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.45rem',
-                                  padding: '0.35rem 0.5rem',
-                                  borderRadius: '4px',
-                                  cursor: 'pointer',
-                                  fontSize: '0.8125rem',
-                                  color: optSelected ? 'var(--primary)' : 'var(--text-main)',
-                                  backgroundColor: optSelected
-                                    ? 'var(--primary-light, rgba(29, 78, 216, 0.08))'
-                                    : 'transparent',
-                                  fontWeight: optSelected ? '600' : '400',
-                                  transition: 'background-color 0.15s ease'
-                                }}
-                              >
-                                <span
-                                  style={{
-                                    width: '14px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                >
-                                  {optSelected ? <Check size={13} color="var(--primary)" /> : null}
-                                </span>
-                                <span>{opt}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                {activeFilterCount}
+              </span>
             )}
-          </div>
+          </button>
 
           {/* Compact / Square + Add Button */}
           <button
@@ -490,6 +425,211 @@ export default function OpportunitiesListView({ onSelectOpportunity, searchVal =
           </button>
         </div>
       </div>
+
+      {/* Horizontal Row-Wise Filter Bar */}
+      {showFilters && (
+        <div
+          ref={filterBarRef}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+            flexWrap: 'wrap',
+            padding: '0.5rem 0.75rem',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-md, 6px)',
+            boxShadow: 'var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05))',
+            width: '100%',
+            boxSizing: 'border-box'
+          }}
+        >
+          {/* Filter Chips */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+            {filterCategories.map((cat) => {
+              const isOpen = activeDropdown === cat.id;
+              const isSelected = Array.isArray(cat.selected) ? cat.selected.length > 0 : Boolean(cat.selected);
+
+              return (
+                <div key={cat.id} style={{ position: 'relative', display: 'inline-block' }}>
+                  {/* Dropdown / Chip Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveDropdown((prev) => (prev === cat.id ? null : cat.id))}
+                    style={{
+                      height: '32px',
+                      padding: '0 0.65rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      borderRadius: 'var(--radius-md, 6px)',
+                      border: isSelected
+                        ? '1px solid var(--primary)'
+                        : isOpen
+                        ? '1px solid var(--primary)'
+                        : '1px solid var(--border-color)',
+                      backgroundColor: isSelected
+                        ? 'var(--primary-light)'
+                        : isOpen
+                        ? 'var(--bg-subtle)'
+                        : 'var(--bg-card)',
+                      color: isSelected ? 'var(--primary)' : 'var(--text-main)',
+                      fontSize: '0.8125rem',
+                      fontWeight: isSelected ? 600 : 500,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.15s ease',
+                      outline: 'none'
+                    }}
+                  >
+                    <span>{cat.label}</span>
+                    {isSelected && (
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          backgroundColor: 'var(--primary)',
+                          color: '#FFFFFF',
+                          padding: '0.05rem 0.35rem',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          maxWidth: '110px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title={Array.isArray(cat.selected) ? cat.selected.join(', ') : cat.selected}
+                      >
+                        {Array.isArray(cat.selected)
+                          ? cat.selected.length === 1
+                            ? cat.selected[0]
+                            : `${cat.selected.length} selected`
+                          : cat.selected}
+                      </span>
+                    )}
+                    <ChevronDown
+                      size={13}
+                      style={{
+                        color: isSelected ? 'var(--primary)' : 'var(--text-muted)',
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease',
+                        flexShrink: 0
+                      }}
+                    />
+                  </button>
+
+                  {/* Dropdown Options Popover */}
+                  {isOpen && (
+                    <div
+                      className="card"
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        zIndex: 1000,
+                        minWidth: '190px',
+                        maxWidth: '280px',
+                        padding: '0.35rem',
+                        borderRadius: 'var(--radius-md, 6px)',
+                        border: '1px solid var(--border-color)',
+                        backgroundColor: 'var(--bg-card)',
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.15rem',
+                        maxHeight: '220px',
+                        overflowY: 'auto'
+                      }}
+                    >
+                      {cat.options.map((opt) => {
+                        const optSelected =
+                          Array.isArray(cat.selected) &&
+                          cat.selected.some((s) => s.toLowerCase() === opt.toLowerCase());
+
+                        return (
+                          <div
+                            key={opt}
+                            onClick={() => handleFilterSelect(cat.id, opt)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.35rem 0.5rem',
+                              borderRadius: 'var(--radius-sm, 4px)',
+                              cursor: 'pointer',
+                              fontSize: '0.8125rem',
+                              color: optSelected ? 'var(--primary)' : 'var(--text-main)',
+                              backgroundColor: optSelected
+                                ? 'var(--primary-light)'
+                                : 'transparent',
+                              fontWeight: optSelected ? 600 : 400,
+                              transition: 'background-color 0.15s ease',
+                              userSelect: 'none'
+                            }}
+                          >
+                            {/* Checkbox UI */}
+                            <div
+                              style={{
+                                width: '15px',
+                                height: '15px',
+                                borderRadius: '3px',
+                                border: optSelected
+                                  ? '1.5px solid var(--primary)'
+                                  : '1.5px solid var(--border-color)',
+                                backgroundColor: optSelected ? 'var(--primary)' : 'var(--bg-card)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0,
+                                transition: 'all 0.15s ease'
+                              }}
+                            >
+                              {optSelected && <Check size={11} strokeWidth={3} color="#FFFFFF" />}
+                            </div>
+
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {opt}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Reset Action */}
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={resetFilters}
+              title="Reset all filters"
+              aria-label="Reset all filters"
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '0.3rem 0.5rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.3rem',
+                color: 'var(--primary)',
+                borderRadius: 'var(--radius-sm, 4px)',
+                fontSize: '0.8125rem',
+                fontWeight: 600,
+                transition: 'all 0.15s ease',
+                flexShrink: 0
+              }}
+            >
+              <RotateCcw size={13} />
+              <span>Reset</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* TanStack Opportunities Data Table */}
       <OpportunityTable

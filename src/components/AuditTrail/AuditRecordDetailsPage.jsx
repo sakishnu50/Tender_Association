@@ -108,7 +108,7 @@ export default function AuditRecordDetailsPage() {
           onClick={() => navigate('/audit')}
           style={{ marginBottom: '1rem' }}
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={15} />
           <span>Back to Audit Trail</span>
         </button>
         <div className={styles.emptyState}>
@@ -127,18 +127,13 @@ export default function AuditRecordDetailsPage() {
 
   return (
     <div className={styles.fullscreenView}>
-      <header className={styles.fullscreenHeader}>
-        <button className={styles.backLink} onClick={() => navigate('/audit')} type="button">
-          <ArrowLeft size={16} />
-          <span>Back to Audit Trail</span>
-        </button>
-
-        <div className={styles.headerRight}>
-          <span className={styles.readOnlyBadge}>Read-only</span>
-        </div>
-      </header>
-
       <div className={styles.fullscreenContent}>
+        <div style={{ marginBottom: '1.25rem' }}>
+          <button className={styles.backLink} onClick={() => navigate('/audit')} type="button">
+            <ArrowLeft size={15} />
+            <span>Back to Audit Trail</span>
+          </button>
+        </div>
         <div className={styles.pageTitleRow}>
           <h2>Audit Record Details</h2>
           <p className={styles.detailSubtitle}>A detailed record of an activity and change recorded in the audit trail.</p>
