@@ -216,28 +216,6 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             const dotColor = isDead ? '#EF4444' : isMeet ? '#F59E0B' : isCut ? '#3B82F6' : 'var(--primary)';
             
             return (
-<<<<<<< HEAD
-              <div
-                key={i}
-                className="calendar-cell-event"
-                style={{
-                  backgroundColor: bgColor,
-                  color: textColor,
-                  border: `1px solid ${borderColor}`,
-                  borderRadius: '4px',
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  width: '100%',
-                  fontSize: '0.7rem',
-                  padding: '0.3rem 0.4rem',
-                  fontWeight: '600',
-                  minWidth: 0
-                }}
-                title={evt.title}
-              >
-                {evt.title}
-=======
               <div key={i} className="calendar-cell-event" style={{
                 fontSize: '0.675rem',
                 padding: '0.2rem 0.35rem',
@@ -254,7 +232,6 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
               }} title={evt.title}>
                 <span className="calendar-event-text">{evt.title}</span>
                 <span className="calendar-event-dot" style={{ backgroundColor: dotColor }} />
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
               </div>
             );
           })}
@@ -279,101 +256,7 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
   };
 
   return (
-<<<<<<< HEAD
-    <div className="page-container" style={{ position: 'relative', overflowX: 'hidden' }}>
-      {headerPortalElement && createPortal(
-        <>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => setIsDrawerOpen(true)}
-            title="View Events"
-            style={{ padding: '0.4rem 0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRadius: 'var(--radius-md)' }}
-          >
-            <CalendarIcon size={18} />
-          </button>
-          
-          <div style={{ position: 'relative' }} ref={filterDropdownRef}>
-            <button
-              onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-              className="btn btn-outline"
-              title="Filter"
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0.4rem 0.6rem', 
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: isFilterDropdownOpen ? 'var(--bg-subtle)' : 'var(--bg-main)',
-                color: 'var(--text-main)',
-                border: '1px solid var(--border-color)',
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                flexShrink: 0
-              }}
-            >
-              <Filter size={18} />
-            </button>
-            
-            {isFilterDropdownOpen && (
-              <div style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '0.5rem',
-                backgroundColor: 'var(--bg-main)',
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                zIndex: 100,
-                minWidth: '150px',
-                padding: '0.4rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.2rem'
-              }}>
-                {['Year', 'Month', 'Week', 'List'].map(v => (
-                  <button
-                    key={v}
-                    onClick={() => {
-                      setView(v);
-                      setIsFilterDropdownOpen(false);
-                    }}
-                    style={{
-                      padding: '0.6rem 1rem',
-                      fontSize: '0.85rem',
-                      fontWeight: '600',
-                      textAlign: 'left',
-                      borderRadius: 'var(--radius-sm)',
-                      backgroundColor: view === v ? 'var(--bg-subtle)' : 'transparent',
-                      color: view === v ? 'var(--primary)' : 'var(--text-main)',
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                    }}
-                    onMouseOver={(e) => {
-                      if (view !== v) {
-                        e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      if (view !== v) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </>,
-        headerPortalElement
-      )}
-
-=======
     <div className="page-container calendar-page-container" style={{ height: 'calc(100vh - 68px)', maxHeight: 'calc(100vh - 68px)', padding: '1rem 1.75rem', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', overflow: 'hidden', gap: 0, position: 'relative' }}>
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
       <style>{`
         .calendar-cell {
           border: 1px solid var(--border-color);
@@ -801,56 +684,6 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
             grid-template-columns: 1fr;
             gap: 0.5rem !important;
           }
-<<<<<<< HEAD
-          .calendar-cell {
-            padding: 0.25rem !important;
-            min-height: 70px !important;
-          }
-          .calendar-cell > div > span {
-            font-size: 0.75rem !important;
-          }
-          .calendar-cell-event {
-            font-size: 0.6rem !important;
-            padding: 0.15rem 0.2rem !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-          }
-          .calendar-header-top {
-            flex-direction: column;
-            align-items: flex-start !important;
-            gap: 0.75rem !important;
-            margin-bottom: 1rem !important;
-          }
-          .calendar-title {
-            font-size: 1.1rem !important;
-          }
-          .calendar-weekdays-grid, .calendar-month-grid {
-            gap: 0.25rem !important;
-          }
-          .calendar-weekdays-grid div {
-            font-size: 0.65rem !important;
-          }
-        }
-      `}</style>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {/* Main Calendar View Area */}
-        <div className="card mobile-compact-card" style={{ flex: 1, minHeight: '500px' }}>
-          <div className="calendar-header-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h3 className="calendar-title" style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', whiteSpace: 'nowrap' }}>{getCalendarTitle()}</h3>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flexWrap: 'nowrap' }}>
-                <button onClick={handlePrev} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)', flexShrink: 0 }}>
-                  <ChevronLeft size={18} />
-                </button>
-                <button onClick={handleToday} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', fontWeight: '700', flexShrink: 0 }}>
-                  Today
-                </button>
-                <button onClick={handleNext} className="btn btn-outline" style={{ padding: '0.4rem', borderRadius: 'var(--radius-md)', flexShrink: 0 }}>
-                  <ChevronRight size={18} />
-=======
         }
       `}</style>
 
@@ -942,41 +775,15 @@ export default function BidCalendarView({ searchVal: propSearchVal, onSelectOppo
                   aria-label="Next period"
                 >
                   <ChevronRight size={17} />
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
                 </button>
               </div>
             </div>
           </div>
 
-<<<<<<< HEAD
-          {view !== 'List' && view !== 'Year' && view !== 'Week' && (
-            <div className="calendar-weekdays-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
-              {weekDays.map(d => <div key={d} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{d}</div>)}
-            </div>
-          )}
-
-          {view === 'Month' && (
-            <div className="calendar-month-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem' }}>
-              {[...Array(firstDayOfMonth)].map((_, i) => (
-                <div key={`blank-${i}`} style={{ minHeight: '90px', backgroundColor: 'var(--bg-subtle)', borderRadius: '8px', opacity: 0.3 }} />
-              ))}
-              {daysInMonth.map(day => {
-                const cellDate = new Date(currentYear, currentMonth, day);
-                return renderCell(cellDate, day);
-              })}
-            </div>
-          )}
-
-          {view === 'Week' && (
-            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', paddingBottom: '0.5rem' }}>
-              <div style={{ minWidth: '700px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.5rem', textTransform: 'uppercase', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
-=======
           {view === 'Month' && (
             <div className="calendar-grid-wrapper">
               <div className="calendar-grid-inner">
                 <div className="calendar-grid-header" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.35rem', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.35rem', flexShrink: 0 }}>
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
                   {weekDays.map(d => <div key={d}>{d}</div>)}
                 </div>
                 <div className="calendar-month-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'repeat(auto-fit, minmax(0, 1fr))', gridAutoRows: '1fr', gap: '0.35rem', flex: 1, minHeight: 0, height: '100%' }}>

@@ -89,138 +89,8 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
   };
 
   return (
-<<<<<<< HEAD
-    <div className="page-container" style={{ padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-      {/* Single Control Row: Heading on Left, Search + Filters on Right */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          gap: '1rem',
-          flexWrap: 'wrap'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(37, 99, 235, 0.12)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--primary, #2563EB)'
-            }}
-          >
-            <TrendingUp size={18} />
-          </div>
-          <h1
-            style={{
-              fontSize: '1.25rem',
-              fontWeight: 700,
-              color: 'var(--text-main, #0F172A)',
-              margin: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.625rem',
-              letterSpacing: '-0.01em',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            Past Project Experience
-          </h1>
-        </div>
-
-        {/* Grouped Right Controls: Search + Sector Filter + Status Filter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', flexShrink: 0 }}>
-          {/* Search Input */}
-          <div style={{ position: 'relative', width: '260px', maxWidth: '100%' }}>
-            <Search
-              size={15}
-              color="var(--text-muted, #64748B)"
-              style={{
-                position: 'absolute',
-                left: '0.75rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                pointerEvents: 'none'
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                height: '36px',
-                padding: '0 0.75rem 0 2.2rem',
-                borderRadius: 'var(--radius-md, 6px)',
-                border: '1px solid var(--border-color, #CBD5E1)',
-                backgroundColor: 'var(--bg-card, #FFFFFF)',
-                color: 'var(--text-main, #0F172A)',
-                fontSize: '0.875rem',
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
-
-          {/* Sector Filter */}
-          <select
-            value={sectorFilter}
-            onChange={(e) => setSectorFilter(e.target.value)}
-            style={{
-              height: '36px',
-              padding: '0 0.75rem',
-              borderRadius: 'var(--radius-md, 6px)',
-              border: '1px solid var(--border-color, #CBD5E1)',
-              backgroundColor: 'var(--bg-card, #FFFFFF)',
-              color: 'var(--text-main, #0F172A)',
-              fontSize: '0.875rem',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="ALL">All Sectors</option>
-            {sectorOptions.map((sec) => (
-              <option key={sec} value={sec}>
-                {sec}
-              </option>
-            ))}
-          </select>
-
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            style={{
-              height: '36px',
-              padding: '0 0.75rem',
-              borderRadius: 'var(--radius-md, 6px)',
-              border: '1px solid var(--border-color, #CBD5E1)',
-              backgroundColor: 'var(--bg-card, #FFFFFF)',
-              color: 'var(--text-main, #0F172A)',
-              fontSize: '0.875rem',
-              outline: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="ALL">All Status</option>
-            <option value="Completed">Completed</option>
-            <option value="Ongoing">Ongoing</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Projects Table Card */}
-=======
     <div className="page-container" style={{ padding: '1rem 1.5rem', gap: '0.875rem', width: '100%', boxSizing: 'border-box' }}>
       {/* Top Header & Controls Row */}
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
       <div
         style={{
           display: 'flex',
@@ -231,20 +101,6 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
           flexWrap: 'wrap'
         }}
       >
-<<<<<<< HEAD
-        <div className="table-container" style={{ border: 'none', overflowX: 'auto' }}>
-          <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color, #E2E8F0)', backgroundColor: 'transparent' }}>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>PROJECT NAME</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>SECTOR</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>COUNTRY</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>YEAR</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>CLIENT / AGENCY</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>STATUS</th>
-                <th style={{ textAlign: 'left', padding: '0.85rem 1.25rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VALUE</th>
-                <th style={{ textAlign: 'center', padding: '0.85rem 1rem', fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted, #64748B)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>VIEW</th>
-=======
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <div
             style={{
@@ -384,7 +240,6 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                 <th style={{ width: '9%', textAlign: 'center', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>STATUS</th>
                 <th style={{ width: '9%', textAlign: 'left', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>VALUE</th>
                 <th style={{ width: '5%', textAlign: 'center', padding: '0.7rem 0.875rem', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>VIEW</th>
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
               </tr>
             </thead>
             <tbody>
@@ -411,18 +266,6 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                       <td style={{ padding: '0.68rem 0.875rem', fontWeight: '600', color: 'var(--text-main)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={project.name}>
                         {project.name}
                       </td>
-<<<<<<< HEAD
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
-                        {project.sector}
-                      </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
-                        {project.country}
-                      </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem' }}>
-                        {project.year}
-                      </td>
-                      <td style={{ padding: '1rem 1rem', color: 'var(--text-muted, #64748B)', fontSize: '0.875rem' }}>
-=======
                       <td style={{ padding: '0.68rem 0.875rem', color: 'var(--text-secondary, #334155)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={project.sector}>
                         {project.sector}
                       </td>
@@ -433,7 +276,6 @@ export default function ClientProfileView({ activeProject, setActiveProject }) {
                         {project.year}
                       </td>
                       <td style={{ padding: '0.68rem 0.875rem', color: 'var(--text-muted)', fontSize: '0.875rem', verticalAlign: 'middle', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={project.client}>
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
                         {project.client}
                       </td>
                       <td style={{ padding: '0.68rem 0.875rem', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>

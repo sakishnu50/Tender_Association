@@ -5,18 +5,6 @@
 
 :root {
   --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-<<<<<<< HEAD
-  
-  /* Brand Navy & Slate Palette */
-  --sidebar-bg: #FFFFFF;
-  --sidebar-hover: #F1F5F9;
-  --sidebar-active: #2563EB;
-  --sidebar-text: #0F172A;
-  --sidebar-text-muted: #64748B;
-  --sidebar-text-active: #FFFFFF;
-  --sidebar-border: #E2E8F0;
-=======
-
   /* Brand SaaS Light Sidebar Palette */
   --sidebar-bg: #FFFFFF;
   --sidebar-hover: #F8FAFC;
@@ -25,7 +13,6 @@
   --sidebar-text-active: #2563EB;
   --sidebar-border: #E2E8F0;
   --sidebar-text-muted: #64748B;
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
 
   /* Main Workspace Colors */
   --bg-main: #F8FAFC;
@@ -107,17 +94,9 @@
   --sidebar-hover: #1E293B;
   --sidebar-active: #2563EB;
   --sidebar-border: #1E293B;
-<<<<<<< HEAD
-  --sidebar-text: #F8FAFC;
-  --sidebar-text-muted: #94A3B8;
-  --sidebar-text-active: #FFFFFF;
-=======
-  --sidebar-hover: #1E293B;
-  --sidebar-active: #2563EB;
   --sidebar-text: #CBD5E1;
   --sidebar-text-active: #FFFFFF;
   --sidebar-text-muted: #94A3B8;
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
 
   --primary: #3B82F6;
   --primary-hover: #2563EB;
@@ -284,13 +263,8 @@ body {
 .sidebar-brand-title {
   font-size: 0.825rem;
   font-weight: 700;
-<<<<<<< HEAD
-  letter-spacing: -0.01em;
-  color: var(--text-main);
-=======
   letter-spacing: 0.03em;
-  color: var(--sidebar-brand-title);
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
+  color: var(--sidebar-brand-title, var(--text-main));
   line-height: 1.2;
   text-transform: uppercase;
 }
@@ -346,23 +320,16 @@ body {
 }
 
 .nav-item.active {
-<<<<<<< HEAD
-  background-color: var(--primary);
-=======
   background-color: var(--sidebar-active);
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
   color: var(--sidebar-text-active);
   font-weight: 600;
 }
 
-<<<<<<< HEAD
-=======
 .nav-item .nav-icon {
   color: #64748B;
   transition: color 0.15s;
 }
 
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
 .nav-item.active .nav-icon {
   color: var(--sidebar-text-active);
 }
@@ -378,13 +345,8 @@ body {
   font-weight: 600;
   padding: 0.15rem 0.55rem;
   border-radius: 9999px;
-<<<<<<< HEAD
-  background-color: var(--bg-subtle);
-  color: var(--text-secondary);
-=======
   background-color: #EFF6FF;
   color: #2563EB;
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
 }
 
 .nav-badge.urgent {
@@ -487,39 +449,12 @@ body {
   color: #FFFFFF;
 }
 
-<<<<<<< HEAD
 .sidebar-bottom-actions {
   padding: 0.75rem 0.5rem;
   border-top: 1px solid var(--sidebar-border);
   margin-top: auto;
 }
 
-.sidebar-logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0.625rem 0.875rem;
-  border-radius: var(--radius-md);
-  color: var(--sidebar-text);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.15s ease;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-}
-
-.sidebar-logout-btn .nav-icon {
-  color: inherit;
-}
-
-.sidebar-logout-btn:hover {
-  background-color: var(--sidebar-hover);
-  color: var(--danger);
-=======
 [data-theme="dark"] .nav-item:hover .nav-icon,
 .dark .nav-item:hover .nav-icon {
   color: #FFFFFF;
@@ -588,7 +523,6 @@ body {
 [data-theme="dark"] .sidebar-brand-title,
 .dark .sidebar-brand-title {
   color: #F8FAFC;
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
 }
 
 /* Main Area */
@@ -693,11 +627,7 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-<<<<<<< HEAD
-  gap: 0.75rem;
-=======
   gap: 1rem;
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
   flex-shrink: 0;
 }
 
@@ -2212,7 +2142,6 @@ textarea {
   }
 }
 
-<<<<<<< HEAD
 /* ─── Mobile Compact Calendar Refinements ─── */
 @media (max-width: 768px) {
   .mobile-compact-card {
@@ -2247,7 +2176,6 @@ textarea {
   }
 }
 
-=======
 @media (min-width: 641px) {
   .header-notifications-menu {
     position: absolute !important;
@@ -2318,4 +2246,3 @@ textarea {
     max-width: 100%;
   }
 }
->>>>>>> a278862d8b3549b848b1ecd09d0aaf91448e4c2c
